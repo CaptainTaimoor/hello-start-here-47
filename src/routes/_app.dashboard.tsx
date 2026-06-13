@@ -9,6 +9,7 @@ import {
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { motion } from "motion/react";
+import { NumberTicker } from "@/components/magic/NumberTicker";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -142,7 +143,7 @@ function DashboardPage() {
           </div>
         </div>
         <div className="relative z-10">
-          <h1 className="font-serif text-5xl md:text-7xl font-normal text-white leading-[1.02] tracking-tight">
+          <h1 className="font-serif text-6xl md:text-8xl font-normal text-white leading-[0.92] tracking-[-0.03em]">
             Welcome back, <span className="italic text-primary">{firstName}.</span>
           </h1>
           <p className="mt-4 max-w-md text-base md:text-lg text-white/50 font-light leading-relaxed">
@@ -224,7 +225,9 @@ function DashboardPage() {
                 </span>
               )}
             </div>
-            <p className="text-4xl font-light text-white tracking-tight mb-1">{s.value}</p>
+            <p className="text-4xl md:text-5xl font-light text-white tracking-[-0.02em] mb-1 tabular-nums">
+              <NumberTicker value={s.value} />
+            </p>
             <p className="text-[11px] text-white/40 uppercase tracking-[0.18em] font-semibold">{s.label}</p>
           </motion.div>
         );
@@ -253,8 +256,24 @@ function DashboardPage() {
                 <stop offset="100%" stopColor="oklch(0.78 0.17 205)" stopOpacity={0} />
               </linearGradient>
             </defs>
-            <path d={chartArea} fill="url(#chartGradient)" />
-            <path d={chartPath} fill="none" stroke="oklch(0.78 0.17 205)" strokeWidth={2.5} strokeLinecap="round" strokeLinejoin="round" />
+            <motion.path
+              d={chartArea}
+              fill="url(#chartGradient)"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ duration: 1.2, delay: 0.6 }}
+            />
+            <motion.path
+              d={chartPath}
+              fill="none"
+              stroke="oklch(0.78 0.17 205)"
+              strokeWidth={2.5}
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              initial={{ pathLength: 0 }}
+              animate={{ pathLength: 1 }}
+              transition={{ duration: 1.8, ease: [0.16, 1, 0.3, 1], delay: 0.3 }}
+            />
           </svg>
           <div className="flex justify-between mt-4 text-[10px] font-bold text-white/20 uppercase tracking-widest">
             {views.filter((_, i) => i % Math.ceil(views.length / 5) === 0).map((v) => (
