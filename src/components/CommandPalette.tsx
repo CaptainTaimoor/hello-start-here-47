@@ -10,6 +10,7 @@ import {
   CommandSeparator,
 } from "@/components/ui/command";
 import { useApp } from "@/lib/app-store";
+import { click } from "@/lib/sound";
 import {
   LayoutDashboard,
   FolderKanban,
@@ -42,7 +43,10 @@ export function CommandPalette() {
     const fn = (e: KeyboardEvent) => {
       if ((e.key === "k" || e.key === "K") && (e.metaKey || e.ctrlKey)) {
         e.preventDefault();
-        setOpen((o) => !o);
+        setOpen((o) => {
+          click("soft");
+          return !o;
+        });
       }
     };
     window.addEventListener("keydown", fn);
