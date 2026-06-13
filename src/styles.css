@@ -157,11 +157,14 @@
 
   /* Premium ambient backdrop in dark mode */
   html.dark body {
-    background:
-      radial-gradient(1200px 600px at 80% -10%, oklch(0.3 0.12 210 / 0.35), transparent 60%),
-      radial-gradient(900px 500px at -10% 10%, oklch(0.28 0.1 250 / 0.25), transparent 60%),
-      var(--color-background);
-    background-attachment: fixed;
+    background: oklch(0.10 0.02 240);
+  }
+
+  /* Tabular numerals on KPIs / metric numbers */
+  .tabular-nums,
+  [data-kpi] {
+    font-variant-numeric: tabular-nums;
+    font-feature-settings: "tnum", "ss01";
   }
 }
 
@@ -227,6 +230,24 @@
   50% { box-shadow: 0 0 40px 8px oklch(0.82 0.16 205 / 0); }
 }
 
+/* === Aurora drift keyframes (used by AuroraBackground) === */
+@keyframes aurora-drift-a {
+  0%, 100% { transform: translate3d(0, 0, 0) scale(1); }
+  50%      { transform: translate3d(8vw, 6vh, 0) scale(1.15); }
+}
+@keyframes aurora-drift-b {
+  0%, 100% { transform: translate3d(0, 0, 0) scale(1.05); }
+  50%      { transform: translate3d(-10vw, 8vh, 0) scale(1.2); }
+}
+@keyframes aurora-drift-c {
+  0%, 100% { transform: translate3d(0, 0, 0) scale(1); }
+  50%      { transform: translate3d(6vw, -10vh, 0) scale(1.18); }
+}
+@keyframes aurora-drift-d {
+  0%, 100% { transform: translate3d(0, 0, 0) scale(1.1); }
+  50%      { transform: translate3d(-6vw, -4vh, 0) scale(1.25); }
+}
+
 @utility aurora-text {
   background: linear-gradient(120deg, oklch(0.92 0.12 200), oklch(0.78 0.18 220) 30%, oklch(0.65 0.22 280) 60%, oklch(0.85 0.18 200) 100%);
   background-size: 300% 300%;
@@ -257,32 +278,69 @@
   position: relative;
   overflow: hidden;
   border-radius: var(--radius-3xl);
-  border: 1px solid color-mix(in oklab, white 6%, transparent);
+  border: 1px solid color-mix(in oklab, white 8%, transparent);
   background:
-    linear-gradient(180deg, color-mix(in oklab, white 3%, transparent), transparent 60%),
-    color-mix(in oklab, var(--card) 92%, transparent);
+    linear-gradient(180deg, color-mix(in oklab, white 5%, transparent), transparent 55%),
+    color-mix(in oklab, var(--card) 55%, transparent);
+  backdrop-filter: blur(24px) saturate(180%);
   padding: 1.5rem;
   transition: border-color 0.5s ease, transform 0.5s ease, box-shadow 0.5s ease;
   box-shadow:
-    0 1px 0 color-mix(in oklab, white 8%, transparent) inset,
-    0 20px 50px -30px rgb(0 0 0 / 0.55);
+    0 1px 0 color-mix(in oklab, white 10%, transparent) inset,
+    0 0 0 1px color-mix(in oklab, white 3%, transparent) inset,
+    0 2px 4px rgb(0 0 0 / 0.2),
+    0 24px 60px -20px rgb(0 0 0 / 0.6);
 
   &::before {
     content: "";
     position: absolute;
     inset: 0;
     pointer-events: none;
-    background: radial-gradient(600px circle at var(--mx, 80%) var(--my, 0%), oklch(0.82 0.16 205 / 0.10), transparent 55%);
-    opacity: 0;
+    background:
+      radial-gradient(600px circle at 100% 0%, oklch(0.82 0.16 205 / 0.14), transparent 55%),
+      radial-gradient(500px circle at 0% 100%, oklch(0.55 0.22 285 / 0.12), transparent 60%);
+    opacity: 0.7;
     transition: opacity 0.6s ease;
+  }
+
+  /* top-edge specular highlight */
+  &::after {
+    content: "";
+    position: absolute;
+    inset: 0 0 auto 0;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, color-mix(in oklab, white 40%, transparent), transparent);
+    pointer-events: none;
   }
 
   &:hover {
     border-color: color-mix(in oklab, var(--primary) 35%, transparent);
     transform: translateY(-2px);
+    box-shadow:
+      0 1px 0 color-mix(in oklab, white 14%, transparent) inset,
+      0 0 0 1px color-mix(in oklab, var(--primary) 20%, transparent) inset,
+      0 4px 8px rgb(0 0 0 / 0.25),
+      0 32px 80px -20px rgb(0 0 0 / 0.7),
+      0 0 60px -10px color-mix(in oklab, var(--primary) 35%, transparent);
   }
 
   &:hover::before { opacity: 1; }
+}
+
+/* Glass chrome (sidebar, header) */
+@utility glass-chrome {
+  background: color-mix(in oklab, var(--background) 35%, transparent);
+  backdrop-filter: blur(28px) saturate(180%);
+  border-color: color-mix(in oklab, white 8%, transparent);
+}
+
+/* Eyebrow label */
+@utility eyebrow {
+  font-size: 10px;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  font-weight: 500;
+  color: color-mix(in oklab, var(--muted-foreground) 80%, transparent);
 }
 
 @utility bento-grid {
