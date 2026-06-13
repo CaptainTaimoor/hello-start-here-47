@@ -235,3 +235,87 @@
   background-clip: text;
   color: transparent;
 }
+
+/* === Bento Editorial Dark — global primitives === */
+
+@keyframes bento-rise {
+  0% { opacity: 0; transform: translateY(16px); }
+  100% { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes bento-fade {
+  0% { opacity: 0; }
+  100% { opacity: 1; }
+}
+
+@keyframes sheen {
+  0% { transform: translateX(-120%) skewX(-12deg); }
+  100% { transform: translateX(220%) skewX(-12deg); }
+}
+
+@utility tile {
+  position: relative;
+  overflow: hidden;
+  border-radius: var(--radius-3xl);
+  border: 1px solid color-mix(in oklab, white 6%, transparent);
+  background:
+    linear-gradient(180deg, color-mix(in oklab, white 3%, transparent), transparent 60%),
+    color-mix(in oklab, var(--card) 92%, transparent);
+  padding: 1.5rem;
+  transition: border-color 0.5s ease, transform 0.5s ease, box-shadow 0.5s ease;
+  box-shadow:
+    0 1px 0 color-mix(in oklab, white 8%, transparent) inset,
+    0 20px 50px -30px rgb(0 0 0 / 0.55);
+
+  &::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    background: radial-gradient(600px circle at var(--mx, 80%) var(--my, 0%), oklch(0.82 0.16 205 / 0.10), transparent 55%);
+    opacity: 0;
+    transition: opacity 0.6s ease;
+  }
+
+  &:hover {
+    border-color: color-mix(in oklab, var(--primary) 35%, transparent);
+    transform: translateY(-2px);
+  }
+
+  &:hover::before { opacity: 1; }
+}
+
+@utility bento-grid {
+  display: grid;
+  grid-template-columns: repeat(12, minmax(0, 1fr));
+  gap: 1.25rem;
+}
+
+@utility page-rise {
+  animation: bento-rise 0.6s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+@utility gradient-border {
+  position: relative;
+
+  &::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+    padding: 1px;
+    background: linear-gradient(135deg, oklch(0.82 0.16 205 / 0.55), transparent 40%, oklch(0.65 0.22 280 / 0.5));
+    -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+            mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+    -webkit-mask-composite: xor;
+            mask-composite: exclude;
+    pointer-events: none;
+  }
+}
+
+@utility serif-display {
+  font-family: var(--font-serif);
+  font-weight: 400;
+  letter-spacing: -0.025em;
+  line-height: 1.02;
+}
