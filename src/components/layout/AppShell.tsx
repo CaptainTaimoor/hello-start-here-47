@@ -5,7 +5,6 @@ import { AppHeader } from "./AppHeader";
 import { useApp } from "@/lib/app-store";
 import { Toaster } from "@/components/ui/sonner";
 import { motion, AnimatePresence } from "motion/react";
-import { AuroraBackground } from "@/components/magic/AuroraBackground";
 import { CommandPalette } from "@/components/CommandPalette";
 
 export function AppShell({ children }: { children?: ReactNode }) {
@@ -23,7 +22,6 @@ export function AppShell({ children }: { children?: ReactNode }) {
 
   return (
     <div className="flex min-h-screen w-full text-foreground">
-      <AuroraBackground />
       <CommandPalette />
       <AppSidebar />
       <div className="flex flex-1 flex-col min-w-0">
