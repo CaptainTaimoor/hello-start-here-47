@@ -1,11 +1,13 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { useMemo } from "react";
+import { useEffect, useMemo, useState } from "react";
 import {
   FileSpreadsheet,
   FolderKanban,
   ListChecks,
   Settings2,
   Users,
+  Sparkles,
+  ArrowUpRight,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { motion } from "motion/react";
@@ -44,6 +46,15 @@ const CARDS = [
 
 function DashboardPage() {
   const { user, dashboardCards, toggleCard, notifications, channels, sheets } = useApp();
+
+  // === Live ticker: gently nudges a "watching" count every 8s for that real-product feel
+  const [watching, setWatching] = useState(() => 3 + Math.floor(Math.random() * 4));
+  useEffect(() => {
+    const id = setInterval(() => {
+      setWatching((v) => Math.max(2, v + (Math.random() > 0.5 ? 1 : -1)));
+    }, 8000);
+    return () => clearInterval(id);
+  }, []);
 
   const role = user?.role ?? "Viewer";
 
@@ -136,12 +147,16 @@ function DashboardPage() {
       >
         <div className="pointer-events-none absolute inset-0 [background:radial-gradient(circle_at_top_right,oklch(0.78_0.17_205/0.12),transparent_55%)]" />
         <div className="absolute top-6 right-6 z-10">
-          <div className="flex items-center gap-2 px-3 py-1 bg-white/5 border border-white/10 rounded-full backdrop-blur-md">
+          <div className="flex items-center gap-3 px-3 py-1 bg-white/5 border border-white/10 rounded-full backdrop-blur-md">
             <span className="relative flex size-1.5">
               <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-primary opacity-60" />
               <span className="relative inline-flex size-1.5 rounded-full bg-primary" />
             </span>
             <span className="text-[10px] uppercase tracking-[0.18em] font-semibold text-white/70">Operational</span>
+            <span className="w-px h-3 bg-white/10" />
+            <span className="text-[10px] tracking-[0.14em] font-medium text-white/50 tabular-nums">
+              {watching} watching
+            </span>
           </div>
         </div>
         <div className="relative z-10">
@@ -432,6 +447,79 @@ function DashboardPage() {
           </div>
         </motion.div>
       )}
+
+      {/* SPOTLIGHT — second fold, 16:9 editorial card, breaks the grid rhythm */}
+      <motion.div
+        variants={{ hidden: { opacity: 0, y: 24 }, show: { opacity: 1, y: 0, transition: { duration: 0.8, ease: [0.16, 1, 0.3, 1] } } }}
+        className="md:col-span-12 relative overflow-hidden rounded-[28px] border border-white/[0.06] aspect-[16/7] min-h-[280px]"
+        style={{
+          background:
+            "radial-gradient(800px circle at 20% 30%, oklch(0.78 0.17 205 / 0.28), transparent 55%), radial-gradient(700px circle at 85% 80%, oklch(0.55 0.22 285 / 0.32), transparent 60%), linear-gradient(180deg, oklch(0.22 0.05 240), oklch(0.14 0.03 240))",
+        }}
+      >
+        {/* Floating orbs */}
+        <div className="absolute inset-0 pointer-events-none">
+          <div className="absolute top-[15%] left-[55%] size-40 rounded-full bg-primary/20 blur-3xl animate-pulse" />
+          <div className="absolute bottom-[10%] right-[20%] size-56 rounded-full bg-purple-500/15 blur-3xl" style={{ animation: "float-y 6s ease-in-out infinite" }} />
+        </div>
+        {/* Grain overlay */}
+        <div
+          aria-hidden
+          className="absolute inset-0 opacity-[0.04] mix-blend-overlay pointer-events-none"
+          style={{ backgroundImage: "url(\"data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E\")" }}
+        />
+        <div className="relative h-full grid grid-cols-1 md:grid-cols-12 gap-6 p-8 md:p-12">
+          <div className="md:col-span-7 flex flex-col justify-between">
+            <div className="flex items-center gap-2">
+              <span className="grid place-items-center size-8 rounded-xl bg-white/10 backdrop-blur-md text-primary">
+                <Sparkles className="size-4" />
+              </span>
+              <span className="eyebrow text-white/60">Aurora · in beta</span>
+            </div>
+            <div className="max-w-xl">
+              <h2 className="font-serif text-4xl md:text-6xl font-normal text-white leading-[0.95] tracking-[-0.025em]">
+                Ask anything.<br />
+                <span className="italic text-primary/90">Aurora answers in your data.</span>
+              </h2>
+              <p className="mt-4 text-sm md:text-base text-white/50 max-w-md leading-relaxed">
+                The signature moment: hit <kbd className="text-[10px] px-1.5 py-0.5 rounded border border-white/15 bg-white/[0.06]">⌘ .</kbd> from anywhere and Aurora opens. She knows your channels, sheets, and team — so you can stop hunting and start shipping.
+              </p>
+              <div className="mt-6 flex gap-3">
+                <button
+                  onClick={() => {
+                    const ev = new KeyboardEvent("keydown", { key: ".", metaKey: true });
+                    window.dispatchEvent(ev);
+                  }}
+                  className="inline-flex items-center gap-2 rounded-xl bg-primary text-primary-foreground px-4 py-2 text-sm font-medium hover:opacity-90 transition"
+                >
+                  Open Aurora
+                  <ArrowUpRight className="size-4" />
+                </button>
+                <Link to="/settings" className="inline-flex items-center gap-2 rounded-xl bg-white/5 border border-white/10 text-white/80 px-4 py-2 text-sm font-medium hover:bg-white/10 transition">
+                  Configure
+                </Link>
+              </div>
+            </div>
+          </div>
+          <div className="md:col-span-5 hidden md:flex items-center justify-center">
+            {/* Decorative aurora hexagon */}
+            <svg viewBox="0 0 200 200" className="w-full max-w-[280px] drop-shadow-[0_20px_60px_rgba(99,102,241,0.4)]">
+              <defs>
+                <linearGradient id="sp-g" x1="0" y1="0" x2="1" y2="1">
+                  <stop offset="0%" stopColor="oklch(0.85 0.16 205)" />
+                  <stop offset="60%" stopColor="oklch(0.7 0.2 240)" />
+                  <stop offset="100%" stopColor="oklch(0.55 0.22 285)" />
+                </linearGradient>
+              </defs>
+              <path d="M100 14 L172 56 L172 144 L100 186 L28 144 L28 56 Z" fill="none" stroke="url(#sp-g)" strokeWidth="1.5" opacity="0.85" />
+              <path d="M100 34 L154 66 L154 134 L100 166 L46 134 L46 66 Z" fill="none" stroke="url(#sp-g)" strokeWidth="1" opacity="0.5" />
+              <path d="M100 54 L138 76 L138 124 L100 146 L62 124 L62 76 Z" fill="none" stroke="url(#sp-g)" strokeWidth="0.8" opacity="0.3" />
+              <circle cx="100" cy="100" r="6" fill="url(#sp-g)" />
+              <circle cx="100" cy="100" r="14" fill="none" stroke="url(#sp-g)" strokeWidth="0.6" opacity="0.5" />
+            </svg>
+          </div>
+        </div>
+      </motion.div>
     </motion.div>
   );
 }
