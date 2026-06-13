@@ -30,7 +30,7 @@ export function AppSidebar() {
   return (
     <aside
       className={cn(
-        "hidden lg:flex flex-col border-r border-sidebar-border bg-sidebar/80 backdrop-blur-xl transition-all duration-300 sticky top-0 h-screen",
+        "hidden lg:flex flex-col border-r border-white/[0.06] bg-sidebar/40 backdrop-blur-2xl backdrop-saturate-150 transition-all duration-300 sticky top-0 h-screen shadow-[1px_0_0_0_rgb(255_255_255/0.04)_inset]",
         sidebarOpen ? "w-64" : "w-16",
       )}
     >
