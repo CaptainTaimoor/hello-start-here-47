@@ -26,7 +26,6 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { AnimatedGridPattern } from "@/components/magic/AnimatedGridPattern";
 import { BorderBeam } from "@/components/magic/BorderBeam";
-import { Meteors } from "@/components/magic/Meteors";
 import { motion } from "motion/react";
 import {
   DropdownMenu,
@@ -91,7 +90,6 @@ function DashboardPage() {
           duration={3}
           className="[mask-image:radial-gradient(600px_circle_at_center,white,transparent)] text-primary"
         />
-        <Meteors number={14} />
         <div className="pointer-events-none absolute inset-0 [background:radial-gradient(800px_300px_at_85%_-20%,oklch(0.78_0.17_205/0.4),transparent_60%),radial-gradient(500px_300px_at_-10%_120%,oklch(0.6_0.18_250/0.28),transparent_60%)]" />
         <BorderBeam size={300} duration={10} />
         <div className="relative flex flex-wrap items-end justify-between gap-6">
