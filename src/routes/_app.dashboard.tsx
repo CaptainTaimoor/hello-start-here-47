@@ -21,7 +21,6 @@ import {
   Tooltip,
   CartesianGrid,
 } from "recharts";
-import { PageHeader } from "@/components/common/PageHeader";
 import { StatCard } from "@/components/common/StatCard";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
