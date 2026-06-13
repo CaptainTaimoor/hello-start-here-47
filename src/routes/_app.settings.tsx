@@ -83,11 +83,6 @@ function SettingsPage() {
             </CardContent>
           </Card>
         </TabsContent>
-              </div>
-              <Switch checked={theme === "dark"} onCheckedChange={toggleTheme}/>
-            </CardContent>
-          </Card>
-        </TabsContent>
 
         <TabsContent value="notif" className="mt-4">
           <Card>
