@@ -55,7 +55,7 @@ interface AppStore {
 
 const Ctx = createContext<AppStore | null>(null);
 
-const LS_KEY = "orvion.state.v1";
+const LS_KEY = "orvion.state.v2";
 
 function readPersisted() {
   if (typeof window === "undefined") return null;
