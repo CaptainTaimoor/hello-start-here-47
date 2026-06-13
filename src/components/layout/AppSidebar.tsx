@@ -7,8 +7,8 @@ import {
   Shield,
   Bell,
   Settings,
-  Sparkles,
 } from "lucide-react";
+import orvionLogo from "@/assets/orvion-logo.png";
 import { useApp } from "@/lib/app-store";
 import { cn } from "@/lib/utils";
 
@@ -34,14 +34,12 @@ export function AppSidebar() {
         sidebarOpen ? "w-64" : "w-16",
       )}
     >
-      <div className="flex items-center gap-2 h-16 px-4 border-b border-border">
-        <div className="size-9 rounded-lg bg-gradient-to-br from-primary to-primary/70 grid place-items-center text-primary-foreground">
-          <Sparkles className="size-5" />
-        </div>
-        {sidebarOpen && (
-          <div className="min-w-0">
-            <div className="text-sm font-bold tracking-tight">Orvion Media</div>
-            <div className="text-[11px] text-muted-foreground">Control Panel</div>
+      <div className="flex items-center gap-2 h-16 px-4 border-b border-sidebar-border">
+        {sidebarOpen ? (
+          <img src={orvionLogo} alt="Orvion Media" className="h-7 w-auto" />
+        ) : (
+          <div className="size-9 rounded-lg bg-primary/15 grid place-items-center text-primary font-bold">
+            O
           </div>
         )}
       </div>
