@@ -24,6 +24,10 @@ import {
 import { StatCard } from "@/components/common/StatCard";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
+import { AnimatedGridPattern } from "@/components/magic/AnimatedGridPattern";
+import { BorderBeam } from "@/components/magic/BorderBeam";
+import { Meteors } from "@/components/magic/Meteors";
+import { motion } from "motion/react";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -75,23 +79,59 @@ function DashboardPage() {
 
   return (
     <div>
-      <section className="relative mb-8 overflow-hidden rounded-3xl border border-border/60 bg-gradient-to-br from-primary/15 via-card/60 to-card/40 p-8 md:p-10">
-        <div className="pointer-events-none absolute inset-0 [background:radial-gradient(800px_300px_at_85%_-20%,oklch(0.78_0.17_205/0.35),transparent_60%),radial-gradient(500px_300px_at_-10%_120%,oklch(0.6_0.18_250/0.25),transparent_60%)]" />
-        <div className="pointer-events-none absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-primary/40 to-transparent" />
+      <motion.section
+        initial={{ opacity: 0, y: 24 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
+        className="relative mb-8 overflow-hidden rounded-3xl border border-border/60 bg-gradient-to-br from-primary/15 via-card/60 to-card/40 p-8 md:p-12"
+      >
+        <AnimatedGridPattern
+          numSquares={28}
+          maxOpacity={0.08}
+          duration={3}
+          className="[mask-image:radial-gradient(600px_circle_at_center,white,transparent)] text-primary"
+        />
+        <Meteors number={14} />
+        <div className="pointer-events-none absolute inset-0 [background:radial-gradient(800px_300px_at_85%_-20%,oklch(0.78_0.17_205/0.4),transparent_60%),radial-gradient(500px_300px_at_-10%_120%,oklch(0.6_0.18_250/0.28),transparent_60%)]" />
+        <BorderBeam size={300} duration={10} />
         <div className="relative flex flex-wrap items-end justify-between gap-6">
           <div className="min-w-0">
-            <div className="inline-flex items-center gap-2 rounded-full border border-border/60 bg-background/40 px-3 py-1 text-[11px] font-medium text-muted-foreground backdrop-blur">
-              <span className="size-1.5 rounded-full bg-emerald-400 shadow-[0_0_8px_rgb(74_222_128/0.8)]" />
+            <motion.div
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.2, duration: 0.6 }}
+              className="inline-flex items-center gap-2 rounded-full border border-border/60 bg-background/40 px-3 py-1 text-[11px] font-medium text-muted-foreground backdrop-blur"
+            >
+              <span className="relative flex size-1.5">
+                <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-emerald-400 opacity-75" />
+                <span className="relative inline-flex size-1.5 rounded-full bg-emerald-400" />
+              </span>
               All systems operational
-            </div>
-            <h1 className="mt-4 text-4xl md:text-5xl font-semibold tracking-tight text-gradient">
-              Welcome back, {user?.name?.split(" ")[0] ?? "there"}.
-            </h1>
-            <p className="mt-3 max-w-xl text-sm md:text-base text-muted-foreground leading-relaxed">
+            </motion.div>
+            <motion.h1
+              initial={{ opacity: 0, y: 16 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.3, duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
+              className="mt-4 text-4xl md:text-6xl font-semibold tracking-tight leading-[1.05]"
+            >
+              Welcome back,{" "}
+              <span className="aurora-text">{user?.name?.split(" ")[0] ?? "there"}.</span>
+            </motion.h1>
+            <motion.p
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.45, duration: 0.6 }}
+              className="mt-4 max-w-xl text-sm md:text-base text-muted-foreground leading-relaxed"
+            >
               You're signed in as <span className="text-foreground font-medium">{role}</span>. Here's everything happening across Orvion Media today.
-            </p>
+            </motion.p>
           </div>
-          <div className="flex items-center gap-2">
+          <motion.div
+            initial={{ opacity: 0, scale: 0.92 }}
+            animate={{ opacity: 1, scale: 1 }}
+            transition={{ delay: 0.5, duration: 0.5 }}
+            className="flex items-center gap-2"
+          >
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <Button variant="outline" size="sm" className="backdrop-blur bg-background/40 border-border/60">
@@ -112,24 +152,46 @@ function DashboardPage() {
               ))}
             </DropdownMenuContent>
           </DropdownMenu>
-          </div>
+          </motion.div>
         </div>
-      </section>
+      </motion.section>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-4">
-        {dashboardCards.projects && (
-          <StatCard label="Assigned projects" value={1} delta="+1 this month" icon={FolderKanban} />
-        )}
-        {dashboardCards.team && (
-          <StatCard label="Team members" value={channels.reduce((s, c) => s + c.team.length, 0)} icon={Users} />
-        )}
-        {dashboardCards.tasks && (
-          <StatCard label="Pending tasks" value={12} delta="3 due today" icon={ListChecks} />
-        )}
-        {dashboardCards.sheets && (
-          <StatCard label="Pending sheet rows" value={totalRows} icon={FileSpreadsheet} />
-        )}
-      </div>
+      <motion.div
+        initial="hidden"
+        animate="show"
+        variants={{
+          hidden: {},
+          show: { transition: { staggerChildren: 0.08, delayChildren: 0.4 } },
+        }}
+        className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-4"
+      >
+        {[
+          dashboardCards.projects && (
+            <StatCard key="p" label="Assigned projects" value={1} delta="+1 this month" icon={FolderKanban} />
+          ),
+          dashboardCards.team && (
+            <StatCard key="t" label="Team members" value={channels.reduce((s, c) => s + c.team.length, 0)} icon={Users} />
+          ),
+          dashboardCards.tasks && (
+            <StatCard key="ts" label="Pending tasks" value={12} delta="3 due today" icon={ListChecks} />
+          ),
+          dashboardCards.sheets && (
+            <StatCard key="sh" label="Pending sheet rows" value={totalRows} icon={FileSpreadsheet} />
+          ),
+        ]
+          .filter(Boolean)
+          .map((card, i) => (
+            <motion.div
+              key={i}
+              variants={{
+                hidden: { opacity: 0, y: 24 },
+                show: { opacity: 1, y: 0, transition: { duration: 0.6, ease: [0.16, 1, 0.3, 1] } },
+              }}
+            >
+              {card}
+            </motion.div>
+          ))}
+      </motion.div>
 
       <div className="mt-6 grid grid-cols-1 xl:grid-cols-3 gap-4">
         <Card className="xl:col-span-2">
