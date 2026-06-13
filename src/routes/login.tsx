@@ -35,9 +35,9 @@ function LoginPage() {
   const [role, setRole] = useState<Role>("Super Admin");
 
   return (
-    <div className="min-h-screen grid lg:grid-cols-2 bg-background text-foreground">
+    <div className="min-h-screen flex flex-col lg:flex-row bg-background text-foreground">
       <Toaster />
-      <div className="hidden lg:flex relative overflow-hidden bg-gradient-to-br from-primary/90 via-primary to-primary/70 text-primary-foreground p-12 flex-col justify-between">
+      <div className="hidden lg:flex lg:w-1/2 relative overflow-hidden bg-gradient-to-br from-primary/90 via-primary to-primary/70 text-primary-foreground p-12 flex-col justify-between">
         <div className="flex items-center gap-2">
           <div className="size-10 rounded-xl bg-primary-foreground/15 grid place-items-center backdrop-blur">
             <Sparkles className="size-5" />
@@ -58,7 +58,7 @@ function LoginPage() {
         </div>
       </div>
 
-      <div className="flex items-center justify-center p-6 lg:p-12">
+      <div className="flex-1 flex items-center justify-center p-6 lg:p-12">
         <Card className="w-full max-w-md p-8">
           <div className="lg:hidden flex items-center gap-2 mb-6">
             <div className="size-9 rounded-lg bg-primary text-primary-foreground grid place-items-center">
