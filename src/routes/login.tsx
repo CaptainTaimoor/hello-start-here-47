@@ -1,6 +1,6 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useState } from "react";
-import { Sparkles } from "lucide-react";
+import orvionLogo from "@/assets/orvion-logo.png";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -37,34 +37,29 @@ function LoginPage() {
   return (
     <div className="min-h-screen flex flex-col lg:flex-row bg-background text-foreground">
       <Toaster />
-      <div className="hidden lg:flex lg:w-1/2 relative overflow-hidden bg-gradient-to-br from-primary/90 via-primary to-primary/70 text-primary-foreground p-12 flex-col justify-between">
-        <div className="flex items-center gap-2">
-          <div className="size-10 rounded-xl bg-primary-foreground/15 grid place-items-center backdrop-blur">
-            <Sparkles className="size-5" />
-          </div>
-          <div className="font-bold text-lg">Orvion Media</div>
+      <div className="hidden lg:flex lg:w-1/2 relative overflow-hidden bg-[linear-gradient(135deg,oklch(0.18_0.05_235),oklch(0.28_0.1_215),oklch(0.42_0.15_205))] text-white p-12 flex-col justify-between">
+        <div className="absolute inset-0 opacity-30 [background:radial-gradient(circle_at_20%_20%,oklch(0.78_0.17_205)_0%,transparent_50%),radial-gradient(circle_at_80%_70%,oklch(0.6_0.2_220)_0%,transparent_50%)]" />
+        <div className="relative flex items-center gap-2">
+          <img src={orvionLogo} alt="Orvion Media" className="h-9 w-auto" />
         </div>
-        <div>
+        <div className="relative">
           <div className="text-4xl font-bold leading-tight max-w-md">
             One control panel for the entire newsroom.
           </div>
-          <p className="mt-4 text-primary-foreground/80 max-w-md text-sm">
+          <p className="mt-4 text-white/75 max-w-md text-sm">
             Plan content, run channels, manage editing pipelines and connect to
             your team across every department — all in one place.
           </p>
         </div>
-        <div className="text-xs text-primary-foreground/70">
+        <div className="relative text-xs text-white/60">
           © {new Date().getFullYear()} Orvion Media · Internal use only
         </div>
       </div>
 
       <div className="flex-1 flex items-center justify-center p-6 lg:p-12">
         <Card className="w-full max-w-md p-8">
-          <div className="lg:hidden flex items-center gap-2 mb-6">
-            <div className="size-9 rounded-lg bg-primary text-primary-foreground grid place-items-center">
-              <Sparkles className="size-5" />
-            </div>
-            <div className="font-bold">Orvion Media</div>
+          <div className="lg:hidden flex items-center gap-2 mb-6 bg-[oklch(0.18_0.05_235)] rounded-lg p-3">
+            <img src={orvionLogo} alt="Orvion Media" className="h-7 w-auto" />
           </div>
           <h1 className="text-2xl font-bold tracking-tight">Welcome back</h1>
           <p className="text-sm text-muted-foreground mt-1">
