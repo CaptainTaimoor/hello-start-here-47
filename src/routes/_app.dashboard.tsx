@@ -10,6 +10,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { motion } from "motion/react";
 import { NumberTicker } from "@/components/magic/NumberTicker";
+import { SignatureChart } from "@/components/magic/SignatureChart";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -62,16 +63,17 @@ function DashboardPage() {
 
   // Build channel-views path for inline SVG
   const views = MOCK_ANALYTICS.views;
-  const maxV = Math.max(...views.map((v) => v.value));
-  const minV = Math.min(...views.map((v) => v.value));
-  const chartPath = views
-    .map((p, i) => {
-      const x = (i / (views.length - 1)) * 800;
-      const y = 140 - ((p.value - minV) / (maxV - minV || 1)) * 120;
-      return `${i === 0 ? "M" : "L"}${x.toFixed(1)},${y.toFixed(1)}`;
-    })
-    .join(" ");
-  const chartArea = `${chartPath} L800,150 L0,150 Z`;
+  const sigLabels = views.map((v) => v.day);
+  const sigSeries = useMemo(() => {
+    const colors = ["oklch(0.82 0.16 205)", "oklch(0.7 0.2 240)", "oklch(0.62 0.22 285)", "oklch(0.75 0.18 175)"];
+    return channels.slice(0, 4).map((c, idx) => ({
+      name: c.name,
+      color: colors[idx % colors.length],
+      data: views.map((v, i) =>
+        Math.round(v.value * (0.18 + 0.08 * idx) * (1 + 0.12 * Math.sin(i / 2 + idx))),
+      ),
+    }));
+  }, [channels, views]);
 
   const activity = [
     { who: "Aisha K.", what: "edited Daily Content (3 rows)", when: "5m" },
@@ -249,37 +251,7 @@ function DashboardPage() {
           </div>
         </div>
         <div className="h-56 relative">
-          <svg className="w-full h-full overflow-visible" viewBox="0 0 800 150" preserveAspectRatio="none">
-            <defs>
-              <linearGradient id="chartGradient" x1="0" y1="0" x2="0" y2="1">
-                <stop offset="0%" stopColor="oklch(0.78 0.17 205)" stopOpacity={0.3} />
-                <stop offset="100%" stopColor="oklch(0.78 0.17 205)" stopOpacity={0} />
-              </linearGradient>
-            </defs>
-            <motion.path
-              d={chartArea}
-              fill="url(#chartGradient)"
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              transition={{ duration: 1.2, delay: 0.6 }}
-            />
-            <motion.path
-              d={chartPath}
-              fill="none"
-              stroke="oklch(0.78 0.17 205)"
-              strokeWidth={2.5}
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              initial={{ pathLength: 0 }}
-              animate={{ pathLength: 1 }}
-              transition={{ duration: 1.8, ease: [0.16, 1, 0.3, 1], delay: 0.3 }}
-            />
-          </svg>
-          <div className="flex justify-between mt-4 text-[10px] font-bold text-white/20 uppercase tracking-widest">
-            {views.filter((_, i) => i % Math.ceil(views.length / 5) === 0).map((v) => (
-              <span key={v.day}>{v.day}</span>
-            ))}
-          </div>
+          <SignatureChart labels={sigLabels} series={sigSeries} height={220} />
         </div>
       </motion.div>
 
