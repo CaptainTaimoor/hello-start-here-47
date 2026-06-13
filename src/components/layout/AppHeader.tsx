@@ -33,7 +33,7 @@ export function AppHeader() {
   const unread = notifications.filter((n) => !n.read).length;
 
   return (
-    <header className="sticky top-0 z-30 border-b border-border/60 bg-background/60 backdrop-blur-xl">
+    <header className="sticky top-0 z-30 border-b border-white/[0.06] bg-background/30 backdrop-blur-2xl backdrop-saturate-150 shadow-[0_1px_0_0_rgb(255_255_255/0.04)_inset]">
       <div className="flex items-center gap-3 px-6 h-16">
         <Button
           variant="ghost"
