@@ -15,6 +15,7 @@ import { Route as AppRouteImport } from './routes/_app'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as AppTeamRouteImport } from './routes/_app.team'
 import { Route as AppProjectsRouteImport } from './routes/_app.projects'
+import { Route as AppNotificationsRouteImport } from './routes/_app.notifications'
 import { Route as AppDepartmentsRouteImport } from './routes/_app.departments'
 import { Route as AppDashboardRouteImport } from './routes/_app.dashboard'
 import { Route as AppAdminRouteImport } from './routes/_app.admin'
@@ -54,6 +55,11 @@ const AppTeamRoute = AppTeamRouteImport.update({
 const AppProjectsRoute = AppProjectsRouteImport.update({
   id: '/projects',
   path: '/projects',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppNotificationsRoute = AppNotificationsRouteImport.update({
+  id: '/notifications',
+  path: '/notifications',
   getParentRoute: () => AppRoute,
 } as any)
 const AppDepartmentsRoute = AppDepartmentsRouteImport.update({
@@ -122,6 +128,7 @@ export interface FileRoutesByFullPath {
   '/admin': typeof AppAdminRoute
   '/dashboard': typeof AppDashboardRoute
   '/departments': typeof AppDepartmentsRouteWithChildren
+  '/notifications': typeof AppNotificationsRoute
   '/projects': typeof AppProjectsRouteWithChildren
   '/team': typeof AppTeamRouteWithChildren
   '/departments/finance': typeof AppDepartmentsFinanceRoute
@@ -140,6 +147,7 @@ export interface FileRoutesByTo {
   '/admin': typeof AppAdminRoute
   '/dashboard': typeof AppDashboardRoute
   '/departments': typeof AppDepartmentsRouteWithChildren
+  '/notifications': typeof AppNotificationsRoute
   '/projects': typeof AppProjectsRouteWithChildren
   '/team': typeof AppTeamRouteWithChildren
   '/departments/finance': typeof AppDepartmentsFinanceRoute
@@ -160,6 +168,7 @@ export interface FileRoutesById {
   '/_app/admin': typeof AppAdminRoute
   '/_app/dashboard': typeof AppDashboardRoute
   '/_app/departments': typeof AppDepartmentsRouteWithChildren
+  '/_app/notifications': typeof AppNotificationsRoute
   '/_app/projects': typeof AppProjectsRouteWithChildren
   '/_app/team': typeof AppTeamRouteWithChildren
   '/_app/departments/finance': typeof AppDepartmentsFinanceRoute
@@ -180,6 +189,7 @@ export interface FileRouteTypes {
     | '/admin'
     | '/dashboard'
     | '/departments'
+    | '/notifications'
     | '/projects'
     | '/team'
     | '/departments/finance'
@@ -198,6 +208,7 @@ export interface FileRouteTypes {
     | '/admin'
     | '/dashboard'
     | '/departments'
+    | '/notifications'
     | '/projects'
     | '/team'
     | '/departments/finance'
@@ -217,6 +228,7 @@ export interface FileRouteTypes {
     | '/_app/admin'
     | '/_app/dashboard'
     | '/_app/departments'
+    | '/_app/notifications'
     | '/_app/projects'
     | '/_app/team'
     | '/_app/departments/finance'
@@ -278,6 +290,13 @@ declare module '@tanstack/react-router' {
       path: '/projects'
       fullPath: '/projects'
       preLoaderRoute: typeof AppProjectsRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/_app/notifications': {
+      id: '/_app/notifications'
+      path: '/notifications'
+      fullPath: '/notifications'
+      preLoaderRoute: typeof AppNotificationsRouteImport
       parentRoute: typeof AppRoute
     }
     '/_app/departments': {
@@ -446,6 +465,7 @@ interface AppRouteChildren {
   AppAdminRoute: typeof AppAdminRoute
   AppDashboardRoute: typeof AppDashboardRoute
   AppDepartmentsRoute: typeof AppDepartmentsRouteWithChildren
+  AppNotificationsRoute: typeof AppNotificationsRoute
   AppProjectsRoute: typeof AppProjectsRouteWithChildren
   AppTeamRoute: typeof AppTeamRouteWithChildren
 }
@@ -454,6 +474,7 @@ const AppRouteChildren: AppRouteChildren = {
   AppAdminRoute: AppAdminRoute,
   AppDashboardRoute: AppDashboardRoute,
   AppDepartmentsRoute: AppDepartmentsRouteWithChildren,
+  AppNotificationsRoute: AppNotificationsRoute,
   AppProjectsRoute: AppProjectsRouteWithChildren,
   AppTeamRoute: AppTeamRouteWithChildren,
 }
