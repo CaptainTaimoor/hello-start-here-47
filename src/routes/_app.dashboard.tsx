@@ -1,31 +1,13 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useMemo } from "react";
 import {
-  Activity,
-  CheckCircle2,
   FileSpreadsheet,
   FolderKanban,
-  Gauge,
   ListChecks,
   Settings2,
   Users,
 } from "lucide-react";
-import {
-  AreaChart,
-  Area,
-  ResponsiveContainer,
-  BarChart,
-  Bar,
-  XAxis,
-  YAxis,
-  Tooltip,
-  CartesianGrid,
-} from "recharts";
-import { StatCard } from "@/components/common/StatCard";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { AnimatedGridPattern } from "@/components/magic/AnimatedGridPattern";
-import { BorderBeam } from "@/components/magic/BorderBeam";
 import { motion } from "motion/react";
 import {
   DropdownMenu,
@@ -34,7 +16,6 @@ import {
   DropdownMenuLabel,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { Badge } from "@/components/ui/badge";
 import { useApp } from "@/lib/app-store";
 import { MOCK_ANALYTICS } from "@/lib/mock-data";
 import { Link } from "@tanstack/react-router";
@@ -75,69 +56,108 @@ function DashboardPage() {
   );
 
   const totalRows = Object.values(sheets).reduce((s, r) => s + r.length, 0);
+  const teamCount = channels.reduce((s, c) => s + c.team.length, 0);
+  const firstName = user?.name?.split(" ")[0] ?? "there";
+
+  // Build channel-views path for inline SVG
+  const views = MOCK_ANALYTICS.views;
+  const maxV = Math.max(...views.map((v) => v.value));
+  const minV = Math.min(...views.map((v) => v.value));
+  const chartPath = views
+    .map((p, i) => {
+      const x = (i / (views.length - 1)) * 800;
+      const y = 140 - ((p.value - minV) / (maxV - minV || 1)) * 120;
+      return `${i === 0 ? "M" : "L"}${x.toFixed(1)},${y.toFixed(1)}`;
+    })
+    .join(" ");
+  const chartArea = `${chartPath} L800,150 L0,150 Z`;
+
+  const activity = [
+    { who: "Aisha K.", what: "edited Daily Content (3 rows)", when: "5m" },
+    { who: "Ben L.", what: "marked Markets close render complete", when: "22m" },
+    { who: "Carla R.", what: "added KPI note for Orvion World", when: "1h" },
+    { who: "Priya M.", what: "approved thumbnail v3", when: "2h" },
+  ];
+
+  const stats = [
+    dashboardCards.projects && {
+      key: "p",
+      icon: FolderKanban,
+      value: 1,
+      label: "Assigned Projects",
+      badge: { text: "+1", tone: "primary" as const },
+    },
+    dashboardCards.team && {
+      key: "t",
+      icon: Users,
+      value: teamCount,
+      label: "Team Members",
+      badge: { text: "Active", tone: "muted" as const },
+    },
+    dashboardCards.tasks && {
+      key: "ts",
+      icon: ListChecks,
+      value: 12,
+      label: "Pending Tasks",
+      badge: { text: "3 Due", tone: "danger" as const },
+    },
+    dashboardCards.sheets && {
+      key: "sh",
+      icon: FileSpreadsheet,
+      value: totalRows,
+      label: "Pending Sheet Rows",
+      badge: null,
+    },
+  ].filter(Boolean) as Array<{
+    key: string;
+    icon: typeof FolderKanban;
+    value: number;
+    label: string;
+    badge: { text: string; tone: "primary" | "muted" | "danger" } | null;
+  }>;
+
+  const tile =
+    "group relative overflow-hidden rounded-3xl border border-white/[0.06] bg-[oklch(0.2_0.04_235)] p-6 transition-all duration-500 hover:border-primary/30 hover:-translate-y-0.5";
 
   return (
-    <div>
-      <motion.section
-        initial={{ opacity: 0, y: 24 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
-        className="relative mb-8 overflow-hidden rounded-3xl border border-border/60 bg-gradient-to-br from-primary/15 via-card/60 to-card/40 p-8 md:p-12"
+    <motion.div
+      initial="hidden"
+      animate="show"
+      variants={{ hidden: {}, show: { transition: { staggerChildren: 0.06, delayChildren: 0.1 } } }}
+      className="grid grid-cols-1 md:grid-cols-12 gap-5 auto-rows-min"
+    >
+      {/* HERO */}
+      <motion.div
+        variants={{ hidden: { opacity: 0, y: 20 }, show: { opacity: 1, y: 0, transition: { duration: 0.7, ease: [0.16, 1, 0.3, 1] } } }}
+        className="md:col-span-8 relative overflow-hidden rounded-3xl border border-white/[0.06] bg-[oklch(0.2_0.04_235)] p-8 md:p-10 min-h-[320px] flex flex-col justify-between"
       >
-        <AnimatedGridPattern
-          numSquares={28}
-          maxOpacity={0.08}
-          duration={3}
-          className="[mask-image:radial-gradient(600px_circle_at_center,white,transparent)] text-primary"
-        />
-        <div className="pointer-events-none absolute inset-0 [background:radial-gradient(800px_300px_at_85%_-20%,oklch(0.78_0.17_205/0.4),transparent_60%),radial-gradient(500px_300px_at_-10%_120%,oklch(0.6_0.18_250/0.28),transparent_60%)]" />
-        <BorderBeam size={300} duration={10} />
-        <div className="relative flex flex-wrap items-end justify-between gap-6">
-          <div className="min-w-0">
-            <motion.div
-              initial={{ opacity: 0, y: 10 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.2, duration: 0.6 }}
-              className="inline-flex items-center gap-2 rounded-full border border-border/60 bg-background/40 px-3 py-1 text-[11px] font-medium text-muted-foreground backdrop-blur"
-            >
-              <span className="relative flex size-1.5">
-                <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-emerald-400 opacity-75" />
-                <span className="relative inline-flex size-1.5 rounded-full bg-emerald-400" />
-              </span>
-              All systems operational
-            </motion.div>
-            <motion.h1
-              initial={{ opacity: 0, y: 16 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.3, duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
-              className="mt-4 text-4xl md:text-6xl font-semibold tracking-tight leading-[1.05]"
-            >
-              Welcome back,{" "}
-              <span className="aurora-text">{user?.name?.split(" ")[0] ?? "there"}.</span>
-            </motion.h1>
-            <motion.p
-              initial={{ opacity: 0, y: 10 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.45, duration: 0.6 }}
-              className="mt-4 max-w-xl text-sm md:text-base text-muted-foreground leading-relaxed"
-            >
-              You're signed in as <span className="text-foreground font-medium">{role}</span>. Here's everything happening across Orvion Media today.
-            </motion.p>
+        <div className="pointer-events-none absolute inset-0 [background:radial-gradient(circle_at_top_right,oklch(0.78_0.17_205/0.12),transparent_55%)]" />
+        <div className="absolute top-6 right-6 z-10">
+          <div className="flex items-center gap-2 px-3 py-1 bg-white/5 border border-white/10 rounded-full backdrop-blur-md">
+            <span className="relative flex size-1.5">
+              <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-primary opacity-60" />
+              <span className="relative inline-flex size-1.5 rounded-full bg-primary" />
+            </span>
+            <span className="text-[10px] uppercase tracking-[0.18em] font-semibold text-white/70">Operational</span>
           </div>
-          <motion.div
-            initial={{ opacity: 0, scale: 0.92 }}
-            animate={{ opacity: 1, scale: 1 }}
-            transition={{ delay: 0.5, duration: 0.5 }}
-            className="flex items-center gap-2"
-          >
+        </div>
+        <div className="relative z-10">
+          <h1 className="font-serif text-5xl md:text-7xl font-normal text-white leading-[1.02] tracking-tight">
+            Welcome back, <span className="italic text-primary">{firstName}.</span>
+          </h1>
+          <p className="mt-4 max-w-md text-base md:text-lg text-white/50 font-light leading-relaxed">
+            You're signed in as <span className="text-white/85">{role}</span>. Here's your production pulse for today.
+          </p>
+        </div>
+        <div className="relative z-10 mt-6 flex gap-3">
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
-              <Button variant="outline" size="sm" className="backdrop-blur bg-background/40 border-border/60">
-                <Settings2 className="size-4 mr-2" />
-                Customize
+              <Button variant="outline" size="sm" className="rounded-xl bg-white/5 border-white/10 hover:bg-white/10 text-white/85">
+                <Settings2 className="size-4 mr-2 text-primary" />
+                Customize View
               </Button>
             </DropdownMenuTrigger>
-            <DropdownMenuContent align="end" className="w-60">
+            <DropdownMenuContent align="start" className="w-60">
               <DropdownMenuLabel>Dashboard cards</DropdownMenuLabel>
               {CARDS.map((c) => (
                 <DropdownMenuCheckboxItem
@@ -150,199 +170,277 @@ function DashboardPage() {
               ))}
             </DropdownMenuContent>
           </DropdownMenu>
-          </motion.div>
         </div>
-      </motion.section>
-
-      <motion.div
-        initial="hidden"
-        animate="show"
-        variants={{
-          hidden: {},
-          show: { transition: { staggerChildren: 0.08, delayChildren: 0.4 } },
-        }}
-        className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-4"
-      >
-        {[
-          dashboardCards.projects && (
-            <StatCard key="p" label="Assigned projects" value={1} delta="+1 this month" icon={FolderKanban} />
-          ),
-          dashboardCards.team && (
-            <StatCard key="t" label="Team members" value={channels.reduce((s, c) => s + c.team.length, 0)} icon={Users} />
-          ),
-          dashboardCards.tasks && (
-            <StatCard key="ts" label="Pending tasks" value={12} delta="3 due today" icon={ListChecks} />
-          ),
-          dashboardCards.sheets && (
-            <StatCard key="sh" label="Pending sheet rows" value={totalRows} icon={FileSpreadsheet} />
-          ),
-        ]
-          .filter(Boolean)
-          .map((card, i) => (
-            <motion.div
-              key={i}
-              variants={{
-                hidden: { opacity: 0, y: 24 },
-                show: { opacity: 1, y: 0, transition: { duration: 0.6, ease: [0.16, 1, 0.3, 1] } },
-              }}
-            >
-              {card}
-            </motion.div>
-          ))}
       </motion.div>
 
-      <div className="mt-6 grid grid-cols-1 xl:grid-cols-3 gap-4">
-        <Card className="xl:col-span-2">
-          <CardHeader>
-            <CardTitle className="text-base">Channel views — last 14 days</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="h-64">
-              <ResponsiveContainer>
-                <AreaChart data={MOCK_ANALYTICS.views} margin={{ left: -20 }}>
-                  <defs>
-                    <linearGradient id="g1" x1="0" y1="0" x2="0" y2="1">
-                      <stop offset="0%" stopColor="var(--primary)" stopOpacity={0.5} />
-                      <stop offset="100%" stopColor="var(--primary)" stopOpacity={0} />
-                    </linearGradient>
-                  </defs>
-                  <CartesianGrid strokeDasharray="3 3" stroke="var(--border)" />
-                  <XAxis dataKey="day" stroke="var(--muted-foreground)" fontSize={11} />
-                  <YAxis stroke="var(--muted-foreground)" fontSize={11} />
-                  <Tooltip contentStyle={{ background: "var(--card)", border: "1px solid var(--border)", borderRadius: 8 }} />
-                  <Area type="monotone" dataKey="value" stroke="var(--primary)" fill="url(#g1)" />
-                </AreaChart>
-              </ResponsiveContainer>
+      {/* LIVE ACTIVITY */}
+      {dashboardCards.activity && (
+        <motion.div
+          variants={{ hidden: { opacity: 0, y: 20 }, show: { opacity: 1, y: 0, transition: { duration: 0.7, ease: [0.16, 1, 0.3, 1] } } }}
+          className={`md:col-span-4 ${tile} flex flex-col`}
+        >
+          <div className="flex items-center justify-between mb-6">
+            <h3 className="text-[10px] uppercase tracking-[0.22em] font-semibold text-white/40">Live Stream</h3>
+            <span className="size-2 rounded-full bg-rose-500 shadow-[0_0_8px_rgba(244,63,94,0.6)] animate-pulse" />
+          </div>
+          <div className="flex gap-4 flex-1">
+            <div className="w-px bg-gradient-to-b from-primary/40 via-primary/10 to-transparent" />
+            <div className="space-y-5 flex-1">
+              {activity.map((a, i) => (
+                <div key={i}>
+                  <p className="text-sm text-white/80 leading-snug">
+                    <span className="font-semibold text-white">{a.who}</span> {a.what}
+                  </p>
+                  <span className="text-[11px] text-white/30 tracking-wider uppercase">{a.when} ago</span>
+                </div>
+              ))}
             </div>
-          </CardContent>
-        </Card>
+          </div>
+        </motion.div>
+      )}
 
+      {/* STAT CARDS */}
+      {stats.map((s) => {
+        const Icon = s.icon;
+        const badgeCls =
+          s.badge?.tone === "danger"
+            ? "text-rose-400 bg-rose-400/10"
+            : s.badge?.tone === "primary"
+              ? "text-primary bg-primary/10"
+              : "text-white/40 bg-white/5";
+        return (
+          <motion.div
+            key={s.key}
+            variants={{ hidden: { opacity: 0, y: 20 }, show: { opacity: 1, y: 0, transition: { duration: 0.6, ease: [0.16, 1, 0.3, 1] } } }}
+            className={`md:col-span-3 ${tile}`}
+          >
+            <div className="flex justify-between items-start mb-6">
+              <div className="p-2.5 bg-primary/10 rounded-xl text-primary">
+                <Icon className="size-5" strokeWidth={1.5} />
+              </div>
+              {s.badge && (
+                <span className={`text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-full ${badgeCls}`}>
+                  {s.badge.text}
+                </span>
+              )}
+            </div>
+            <p className="text-4xl font-light text-white tracking-tight mb-1">{s.value}</p>
+            <p className="text-[11px] text-white/40 uppercase tracking-[0.18em] font-semibold">{s.label}</p>
+          </motion.div>
+        );
+      })}
+
+      {/* CHANNEL GROWTH CHART (large) */}
+      <motion.div
+        variants={{ hidden: { opacity: 0, y: 20 }, show: { opacity: 1, y: 0, transition: { duration: 0.7, ease: [0.16, 1, 0.3, 1] } } }}
+        className={`md:col-span-9 ${tile} p-8`}
+      >
+        <div className="flex items-center justify-between mb-8">
+          <div>
+            <h3 className="text-xl font-medium text-white mb-1">Channel Growth</h3>
+            <p className="text-xs text-white/40">Aggregated views across all Orvion networks · last 14 days</p>
+          </div>
+          <div className="flex gap-2">
+            <span className="px-3 py-1 bg-white/5 rounded-lg text-xs font-semibold text-white/60">Daily</span>
+            <span className="px-3 py-1 bg-primary/10 text-primary rounded-lg text-xs font-semibold">Weekly</span>
+          </div>
+        </div>
+        <div className="h-56 relative">
+          <svg className="w-full h-full overflow-visible" viewBox="0 0 800 150" preserveAspectRatio="none">
+            <defs>
+              <linearGradient id="chartGradient" x1="0" y1="0" x2="0" y2="1">
+                <stop offset="0%" stopColor="oklch(0.78 0.17 205)" stopOpacity={0.3} />
+                <stop offset="100%" stopColor="oklch(0.78 0.17 205)" stopOpacity={0} />
+              </linearGradient>
+            </defs>
+            <path d={chartArea} fill="url(#chartGradient)" />
+            <path d={chartPath} fill="none" stroke="oklch(0.78 0.17 205)" strokeWidth={2.5} strokeLinecap="round" strokeLinejoin="round" />
+          </svg>
+          <div className="flex justify-between mt-4 text-[10px] font-bold text-white/20 uppercase tracking-widest">
+            {views.filter((_, i) => i % Math.ceil(views.length / 5) === 0).map((v) => (
+              <span key={v.day}>{v.day}</span>
+            ))}
+          </div>
+        </div>
+      </motion.div>
+
+      {/* KPI + EDITING QUEUE side stack */}
+      <motion.div
+        variants={{ hidden: { opacity: 0, y: 20 }, show: { opacity: 1, y: 0, transition: { duration: 0.6, ease: [0.16, 1, 0.3, 1] } } }}
+        className="md:col-span-3 flex flex-col gap-5"
+      >
         {dashboardCards.kpi && (
-          <Card>
-            <CardHeader>
-              <CardTitle className="text-base flex items-center gap-2">
-                <Gauge className="size-4" /> KPI status
-              </CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              {channels.map((c) => (
-                <div key={c.id} className="flex items-center justify-between">
-                  <div>
-                    <div className="text-sm font-medium">{c.name}</div>
-                    <div className="text-xs text-muted-foreground">{c.todayCount} uploads today</div>
+          <div className={`${tile} flex-1`}>
+            <h3 className="text-[10px] uppercase tracking-[0.22em] font-semibold text-white/40 mb-5">KPI Status</h3>
+            <div className="space-y-4">
+              {channels.map((c, i) => {
+                const onTrack = c.kpiStatus === "On Track" || c.kpiStatus === "Healthy";
+                const pct = onTrack ? 88 - i * 6 : 45;
+                return (
+                  <div key={c.id}>
+                    <div className="flex justify-between text-xs mb-2">
+                      <span className="text-white/80 font-medium truncate">{c.name}</span>
+                      <span className={`font-bold ${onTrack ? "text-primary" : "text-orange-400"}`}>
+                        {onTrack ? `${pct}%` : "At Risk"}
+                      </span>
+                    </div>
+                    <div className="w-full bg-white/5 h-1 rounded-full overflow-hidden">
+                      <div
+                        className={`${onTrack ? "bg-primary" : "bg-orange-400"} h-1 rounded-full`}
+                        style={{ width: `${pct}%` }}
+                      />
+                    </div>
                   </div>
-                  <Badge variant="outline" className="text-xs">{c.kpiStatus}</Badge>
-                </div>
-              ))}
-            </CardContent>
-          </Card>
+                );
+              })}
+            </div>
+          </div>
         )}
-      </div>
-
-      <div className="mt-6 grid grid-cols-1 xl:grid-cols-3 gap-4">
-        {dashboardCards.activity && (
-          <Card className="xl:col-span-2">
-            <CardHeader><CardTitle className="text-base flex items-center gap-2"><Activity className="size-4"/> Recent activity</CardTitle></CardHeader>
-            <CardContent className="text-sm space-y-3">
-              {[
-                { who: "Aisha K.", what: "edited Daily Content (3 rows)", when: "5m" },
-                { who: "Ben L.", what: "marked Markets close render complete", when: "20m" },
-                { who: "Carla R.", what: "added KPI note for Orvion World", when: "1h" },
-                { who: "Priya M.", what: "approved thumbnail v3", when: "2h" },
-              ].map((a, i) => (
-                <div key={i} className="flex items-center justify-between">
-                  <div className="flex items-center gap-2">
-                    <CheckCircle2 className="size-4 text-emerald-500" />
-                    <span><b>{a.who}</b> {a.what}</span>
-                  </div>
-                  <span className="text-xs text-muted-foreground">{a.when}</span>
-                </div>
-              ))}
-            </CardContent>
-          </Card>
-        )}
-        {dashboardCards.notifications && (
-          <Card>
-            <CardHeader><CardTitle className="text-base">Notifications</CardTitle></CardHeader>
-            <CardContent className="space-y-3 text-sm">
-              {notifications.slice(0, 5).map((n) => (
-                <div key={n.id} className="flex items-start gap-2">
-                  <span className={`mt-1.5 size-1.5 rounded-full ${n.read ? "bg-muted-foreground/40" : "bg-primary"}`} />
-                  <div className="flex-1 min-w-0">
-                    <div className="truncate font-medium">{n.title}</div>
-                    <div className="text-xs text-muted-foreground truncate">{n.description}</div>
-                  </div>
-                </div>
-              ))}
-            </CardContent>
-          </Card>
-        )}
-      </div>
-
-      <div className="mt-6 grid grid-cols-1 xl:grid-cols-3 gap-4">
         {dashboardCards.editing && showFor.editing && (
-          <Card>
-            <CardHeader><CardTitle className="text-base">Editing queue</CardTitle></CardHeader>
-            <CardContent className="text-sm space-y-2">
-              <div className="flex justify-between"><span>To do</span><b>5</b></div>
-              <div className="flex justify-between"><span>In progress</span><b>3</b></div>
-              <div className="flex justify-between"><span>Review</span><b>2</b></div>
-              <div className="flex justify-between"><span>Done</span><b>14</b></div>
-            </CardContent>
-          </Card>
+          <div className="rounded-3xl bg-primary p-6 flex flex-col justify-between min-h-[140px]">
+            <h3 className="text-[10px] uppercase tracking-[0.22em] font-bold text-[oklch(0.15_0.04_235)]/60">Editing Queue</h3>
+            <div>
+              <p className="text-5xl font-semibold text-[oklch(0.15_0.04_235)] leading-none mb-1 tracking-tight">14</p>
+              <p className="text-[10px] font-bold text-[oklch(0.15_0.04_235)]/60 uppercase tracking-wider">Videos in pipeline</p>
+            </div>
+          </div>
         )}
-        {dashboardCards.hr && showFor.hr && (
-          <Card>
-            <CardHeader><CardTitle className="text-base">HR snapshot</CardTitle></CardHeader>
-            <CardContent className="text-sm space-y-2">
-              <div className="flex justify-between"><span>Active employees</span><b>48</b></div>
-              <div className="flex justify-between"><span>Today's attendance</span><b>92%</b></div>
-              <div className="flex justify-between"><span>Open hires</span><b>4</b></div>
-            </CardContent>
-          </Card>
-        )}
-        {dashboardCards.finance && showFor.finance && (
-          <Card>
-            <CardHeader><CardTitle className="text-base">Finance snapshot</CardTitle></CardHeader>
-            <CardContent className="h-40">
-              <ResponsiveContainer>
-                <BarChart data={[
-                  { m: "Jan", v: 64 }, { m: "Feb", v: 72 }, { m: "Mar", v: 81 },
-                  { m: "Apr", v: 78 }, { m: "May", v: 88 }, { m: "Jun", v: 95 },
-                ]}>
-                  <CartesianGrid strokeDasharray="3 3" stroke="var(--border)"/>
-                  <XAxis dataKey="m" fontSize={11} stroke="var(--muted-foreground)"/>
-                  <YAxis fontSize={11} stroke="var(--muted-foreground)"/>
-                  <Tooltip contentStyle={{ background: "var(--card)", border: "1px solid var(--border)", borderRadius: 8 }}/>
-                  <Bar dataKey="v" fill="var(--primary)" radius={4}/>
-                </BarChart>
-              </ResponsiveContainer>
-            </CardContent>
-          </Card>
-        )}
-        {dashboardCards.it && showFor.it && (
-          <Card>
-            <CardHeader><CardTitle className="text-base">IT snapshot</CardTitle></CardHeader>
-            <CardContent className="text-sm space-y-2">
-              <div className="flex justify-between"><span>App health</span><b className="text-emerald-600">Healthy</b></div>
-              <div className="flex justify-between"><span>Open tickets</span><b>2</b></div>
-              <div className="flex justify-between"><span>Server status</span><b className="text-emerald-600">Online</b></div>
-            </CardContent>
-          </Card>
-        )}
-        {dashboardCards.quickLinks && (
-          <Card>
-            <CardHeader><CardTitle className="text-base">Quick links</CardTitle></CardHeader>
-            <CardContent className="grid grid-cols-2 gap-2 text-sm">
-              <Link to="/projects" className="rounded-md border p-2 hover:bg-accent">Projects</Link>
-              <Link to="/team" className="rounded-md border p-2 hover:bg-accent">Team Workspace</Link>
-              <Link to="/admin" className="rounded-md border p-2 hover:bg-accent">Admin</Link>
-              <Link to="/settings" className="rounded-md border p-2 hover:bg-accent">Settings</Link>
-            </CardContent>
-          </Card>
-        )}
-      </div>
+      </motion.div>
 
-    </div>
+      {/* HR */}
+      {dashboardCards.hr && showFor.hr && (
+        <motion.div
+          variants={{ hidden: { opacity: 0, y: 20 }, show: { opacity: 1, y: 0, transition: { duration: 0.6 } } }}
+          className={`md:col-span-4 ${tile}`}
+        >
+          <h3 className="text-[10px] uppercase tracking-[0.22em] font-semibold text-white/40 mb-6">HR Snapshot</h3>
+          <div className="grid grid-cols-2 gap-4">
+            <div className="bg-white/5 p-4 rounded-2xl">
+              <p className="text-2xl font-medium text-white">48</p>
+              <p className="text-[10px] text-white/30 font-bold uppercase tracking-wider mt-1">Active</p>
+            </div>
+            <div className="bg-white/5 p-4 rounded-2xl">
+              <p className="text-2xl font-medium text-white">92%</p>
+              <p className="text-[10px] text-white/30 font-bold uppercase tracking-wider mt-1">Attendance</p>
+            </div>
+            <div className="bg-white/5 p-4 rounded-2xl col-span-2">
+              <div className="flex items-end justify-between">
+                <div>
+                  <p className="text-2xl font-medium text-white">4</p>
+                  <p className="text-[10px] text-white/30 font-bold uppercase tracking-wider mt-1">Open Hires</p>
+                </div>
+                <span className="text-[10px] font-bold text-primary bg-primary/10 px-2 py-0.5 rounded-full">Hiring</span>
+              </div>
+            </div>
+          </div>
+        </motion.div>
+      )}
+
+      {/* IT */}
+      {dashboardCards.it && showFor.it && (
+        <motion.div
+          variants={{ hidden: { opacity: 0, y: 20 }, show: { opacity: 1, y: 0, transition: { duration: 0.6 } } }}
+          className={`md:col-span-4 ${tile}`}
+        >
+          <h3 className="text-[10px] uppercase tracking-[0.22em] font-semibold text-white/40 mb-6">IT Snapshot</h3>
+          <div className="space-y-4">
+            <div className="flex justify-between items-center">
+              <span className="text-sm text-white/60">App Health</span>
+              <span className="text-xs font-bold text-primary bg-primary/10 px-2 py-0.5 rounded-md">Healthy</span>
+            </div>
+            <div className="flex justify-between items-center">
+              <span className="text-sm text-white/60">Server Status</span>
+              <span className="text-xs font-bold text-emerald-400 flex items-center gap-1.5">
+                <span className="size-1.5 rounded-full bg-emerald-400 animate-pulse" />
+                Online
+              </span>
+            </div>
+            <div className="flex justify-between items-center">
+              <span className="text-sm text-white/60">Open Tickets</span>
+              <span className="text-sm font-bold text-white">2</span>
+            </div>
+            <div className="flex justify-between items-center">
+              <span className="text-sm text-white/60">Uptime</span>
+              <span className="text-sm font-mono text-white/80">99.98%</span>
+            </div>
+          </div>
+        </motion.div>
+      )}
+
+      {/* FINANCE */}
+      {dashboardCards.finance && showFor.finance && (
+        <motion.div
+          variants={{ hidden: { opacity: 0, y: 20 }, show: { opacity: 1, y: 0, transition: { duration: 0.6 } } }}
+          className={`md:col-span-4 ${tile} flex flex-col justify-between`}
+        >
+          <div className="flex justify-between items-start mb-4">
+            <h3 className="text-[10px] uppercase tracking-[0.22em] font-semibold text-white/40">Finance Pulse</h3>
+            <span className="text-[10px] font-mono text-white/30 tracking-tighter">USD · 6mo</span>
+          </div>
+          <div className="flex items-end gap-2 h-24 mt-4">
+            {[40, 60, 55, 80, 75, 95].map((h, i) => (
+              <div
+                key={i}
+                className={`w-full rounded-t-sm transition-all hover:opacity-80 ${i === 5 ? "bg-primary" : "bg-white/10"}`}
+                style={{ height: `${h}%` }}
+              />
+            ))}
+          </div>
+          <div className="flex justify-between mt-3 text-[10px] font-bold text-white/20 uppercase tracking-widest">
+            <span>Jan</span><span>Feb</span><span>Mar</span><span>Apr</span><span>May</span><span>Jun</span>
+          </div>
+        </motion.div>
+      )}
+
+      {/* NOTIFICATIONS */}
+      {dashboardCards.notifications && (
+        <motion.div
+          variants={{ hidden: { opacity: 0, y: 20 }, show: { opacity: 1, y: 0, transition: { duration: 0.6 } } }}
+          className={`md:col-span-8 ${tile}`}
+        >
+          <div className="flex items-center justify-between mb-6">
+            <h3 className="text-[10px] uppercase tracking-[0.22em] font-semibold text-white/40">Notifications</h3>
+            <span className="text-[10px] text-white/40">{notifications.length} total</span>
+          </div>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-3 text-sm">
+            {notifications.slice(0, 4).map((n) => (
+              <div key={n.id} className="p-3 rounded-2xl bg-white/[0.03] border border-white/5 flex items-start gap-3">
+                <span className={`mt-1.5 size-1.5 rounded-full shrink-0 ${n.read ? "bg-white/20" : "bg-primary shadow-[0_0_6px_oklch(0.78_0.17_205)]"}`} />
+                <div className="min-w-0">
+                  <div className="truncate font-medium text-white/90">{n.title}</div>
+                  <div className="truncate text-xs text-white/40 mt-0.5">{n.description}</div>
+                </div>
+              </div>
+            ))}
+          </div>
+        </motion.div>
+      )}
+
+      {/* QUICK LINKS */}
+      {dashboardCards.quickLinks && (
+        <motion.div
+          variants={{ hidden: { opacity: 0, y: 20 }, show: { opacity: 1, y: 0, transition: { duration: 0.6 } } }}
+          className={`md:col-span-4 ${tile}`}
+        >
+          <h3 className="text-[10px] uppercase tracking-[0.22em] font-semibold text-white/40 mb-5">Quick Links</h3>
+          <div className="grid grid-cols-2 gap-2 text-xs">
+            {[
+              { to: "/projects", label: "Projects" },
+              { to: "/team", label: "Team" },
+              { to: "/admin", label: "Admin" },
+              { to: "/settings", label: "Settings" },
+            ].map((l) => (
+              <Link
+                key={l.to}
+                to={l.to}
+                className="rounded-2xl bg-white/[0.03] border border-white/5 p-3 hover:border-primary/30 hover:bg-white/[0.06] transition-all uppercase tracking-widest font-semibold text-center text-white/70 hover:text-white"
+              >
+                {l.label}
+              </Link>
+            ))}
+          </div>
+        </motion.div>
+      )}
+    </motion.div>
   );
 }
