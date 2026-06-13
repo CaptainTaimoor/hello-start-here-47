@@ -60,9 +60,9 @@ export function CommandPalette() {
 
   return (
     <CommandDialog open={open} onOpenChange={setOpen}>
-      <CommandInput placeholder="Search pages, actions, settings…" />
+      <CommandInput placeholder="Where to? Type a page, an action, or vibes…" />
       <CommandList>
-        <CommandEmpty>No results found.</CommandEmpty>
+        <CommandEmpty>Nothing matches. Try fewer letters.</CommandEmpty>
         <CommandGroup heading="Navigate">
           {NAV.map((n) => {
             const Icon = n.icon;
