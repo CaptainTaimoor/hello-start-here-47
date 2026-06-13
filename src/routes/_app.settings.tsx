@@ -8,6 +8,8 @@ import { Switch } from "@/components/ui/switch";
 import { Button } from "@/components/ui/button";
 import { useApp } from "@/lib/app-store";
 import { toast } from "sonner";
+import { useEffect, useState } from "react";
+import { isSoundEnabled, setSoundEnabled, click } from "@/lib/sound";
 
 export const Route = createFileRoute("/_app/settings")({
   head: () => ({ meta: [{ title: "Settings — Orvion Media" }] }),
@@ -16,6 +18,8 @@ export const Route = createFileRoute("/_app/settings")({
 
 function SettingsPage() {
   const { user, theme, toggleTheme } = useApp();
+  const [sound, setSound] = useState(false);
+  useEffect(() => { setSound(isSoundEnabled()); }, []);
   return (
     <div>
       <PageHeader title="Settings" description="Profile, workspace, theme and integrations." />
@@ -54,12 +58,28 @@ function SettingsPage() {
         <TabsContent value="theme" className="mt-4">
           <Card>
             <CardHeader><CardTitle className="text-base">Theme</CardTitle></CardHeader>
-            <CardContent className="flex items-center justify-between max-w-md">
+            <CardContent className="space-y-6 max-w-md">
+              <div className="flex items-center justify-between">
               <div>
                 <div className="text-sm font-medium">Dark mode</div>
                 <div className="text-xs text-muted-foreground">Current: {theme}</div>
               </div>
-              <Switch checked={theme === "dark"} onCheckedChange={toggleTheme}/>
+              <Switch checked={theme === "dark"} onCheckedChange={toggleTheme} />
+              </div>
+              <div className="flex items-center justify-between pt-4 border-t border-white/[0.06]">
+                <div>
+                  <div className="text-sm font-medium">Soft UI sounds</div>
+                  <div className="text-xs text-muted-foreground">Subtle click on ⌘K and route changes.</div>
+                </div>
+                <Switch
+                  checked={sound}
+                  onCheckedChange={(v) => {
+                    setSoundEnabled(v);
+                    setSound(v);
+                    if (v) click("soft");
+                  }}
+                />
+              </div>
             </CardContent>
           </Card>
         </TabsContent>
