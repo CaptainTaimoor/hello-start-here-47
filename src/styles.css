@@ -377,3 +377,26 @@
   letter-spacing: -0.025em;
   line-height: 1.02;
 }
+
+/* Aurora-tinted shimmer skeleton */
+@keyframes shimmer-aurora {
+  0%   { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
+}
+
+@utility skeleton-aurora {
+  position: relative;
+  overflow: hidden;
+  border-radius: var(--radius-lg);
+  background:
+    linear-gradient(
+      90deg,
+      color-mix(in oklab, var(--card) 60%, transparent) 0%,
+      color-mix(in oklab, oklch(0.78 0.17 205) 14%, transparent) 35%,
+      color-mix(in oklab, oklch(0.55 0.22 285) 14%, transparent) 50%,
+      color-mix(in oklab, oklch(0.78 0.17 205) 14%, transparent) 65%,
+      color-mix(in oklab, var(--card) 60%, transparent) 100%
+    );
+  background-size: 200% 100%;
+  animation: shimmer-aurora 2.2s linear infinite;
+}
