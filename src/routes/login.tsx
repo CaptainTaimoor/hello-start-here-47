@@ -1,5 +1,6 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useState } from "react";
+import { motion } from "motion/react";
 import orvionLogo from "@/assets/orvion-logo.png";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -11,11 +12,11 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { Card } from "@/components/ui/card";
 import { useApp } from "@/lib/app-store";
 import { ALL_ROLES, type Role } from "@/lib/types";
 import { toast } from "sonner";
 import { Toaster } from "@/components/ui/sonner";
+import { AuroraMark } from "@/components/magic/AuroraMark";
 
 export const Route = createFileRoute("/login")({
   head: () => ({
@@ -35,39 +36,67 @@ function LoginPage() {
   const [role, setRole] = useState<Role>("Super Admin");
 
   return (
-    <div className="min-h-screen flex flex-col lg:flex-row text-foreground">
+    <div className="min-h-screen flex flex-col lg:flex-row text-foreground relative">
       <Toaster />
-      <div className="hidden lg:flex lg:w-1/2 relative overflow-hidden bg-[linear-gradient(135deg,oklch(0.18_0.05_235),oklch(0.28_0.1_215),oklch(0.42_0.15_205))] text-white p-12 flex-col justify-between">
-        <div className="absolute inset-0 opacity-30 [background:radial-gradient(circle_at_20%_20%,oklch(0.78_0.17_205)_0%,transparent_50%),radial-gradient(circle_at_80%_70%,oklch(0.6_0.2_220)_0%,transparent_50%)]" />
-        <div className="relative flex items-center gap-2">
-          <img src={orvionLogo} alt="Orvion Media" className="h-9 w-auto" />
+      {/* LEFT: editorial canvas */}
+      <motion.div
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        transition={{ duration: 1.2 }}
+        className="hidden lg:flex lg:w-1/2 relative overflow-hidden p-12 flex-col justify-between"
+      >
+        <div className="relative flex items-center gap-3 z-10">
+          <AuroraMark size={28} spin />
+          <img src={orvionLogo} alt="Orvion Media" className="h-8 w-auto" />
         </div>
-        <div className="relative">
-          <div className="text-4xl font-bold leading-tight max-w-md">
-            One control panel for the entire newsroom.
-          </div>
-          <p className="mt-4 text-white/75 max-w-md text-sm">
-            Plan content, run channels, manage editing pipelines and connect to
-            your team across every department — all in one place.
-          </p>
+        <div className="relative z-10 max-w-xl">
+          <div className="eyebrow text-primary/80 mb-6">Newsroom OS · v2.6</div>
+          <motion.h2
+            initial={{ opacity: 0, y: 24 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 1, delay: 0.3, ease: [0.16, 1, 0.3, 1] }}
+            className="serif-display text-6xl xl:text-7xl text-foreground leading-[0.95] tracking-[-0.03em]"
+          >
+            One panel for the <span className="italic text-primary">entire</span> newsroom.
+          </motion.h2>
+          <motion.p
+            initial={{ opacity: 0, y: 16 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 1, delay: 0.6 }}
+            className="mt-6 text-base text-muted-foreground max-w-md leading-relaxed font-light"
+          >
+            Plan content, run channels, manage editing pipelines and connect
+            every department — choreographed in one place.
+          </motion.p>
         </div>
-        <div className="relative text-xs text-white/60">
-          © {new Date().getFullYear()} Orvion Media · Internal use only
+        <div className="relative z-10 flex items-center justify-between text-xs text-muted-foreground/70 font-mono">
+          <span>© {new Date().getFullYear()} Orvion Media</span>
+          <span className="tracking-[0.2em] uppercase">Internal · Encrypted</span>
         </div>
-      </div>
+      </motion.div>
 
-      <div className="flex-1 flex items-center justify-center p-6 lg:p-12">
-        <Card className="w-full max-w-md p-8">
-          <div className="lg:hidden flex items-center gap-2 mb-6 bg-[oklch(0.18_0.05_235)] rounded-lg p-3">
+      {/* RIGHT: glass form */}
+      <div className="flex-1 flex items-center justify-center p-6 lg:p-12 relative z-10">
+        <motion.div
+          initial={{ opacity: 0, y: 24, scale: 0.98 }}
+          animate={{ opacity: 1, y: 0, scale: 1 }}
+          transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1], delay: 0.2 }}
+          className="tile w-full max-w-md p-10"
+        >
+          <div className="lg:hidden flex items-center gap-3 mb-6">
+            <AuroraMark size={24} />
             <img src={orvionLogo} alt="Orvion Media" className="h-7 w-auto" />
           </div>
-          <h1 className="text-2xl font-bold tracking-tight">Welcome back</h1>
-          <p className="text-sm text-muted-foreground mt-1">
+          <div className="eyebrow text-primary/80 mb-3">Sign in</div>
+          <h1 className="serif-display text-4xl text-foreground">
+            Welcome <span className="italic text-primary">back.</span>
+          </h1>
+          <p className="text-sm text-muted-foreground mt-2">
             Sign in to your workspace. Mock login — pick any role.
           </p>
 
           <form
-            className="mt-6 space-y-4"
+            className="mt-8 space-y-4 relative"
             onSubmit={(e) => {
               e.preventDefault();
               login({
@@ -80,12 +109,12 @@ function LoginPage() {
             }}
           >
             <div className="space-y-2">
-              <Label htmlFor="email">Email</Label>
+              <Label htmlFor="email" className="eyebrow">Email</Label>
               <Input id="email" type="email" value={email} onChange={(e) => setEmail(e.target.value)} required />
             </div>
             <div className="space-y-2">
               <div className="flex items-center justify-between">
-                <Label htmlFor="password">Password</Label>
+                <Label htmlFor="password" className="eyebrow">Password</Label>
                 <Link to="/forgot-password" className="text-xs text-primary hover:underline">
                   Forgot?
                 </Link>
@@ -93,7 +122,7 @@ function LoginPage() {
               <Input id="password" type="password" value={password} onChange={(e) => setPassword(e.target.value)} required />
             </div>
             <div className="space-y-2">
-              <Label>Sign in as</Label>
+              <Label className="eyebrow">Sign in as</Label>
               <Select value={role} onValueChange={(v) => setRole(v as Role)}>
                 <SelectTrigger>
                   <SelectValue />
@@ -105,12 +134,12 @@ function LoginPage() {
                 </SelectContent>
               </Select>
             </div>
-            <Button type="submit" className="w-full">Sign in</Button>
+            <Button type="submit" variant="premium" size="lg" className="w-full mt-2">Sign in →</Button>
           </form>
-          <p className="text-[11px] text-muted-foreground mt-6 text-center">
+          <p className="text-[11px] text-muted-foreground/70 mt-6 text-center font-mono tracking-wide">
             This is a mock authentication. No credentials are validated.
           </p>
-        </Card>
+        </motion.div>
       </div>
     </div>
   );
