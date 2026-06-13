@@ -55,7 +55,7 @@ interface AppStore {
 
 const Ctx = createContext<AppStore | null>(null);
 
-const LS_KEY = "orvion.state.v1";
+const LS_KEY = "orvion.state.v2";
 
 function readPersisted() {
   if (typeof window === "undefined") return null;
@@ -71,7 +71,7 @@ export function AppStoreProvider({ children }: { children: ReactNode }) {
   const persisted = readPersisted();
 
   const [user, setUser] = useState<AuthUser | null>(persisted?.user ?? null);
-  const [theme, setTheme] = useState<Theme>(persisted?.theme ?? "light");
+  const [theme, setTheme] = useState<Theme>(persisted?.theme ?? "dark");
   const [sidebarOpen, setSidebarOpen] = useState(true);
   const [channels, setChannels] = useState<Channel[]>(persisted?.channels ?? MOCK_CHANNELS);
   const [sheets, setSheets] = useState<Record<string, SheetRow[]>>(

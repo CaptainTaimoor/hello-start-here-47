@@ -1,5 +1,4 @@
 import type { LucideIcon } from "lucide-react";
-import { Card, CardContent } from "@/components/ui/card";
 
 export function StatCard({
   label,
@@ -13,21 +12,24 @@ export function StatCard({
   icon?: LucideIcon;
 }) {
   return (
-    <Card>
-      <CardContent className="p-5">
-        <div className="flex items-start justify-between">
-          <div>
-            <div className="text-xs text-muted-foreground">{label}</div>
-            <div className="mt-1 text-2xl font-bold tracking-tight">{value}</div>
-            {delta && <div className="text-xs text-emerald-600 mt-1">{delta}</div>}
-          </div>
-          {Icon && (
-            <div className="size-9 rounded-lg bg-primary/10 text-primary grid place-items-center">
-              <Icon className="size-5" />
+    <div className="premium-card group relative overflow-hidden p-5 transition-all duration-300 hover:-translate-y-0.5 hover:shadow-[0_20px_50px_-20px_rgb(0_0_0/0.5)]">
+      <div className="pointer-events-none absolute -right-16 -top-16 size-48 rounded-full bg-primary/10 blur-3xl opacity-0 transition-opacity duration-500 group-hover:opacity-100" />
+      <div className="relative flex items-start justify-between gap-4">
+        <div className="min-w-0">
+          <div className="text-[11px] uppercase tracking-[0.14em] text-muted-foreground/80">{label}</div>
+          <div className="mt-2 text-3xl font-semibold tracking-tight text-gradient">{value}</div>
+          {delta && (
+            <div className="mt-2 inline-flex items-center gap-1 rounded-full bg-emerald-500/10 px-2 py-0.5 text-[11px] font-medium text-emerald-400 ring-1 ring-inset ring-emerald-500/20">
+              {delta}
             </div>
           )}
         </div>
-      </CardContent>
-    </Card>
+        {Icon && (
+          <div className="size-10 rounded-xl bg-gradient-to-br from-primary/25 to-primary/5 text-primary grid place-items-center ring-1 ring-inset ring-primary/20">
+            <Icon className="size-5" />
+          </div>
+        )}
+      </div>
+    </div>
   );
 }

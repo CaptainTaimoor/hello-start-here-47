@@ -33,7 +33,7 @@ export function AppHeader() {
   const unread = notifications.filter((n) => !n.read).length;
 
   return (
-    <header className="sticky top-0 z-30 border-b border-border bg-background/80 backdrop-blur">
+    <header className="sticky top-0 z-30 border-b border-border/60 bg-background/60 backdrop-blur-xl">
       <div className="flex items-center gap-3 px-6 h-16">
         <Button
           variant="ghost"
@@ -46,7 +46,13 @@ export function AppHeader() {
         <div className="hidden md:flex items-center gap-2 max-w-md flex-1">
           <div className="relative w-full">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 size-4 text-muted-foreground" />
-            <Input placeholder="Search sheets, channels, people…" className="pl-9 bg-muted/40" />
+            <Input
+              placeholder="Search sheets, channels, people…"
+              className="pl-9 h-10 bg-muted/30 border-border/50 rounded-xl focus-visible:ring-primary/30"
+            />
+            <kbd className="hidden md:inline-flex absolute right-2 top-1/2 -translate-y-1/2 items-center gap-1 rounded-md border border-border/60 bg-background/50 px-1.5 py-0.5 text-[10px] font-medium text-muted-foreground">
+              ⌘K
+            </kbd>
           </div>
         </div>
         <div className="flex-1 md:hidden" />

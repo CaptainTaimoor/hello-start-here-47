@@ -21,7 +21,6 @@ import {
   Tooltip,
   CartesianGrid,
 } from "recharts";
-import { PageHeader } from "@/components/common/PageHeader";
 import { StatCard } from "@/components/common/StatCard";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -76,13 +75,26 @@ function DashboardPage() {
 
   return (
     <div>
-      <PageHeader
-        title={`Welcome back, ${user?.name?.split(" ")[0] ?? "there"}`}
-        description={`You're signed in as ${role}. Here's what's happening today.`}
-        actions={
+      <section className="relative mb-8 overflow-hidden rounded-3xl border border-border/60 bg-gradient-to-br from-primary/15 via-card/60 to-card/40 p-8 md:p-10">
+        <div className="pointer-events-none absolute inset-0 [background:radial-gradient(800px_300px_at_85%_-20%,oklch(0.78_0.17_205/0.35),transparent_60%),radial-gradient(500px_300px_at_-10%_120%,oklch(0.6_0.18_250/0.25),transparent_60%)]" />
+        <div className="pointer-events-none absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-primary/40 to-transparent" />
+        <div className="relative flex flex-wrap items-end justify-between gap-6">
+          <div className="min-w-0">
+            <div className="inline-flex items-center gap-2 rounded-full border border-border/60 bg-background/40 px-3 py-1 text-[11px] font-medium text-muted-foreground backdrop-blur">
+              <span className="size-1.5 rounded-full bg-emerald-400 shadow-[0_0_8px_rgb(74_222_128/0.8)]" />
+              All systems operational
+            </div>
+            <h1 className="mt-4 text-4xl md:text-5xl font-semibold tracking-tight text-gradient">
+              Welcome back, {user?.name?.split(" ")[0] ?? "there"}.
+            </h1>
+            <p className="mt-3 max-w-xl text-sm md:text-base text-muted-foreground leading-relaxed">
+              You're signed in as <span className="text-foreground font-medium">{role}</span>. Here's everything happening across Orvion Media today.
+            </p>
+          </div>
+          <div className="flex items-center gap-2">
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
-              <Button variant="outline" size="sm">
+              <Button variant="outline" size="sm" className="backdrop-blur bg-background/40 border-border/60">
                 <Settings2 className="size-4 mr-2" />
                 Customize
               </Button>
@@ -100,8 +112,9 @@ function DashboardPage() {
               ))}
             </DropdownMenuContent>
           </DropdownMenu>
-        }
-      />
+          </div>
+        </div>
+      </section>
 
       <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-4">
         {dashboardCards.projects && (
