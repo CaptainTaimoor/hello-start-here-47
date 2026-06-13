@@ -71,7 +71,7 @@ export function AppStoreProvider({ children }: { children: ReactNode }) {
   const persisted = readPersisted();
 
   const [user, setUser] = useState<AuthUser | null>(persisted?.user ?? null);
-  const [theme, setTheme] = useState<Theme>(persisted?.theme ?? "light");
+  const [theme, setTheme] = useState<Theme>(persisted?.theme ?? "dark");
   const [sidebarOpen, setSidebarOpen] = useState(true);
   const [channels, setChannels] = useState<Channel[]>(persisted?.channels ?? MOCK_CHANNELS);
   const [sheets, setSheets] = useState<Record<string, SheetRow[]>>(
