@@ -156,20 +156,42 @@ function DashboardPage() {
         </div>
       </motion.section>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-4">
-        {dashboardCards.projects && (
-          <StatCard label="Assigned projects" value={1} delta="+1 this month" icon={FolderKanban} />
-        )}
-        {dashboardCards.team && (
-          <StatCard label="Team members" value={channels.reduce((s, c) => s + c.team.length, 0)} icon={Users} />
-        )}
-        {dashboardCards.tasks && (
-          <StatCard label="Pending tasks" value={12} delta="3 due today" icon={ListChecks} />
-        )}
-        {dashboardCards.sheets && (
-          <StatCard label="Pending sheet rows" value={totalRows} icon={FileSpreadsheet} />
-        )}
-      </div>
+      <motion.div
+        initial="hidden"
+        animate="show"
+        variants={{
+          hidden: {},
+          show: { transition: { staggerChildren: 0.08, delayChildren: 0.4 } },
+        }}
+        className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-4"
+      >
+        {[
+          dashboardCards.projects && (
+            <StatCard key="p" label="Assigned projects" value={1} delta="+1 this month" icon={FolderKanban} />
+          ),
+          dashboardCards.team && (
+            <StatCard key="t" label="Team members" value={channels.reduce((s, c) => s + c.team.length, 0)} icon={Users} />
+          ),
+          dashboardCards.tasks && (
+            <StatCard key="ts" label="Pending tasks" value={12} delta="3 due today" icon={ListChecks} />
+          ),
+          dashboardCards.sheets && (
+            <StatCard key="sh" label="Pending sheet rows" value={totalRows} icon={FileSpreadsheet} />
+          ),
+        ]
+          .filter(Boolean)
+          .map((card, i) => (
+            <motion.div
+              key={i}
+              variants={{
+                hidden: { opacity: 0, y: 24 },
+                show: { opacity: 1, y: 0, transition: { duration: 0.6, ease: [0.16, 1, 0.3, 1] } },
+              }}
+            >
+              {card}
+            </motion.div>
+          ))}
+      </motion.div>
 
       <div className="mt-6 grid grid-cols-1 xl:grid-cols-3 gap-4">
         <Card className="xl:col-span-2">
