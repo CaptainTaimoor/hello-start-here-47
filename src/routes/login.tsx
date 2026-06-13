@@ -35,7 +35,7 @@ function LoginPage() {
   const [role, setRole] = useState<Role>("Super Admin");
 
   return (
-    <div className="min-h-screen flex flex-col lg:flex-row bg-background text-foreground">
+    <div className="min-h-screen flex flex-col lg:flex-row text-foreground">
       <Toaster />
       <div className="hidden lg:flex lg:w-1/2 relative overflow-hidden bg-[linear-gradient(135deg,oklch(0.18_0.05_235),oklch(0.28_0.1_215),oklch(0.42_0.15_205))] text-white p-12 flex-col justify-between">
         <div className="absolute inset-0 opacity-30 [background:radial-gradient(circle_at_20%_20%,oklch(0.78_0.17_205)_0%,transparent_50%),radial-gradient(circle_at_80%_70%,oklch(0.6_0.2_220)_0%,transparent_50%)]" />
