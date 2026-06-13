@@ -55,13 +55,9 @@ export function AppShell({ children }: { children?: ReactNode }) {
       <CommandPalette />
       <ShortcutsDialog />
       <AssistantPanel />
-      <div data-app-sidebar className="contents">
-        <AppSidebar />
-      </div>
+      <AppSidebar />
       <div className="flex flex-1 flex-col min-w-0">
-        <div data-app-chrome className="contents">
-          <AppHeader />
-        </div>
+        <AppHeader />
         <main className="relative flex-1 min-w-0 p-6 lg:p-8 z-[1]">
           <AnimatePresence mode="wait">
             <motion.div

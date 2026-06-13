@@ -440,20 +440,20 @@
 }
 
 /* === Focus / Zen mode — fades sidebar & header out === */
-.focus-mode [data-app-chrome] {
+.focus-mode > aside,
+.focus-mode header {
   opacity: 0;
   pointer-events: none;
   transform: translateY(-6px);
-  transition: opacity 0.4s ease, transform 0.4s ease;
+  transition: opacity 0.45s ease, transform 0.45s ease;
 }
-.focus-mode [data-app-sidebar] {
-  opacity: 0;
-  pointer-events: none;
+.focus-mode > aside {
   transform: translateX(-12px);
-  transition: opacity 0.4s ease, transform 0.4s ease;
+  width: 0 !important;
+  min-width: 0 !important;
 }
 .focus-mode main {
-  padding-top: 2.5rem !important;
+  padding-top: 3rem !important;
   padding-bottom: 4rem !important;
   max-width: 1200px;
   margin-inline: auto;
