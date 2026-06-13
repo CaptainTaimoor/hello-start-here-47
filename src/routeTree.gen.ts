@@ -9,38 +9,280 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
+import { Route as LoginRouteImport } from './routes/login'
+import { Route as ForgotPasswordRouteImport } from './routes/forgot-password'
+import { Route as AppRouteImport } from './routes/_app'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as AppTeamRouteImport } from './routes/_app.team'
+import { Route as AppSettingsRouteImport } from './routes/_app.settings'
+import { Route as AppProjectsRouteImport } from './routes/_app.projects'
+import { Route as AppNotificationsRouteImport } from './routes/_app.notifications'
+import { Route as AppDepartmentsRouteImport } from './routes/_app.departments'
+import { Route as AppDashboardRouteImport } from './routes/_app.dashboard'
+import { Route as AppAdminRouteImport } from './routes/_app.admin'
+import { Route as AppTeamNewsRouteImport } from './routes/_app.team.news'
+import { Route as AppProjectsNewsRouteImport } from './routes/_app.projects.news'
+import { Route as AppDepartmentsItRouteImport } from './routes/_app.departments.it'
+import { Route as AppDepartmentsHrRouteImport } from './routes/_app.departments.hr'
+import { Route as AppDepartmentsFinanceRouteImport } from './routes/_app.departments.finance'
+import { Route as AppProjectsNewsCurrentAffairsRouteImport } from './routes/_app.projects.news.current-affairs'
+import { Route as AppProjectsNewsCurrentAffairsYoutubeRouteImport } from './routes/_app.projects.news.current-affairs.youtube'
+import { Route as AppProjectsNewsCurrentAffairsYoutubeChannelIdRouteImport } from './routes/_app.projects.news.current-affairs.youtube.$channelId'
 
+const LoginRoute = LoginRouteImport.update({
+  id: '/login',
+  path: '/login',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ForgotPasswordRoute = ForgotPasswordRouteImport.update({
+  id: '/forgot-password',
+  path: '/forgot-password',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AppRoute = AppRouteImport.update({
+  id: '/_app',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AppTeamRoute = AppTeamRouteImport.update({
+  id: '/team',
+  path: '/team',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppSettingsRoute = AppSettingsRouteImport.update({
+  id: '/settings',
+  path: '/settings',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppProjectsRoute = AppProjectsRouteImport.update({
+  id: '/projects',
+  path: '/projects',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppNotificationsRoute = AppNotificationsRouteImport.update({
+  id: '/notifications',
+  path: '/notifications',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppDepartmentsRoute = AppDepartmentsRouteImport.update({
+  id: '/departments',
+  path: '/departments',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppDashboardRoute = AppDashboardRouteImport.update({
+  id: '/dashboard',
+  path: '/dashboard',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppAdminRoute = AppAdminRouteImport.update({
+  id: '/admin',
+  path: '/admin',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppTeamNewsRoute = AppTeamNewsRouteImport.update({
+  id: '/news',
+  path: '/news',
+  getParentRoute: () => AppTeamRoute,
+} as any)
+const AppProjectsNewsRoute = AppProjectsNewsRouteImport.update({
+  id: '/news',
+  path: '/news',
+  getParentRoute: () => AppProjectsRoute,
+} as any)
+const AppDepartmentsItRoute = AppDepartmentsItRouteImport.update({
+  id: '/it',
+  path: '/it',
+  getParentRoute: () => AppDepartmentsRoute,
+} as any)
+const AppDepartmentsHrRoute = AppDepartmentsHrRouteImport.update({
+  id: '/hr',
+  path: '/hr',
+  getParentRoute: () => AppDepartmentsRoute,
+} as any)
+const AppDepartmentsFinanceRoute = AppDepartmentsFinanceRouteImport.update({
+  id: '/finance',
+  path: '/finance',
+  getParentRoute: () => AppDepartmentsRoute,
+} as any)
+const AppProjectsNewsCurrentAffairsRoute =
+  AppProjectsNewsCurrentAffairsRouteImport.update({
+    id: '/current-affairs',
+    path: '/current-affairs',
+    getParentRoute: () => AppProjectsNewsRoute,
+  } as any)
+const AppProjectsNewsCurrentAffairsYoutubeRoute =
+  AppProjectsNewsCurrentAffairsYoutubeRouteImport.update({
+    id: '/youtube',
+    path: '/youtube',
+    getParentRoute: () => AppProjectsNewsCurrentAffairsRoute,
+  } as any)
+const AppProjectsNewsCurrentAffairsYoutubeChannelIdRoute =
+  AppProjectsNewsCurrentAffairsYoutubeChannelIdRouteImport.update({
+    id: '/$channelId',
+    path: '/$channelId',
+    getParentRoute: () => AppProjectsNewsCurrentAffairsYoutubeRoute,
+  } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/forgot-password': typeof ForgotPasswordRoute
+  '/login': typeof LoginRoute
+  '/admin': typeof AppAdminRoute
+  '/dashboard': typeof AppDashboardRoute
+  '/departments': typeof AppDepartmentsRouteWithChildren
+  '/notifications': typeof AppNotificationsRoute
+  '/projects': typeof AppProjectsRouteWithChildren
+  '/settings': typeof AppSettingsRoute
+  '/team': typeof AppTeamRouteWithChildren
+  '/departments/finance': typeof AppDepartmentsFinanceRoute
+  '/departments/hr': typeof AppDepartmentsHrRoute
+  '/departments/it': typeof AppDepartmentsItRoute
+  '/projects/news': typeof AppProjectsNewsRouteWithChildren
+  '/team/news': typeof AppTeamNewsRoute
+  '/projects/news/current-affairs': typeof AppProjectsNewsCurrentAffairsRouteWithChildren
+  '/projects/news/current-affairs/youtube': typeof AppProjectsNewsCurrentAffairsYoutubeRouteWithChildren
+  '/projects/news/current-affairs/youtube/$channelId': typeof AppProjectsNewsCurrentAffairsYoutubeChannelIdRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/forgot-password': typeof ForgotPasswordRoute
+  '/login': typeof LoginRoute
+  '/admin': typeof AppAdminRoute
+  '/dashboard': typeof AppDashboardRoute
+  '/departments': typeof AppDepartmentsRouteWithChildren
+  '/notifications': typeof AppNotificationsRoute
+  '/projects': typeof AppProjectsRouteWithChildren
+  '/settings': typeof AppSettingsRoute
+  '/team': typeof AppTeamRouteWithChildren
+  '/departments/finance': typeof AppDepartmentsFinanceRoute
+  '/departments/hr': typeof AppDepartmentsHrRoute
+  '/departments/it': typeof AppDepartmentsItRoute
+  '/projects/news': typeof AppProjectsNewsRouteWithChildren
+  '/team/news': typeof AppTeamNewsRoute
+  '/projects/news/current-affairs': typeof AppProjectsNewsCurrentAffairsRouteWithChildren
+  '/projects/news/current-affairs/youtube': typeof AppProjectsNewsCurrentAffairsYoutubeRouteWithChildren
+  '/projects/news/current-affairs/youtube/$channelId': typeof AppProjectsNewsCurrentAffairsYoutubeChannelIdRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/_app': typeof AppRouteWithChildren
+  '/forgot-password': typeof ForgotPasswordRoute
+  '/login': typeof LoginRoute
+  '/_app/admin': typeof AppAdminRoute
+  '/_app/dashboard': typeof AppDashboardRoute
+  '/_app/departments': typeof AppDepartmentsRouteWithChildren
+  '/_app/notifications': typeof AppNotificationsRoute
+  '/_app/projects': typeof AppProjectsRouteWithChildren
+  '/_app/settings': typeof AppSettingsRoute
+  '/_app/team': typeof AppTeamRouteWithChildren
+  '/_app/departments/finance': typeof AppDepartmentsFinanceRoute
+  '/_app/departments/hr': typeof AppDepartmentsHrRoute
+  '/_app/departments/it': typeof AppDepartmentsItRoute
+  '/_app/projects/news': typeof AppProjectsNewsRouteWithChildren
+  '/_app/team/news': typeof AppTeamNewsRoute
+  '/_app/projects/news/current-affairs': typeof AppProjectsNewsCurrentAffairsRouteWithChildren
+  '/_app/projects/news/current-affairs/youtube': typeof AppProjectsNewsCurrentAffairsYoutubeRouteWithChildren
+  '/_app/projects/news/current-affairs/youtube/$channelId': typeof AppProjectsNewsCurrentAffairsYoutubeChannelIdRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/'
+  fullPaths:
+    | '/'
+    | '/forgot-password'
+    | '/login'
+    | '/admin'
+    | '/dashboard'
+    | '/departments'
+    | '/notifications'
+    | '/projects'
+    | '/settings'
+    | '/team'
+    | '/departments/finance'
+    | '/departments/hr'
+    | '/departments/it'
+    | '/projects/news'
+    | '/team/news'
+    | '/projects/news/current-affairs'
+    | '/projects/news/current-affairs/youtube'
+    | '/projects/news/current-affairs/youtube/$channelId'
   fileRoutesByTo: FileRoutesByTo
-  to: '/'
-  id: '__root__' | '/'
+  to:
+    | '/'
+    | '/forgot-password'
+    | '/login'
+    | '/admin'
+    | '/dashboard'
+    | '/departments'
+    | '/notifications'
+    | '/projects'
+    | '/settings'
+    | '/team'
+    | '/departments/finance'
+    | '/departments/hr'
+    | '/departments/it'
+    | '/projects/news'
+    | '/team/news'
+    | '/projects/news/current-affairs'
+    | '/projects/news/current-affairs/youtube'
+    | '/projects/news/current-affairs/youtube/$channelId'
+  id:
+    | '__root__'
+    | '/'
+    | '/_app'
+    | '/forgot-password'
+    | '/login'
+    | '/_app/admin'
+    | '/_app/dashboard'
+    | '/_app/departments'
+    | '/_app/notifications'
+    | '/_app/projects'
+    | '/_app/settings'
+    | '/_app/team'
+    | '/_app/departments/finance'
+    | '/_app/departments/hr'
+    | '/_app/departments/it'
+    | '/_app/projects/news'
+    | '/_app/team/news'
+    | '/_app/projects/news/current-affairs'
+    | '/_app/projects/news/current-affairs/youtube'
+    | '/_app/projects/news/current-affairs/youtube/$channelId'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  AppRoute: typeof AppRouteWithChildren
+  ForgotPasswordRoute: typeof ForgotPasswordRoute
+  LoginRoute: typeof LoginRoute
 }
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
+    '/login': {
+      id: '/login'
+      path: '/login'
+      fullPath: '/login'
+      preLoaderRoute: typeof LoginRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/forgot-password': {
+      id: '/forgot-password'
+      path: '/forgot-password'
+      fullPath: '/forgot-password'
+      preLoaderRoute: typeof ForgotPasswordRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/_app': {
+      id: '/_app'
+      path: ''
+      fullPath: '/'
+      preLoaderRoute: typeof AppRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/': {
       id: '/'
       path: '/'
@@ -48,22 +290,224 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/_app/team': {
+      id: '/_app/team'
+      path: '/team'
+      fullPath: '/team'
+      preLoaderRoute: typeof AppTeamRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/_app/settings': {
+      id: '/_app/settings'
+      path: '/settings'
+      fullPath: '/settings'
+      preLoaderRoute: typeof AppSettingsRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/_app/projects': {
+      id: '/_app/projects'
+      path: '/projects'
+      fullPath: '/projects'
+      preLoaderRoute: typeof AppProjectsRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/_app/notifications': {
+      id: '/_app/notifications'
+      path: '/notifications'
+      fullPath: '/notifications'
+      preLoaderRoute: typeof AppNotificationsRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/_app/departments': {
+      id: '/_app/departments'
+      path: '/departments'
+      fullPath: '/departments'
+      preLoaderRoute: typeof AppDepartmentsRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/_app/dashboard': {
+      id: '/_app/dashboard'
+      path: '/dashboard'
+      fullPath: '/dashboard'
+      preLoaderRoute: typeof AppDashboardRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/_app/admin': {
+      id: '/_app/admin'
+      path: '/admin'
+      fullPath: '/admin'
+      preLoaderRoute: typeof AppAdminRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/_app/team/news': {
+      id: '/_app/team/news'
+      path: '/news'
+      fullPath: '/team/news'
+      preLoaderRoute: typeof AppTeamNewsRouteImport
+      parentRoute: typeof AppTeamRoute
+    }
+    '/_app/projects/news': {
+      id: '/_app/projects/news'
+      path: '/news'
+      fullPath: '/projects/news'
+      preLoaderRoute: typeof AppProjectsNewsRouteImport
+      parentRoute: typeof AppProjectsRoute
+    }
+    '/_app/departments/it': {
+      id: '/_app/departments/it'
+      path: '/it'
+      fullPath: '/departments/it'
+      preLoaderRoute: typeof AppDepartmentsItRouteImport
+      parentRoute: typeof AppDepartmentsRoute
+    }
+    '/_app/departments/hr': {
+      id: '/_app/departments/hr'
+      path: '/hr'
+      fullPath: '/departments/hr'
+      preLoaderRoute: typeof AppDepartmentsHrRouteImport
+      parentRoute: typeof AppDepartmentsRoute
+    }
+    '/_app/departments/finance': {
+      id: '/_app/departments/finance'
+      path: '/finance'
+      fullPath: '/departments/finance'
+      preLoaderRoute: typeof AppDepartmentsFinanceRouteImport
+      parentRoute: typeof AppDepartmentsRoute
+    }
+    '/_app/projects/news/current-affairs': {
+      id: '/_app/projects/news/current-affairs'
+      path: '/current-affairs'
+      fullPath: '/projects/news/current-affairs'
+      preLoaderRoute: typeof AppProjectsNewsCurrentAffairsRouteImport
+      parentRoute: typeof AppProjectsNewsRoute
+    }
+    '/_app/projects/news/current-affairs/youtube': {
+      id: '/_app/projects/news/current-affairs/youtube'
+      path: '/youtube'
+      fullPath: '/projects/news/current-affairs/youtube'
+      preLoaderRoute: typeof AppProjectsNewsCurrentAffairsYoutubeRouteImport
+      parentRoute: typeof AppProjectsNewsCurrentAffairsRoute
+    }
+    '/_app/projects/news/current-affairs/youtube/$channelId': {
+      id: '/_app/projects/news/current-affairs/youtube/$channelId'
+      path: '/$channelId'
+      fullPath: '/projects/news/current-affairs/youtube/$channelId'
+      preLoaderRoute: typeof AppProjectsNewsCurrentAffairsYoutubeChannelIdRouteImport
+      parentRoute: typeof AppProjectsNewsCurrentAffairsYoutubeRoute
+    }
   }
 }
 
+interface AppDepartmentsRouteChildren {
+  AppDepartmentsFinanceRoute: typeof AppDepartmentsFinanceRoute
+  AppDepartmentsHrRoute: typeof AppDepartmentsHrRoute
+  AppDepartmentsItRoute: typeof AppDepartmentsItRoute
+}
+
+const AppDepartmentsRouteChildren: AppDepartmentsRouteChildren = {
+  AppDepartmentsFinanceRoute: AppDepartmentsFinanceRoute,
+  AppDepartmentsHrRoute: AppDepartmentsHrRoute,
+  AppDepartmentsItRoute: AppDepartmentsItRoute,
+}
+
+const AppDepartmentsRouteWithChildren = AppDepartmentsRoute._addFileChildren(
+  AppDepartmentsRouteChildren,
+)
+
+interface AppProjectsNewsCurrentAffairsYoutubeRouteChildren {
+  AppProjectsNewsCurrentAffairsYoutubeChannelIdRoute: typeof AppProjectsNewsCurrentAffairsYoutubeChannelIdRoute
+}
+
+const AppProjectsNewsCurrentAffairsYoutubeRouteChildren: AppProjectsNewsCurrentAffairsYoutubeRouteChildren =
+  {
+    AppProjectsNewsCurrentAffairsYoutubeChannelIdRoute:
+      AppProjectsNewsCurrentAffairsYoutubeChannelIdRoute,
+  }
+
+const AppProjectsNewsCurrentAffairsYoutubeRouteWithChildren =
+  AppProjectsNewsCurrentAffairsYoutubeRoute._addFileChildren(
+    AppProjectsNewsCurrentAffairsYoutubeRouteChildren,
+  )
+
+interface AppProjectsNewsCurrentAffairsRouteChildren {
+  AppProjectsNewsCurrentAffairsYoutubeRoute: typeof AppProjectsNewsCurrentAffairsYoutubeRouteWithChildren
+}
+
+const AppProjectsNewsCurrentAffairsRouteChildren: AppProjectsNewsCurrentAffairsRouteChildren =
+  {
+    AppProjectsNewsCurrentAffairsYoutubeRoute:
+      AppProjectsNewsCurrentAffairsYoutubeRouteWithChildren,
+  }
+
+const AppProjectsNewsCurrentAffairsRouteWithChildren =
+  AppProjectsNewsCurrentAffairsRoute._addFileChildren(
+    AppProjectsNewsCurrentAffairsRouteChildren,
+  )
+
+interface AppProjectsNewsRouteChildren {
+  AppProjectsNewsCurrentAffairsRoute: typeof AppProjectsNewsCurrentAffairsRouteWithChildren
+}
+
+const AppProjectsNewsRouteChildren: AppProjectsNewsRouteChildren = {
+  AppProjectsNewsCurrentAffairsRoute:
+    AppProjectsNewsCurrentAffairsRouteWithChildren,
+}
+
+const AppProjectsNewsRouteWithChildren = AppProjectsNewsRoute._addFileChildren(
+  AppProjectsNewsRouteChildren,
+)
+
+interface AppProjectsRouteChildren {
+  AppProjectsNewsRoute: typeof AppProjectsNewsRouteWithChildren
+}
+
+const AppProjectsRouteChildren: AppProjectsRouteChildren = {
+  AppProjectsNewsRoute: AppProjectsNewsRouteWithChildren,
+}
+
+const AppProjectsRouteWithChildren = AppProjectsRoute._addFileChildren(
+  AppProjectsRouteChildren,
+)
+
+interface AppTeamRouteChildren {
+  AppTeamNewsRoute: typeof AppTeamNewsRoute
+}
+
+const AppTeamRouteChildren: AppTeamRouteChildren = {
+  AppTeamNewsRoute: AppTeamNewsRoute,
+}
+
+const AppTeamRouteWithChildren =
+  AppTeamRoute._addFileChildren(AppTeamRouteChildren)
+
+interface AppRouteChildren {
+  AppAdminRoute: typeof AppAdminRoute
+  AppDashboardRoute: typeof AppDashboardRoute
+  AppDepartmentsRoute: typeof AppDepartmentsRouteWithChildren
+  AppNotificationsRoute: typeof AppNotificationsRoute
+  AppProjectsRoute: typeof AppProjectsRouteWithChildren
+  AppSettingsRoute: typeof AppSettingsRoute
+  AppTeamRoute: typeof AppTeamRouteWithChildren
+}
+
+const AppRouteChildren: AppRouteChildren = {
+  AppAdminRoute: AppAdminRoute,
+  AppDashboardRoute: AppDashboardRoute,
+  AppDepartmentsRoute: AppDepartmentsRouteWithChildren,
+  AppNotificationsRoute: AppNotificationsRoute,
+  AppProjectsRoute: AppProjectsRouteWithChildren,
+  AppSettingsRoute: AppSettingsRoute,
+  AppTeamRoute: AppTeamRouteWithChildren,
+}
+
+const AppRouteWithChildren = AppRoute._addFileChildren(AppRouteChildren)
+
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  AppRoute: AppRouteWithChildren,
+  ForgotPasswordRoute: ForgotPasswordRoute,
+  LoginRoute: LoginRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
-
-import type { getRouter } from './router.tsx'
-import type { startInstance } from './start.ts'
-declare module '@tanstack/react-start' {
-  interface Register {
-    ssr: true
-    router: Awaited<ReturnType<typeof getRouter>>
-    config: Awaited<ReturnType<typeof startInstance.getOptions>>
-  }
-}
