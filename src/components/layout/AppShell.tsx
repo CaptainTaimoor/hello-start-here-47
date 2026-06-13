@@ -9,7 +9,6 @@ import { CommandPalette } from "@/components/CommandPalette";
 import { CursorSpotlight } from "@/components/magic/CursorSpotlight";
 import { click } from "@/lib/sound";
 import { useState } from "react";
-import { CustomCursor } from "@/components/magic/CustomCursor";
 import { ShortcutsDialog } from "@/components/ShortcutsDialog";
 import { AssistantPanel } from "@/components/AssistantPanel";
 import { X } from "lucide-react";
@@ -51,7 +50,6 @@ export function AppShell({ children }: { children?: ReactNode }) {
   return (
     <div className={`flex min-h-screen w-full text-foreground relative ${focusMode ? "focus-mode" : ""}`}>
       <CursorSpotlight />
-      <CustomCursor />
       <CommandPalette />
       <ShortcutsDialog />
       <AssistantPanel />
