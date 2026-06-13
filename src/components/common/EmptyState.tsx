@@ -1,15 +1,16 @@
 import type { LucideIcon } from "lucide-react";
 import { Inbox } from "lucide-react";
 import type { ReactNode } from "react";
+import { EMPTY_COPY } from "@/lib/copy";
 
 export function EmptyState({
   icon: Icon = Inbox,
-  title,
-  description,
+  title = EMPTY_COPY.generic.title,
+  description = EMPTY_COPY.generic.description,
   action,
 }: {
   icon?: LucideIcon;
-  title: string;
+  title?: string;
   description?: string;
   action?: ReactNode;
 }) {
