@@ -21,6 +21,7 @@ import {
   BreadcrumbSeparator,
 } from "@/components/ui/breadcrumb";
 import { useApp } from "@/lib/app-store";
+import { useEffect } from "react";
 
 function toTitle(s: string) {
   return s.replace(/-/g, " ").replace(/\b\w/g, (c) => c.toUpperCase());
@@ -32,6 +33,18 @@ export function AppHeader() {
   const parts = pathname.split("/").filter(Boolean);
   const unread = notifications.filter((n) => !n.read).length;
 
+  // ⌘B toggles sidebar
+  useEffect(() => {
+    const fn = (e: KeyboardEvent) => {
+      if ((e.key === "b" || e.key === "B") && (e.metaKey || e.ctrlKey)) {
+        e.preventDefault();
+        setSidebarOpen(!sidebarOpen);
+      }
+    };
+    window.addEventListener("keydown", fn);
+    return () => window.removeEventListener("keydown", fn);
+  }, [sidebarOpen, setSidebarOpen]);
+
   return (
     <header className="sticky top-0 z-30 border-b border-white/[0.06] bg-background/30 backdrop-blur-2xl backdrop-saturate-150 shadow-[0_1px_0_0_rgb(255_255_255/0.04)_inset]">
       <div className="flex items-center gap-3 px-6 h-16">
@@ -40,6 +53,7 @@ export function AppHeader() {
           size="icon"
           onClick={() => setSidebarOpen(!sidebarOpen)}
           aria-label="Toggle sidebar"
+          title="Toggle sidebar  ⌘B"
         >
           <Menu className="size-5" />
         </Button>

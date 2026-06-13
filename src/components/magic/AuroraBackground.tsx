@@ -22,7 +22,7 @@ export function AuroraBackground() {
       <div className="absolute inset-0 bg-background" />
       {/* aurora blobs */}
       <div
-        className="absolute -top-[20%] -left-[10%] size-[60vmax] rounded-full opacity-60 mix-blend-screen blur-[120px] will-change-transform"
+        className="absolute -top-[35%] -left-[25%] size-[55vmax] rounded-full opacity-25 mix-blend-screen blur-[140px] will-change-transform"
         style={{
           background:
             "radial-gradient(circle at 30% 30%, oklch(0.78 0.17 205 / 0.9), transparent 60%)",
@@ -30,7 +30,7 @@ export function AuroraBackground() {
         }}
       />
       <div
-        className="absolute top-[10%] right-[-15%] size-[55vmax] rounded-full opacity-55 mix-blend-screen blur-[120px] will-change-transform"
+        className="absolute top-[-5%] right-[-30%] size-[50vmax] rounded-full opacity-22 mix-blend-screen blur-[140px] will-change-transform"
         style={{
           background:
             "radial-gradient(circle at 60% 40%, oklch(0.62 0.22 255 / 0.85), transparent 60%)",
@@ -38,7 +38,7 @@ export function AuroraBackground() {
         }}
       />
       <div
-        className="absolute bottom-[-25%] left-[20%] size-[65vmax] rounded-full opacity-50 mix-blend-screen blur-[140px] will-change-transform"
+        className="absolute bottom-[-40%] left-[10%] size-[60vmax] rounded-full opacity-20 mix-blend-screen blur-[160px] will-change-transform"
         style={{
           background:
             "radial-gradient(circle at 50% 50%, oklch(0.55 0.24 295 / 0.85), transparent 60%)",
@@ -46,7 +46,7 @@ export function AuroraBackground() {
         }}
       />
       <div
-        className="absolute top-[40%] left-[35%] size-[40vmax] rounded-full opacity-40 mix-blend-screen blur-[120px] will-change-transform"
+        className="absolute top-[60%] left-[55%] size-[35vmax] rounded-full opacity-12 mix-blend-screen blur-[140px] will-change-transform"
         style={{
           background:
             "radial-gradient(circle at 50% 50%, oklch(0.7 0.2 180 / 0.7), transparent 60%)",
@@ -58,7 +58,7 @@ export function AuroraBackground() {
         className="absolute inset-0"
         style={{
           background:
-            "radial-gradient(120% 80% at 50% 0%, transparent 0%, oklch(0.10 0.02 240 / 0.55) 70%, oklch(0.08 0.02 240 / 0.85) 100%)",
+            "radial-gradient(120% 80% at 50% 0%, transparent 0%, oklch(0.09 0.02 240 / 0.75) 60%, oklch(0.07 0.02 240 / 0.95) 100%)",
         }}
       />
       {/* grain — inline SVG, fixed at 2.5% */}
