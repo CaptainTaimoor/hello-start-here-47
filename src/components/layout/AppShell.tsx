@@ -8,11 +8,17 @@ import { motion, AnimatePresence } from "motion/react";
 import { CommandPalette } from "@/components/CommandPalette";
 import { CursorSpotlight } from "@/components/magic/CursorSpotlight";
 import { click } from "@/lib/sound";
+import { useState } from "react";
+import { CustomCursor } from "@/components/magic/CustomCursor";
+import { ShortcutsDialog } from "@/components/ShortcutsDialog";
+import { AssistantPanel } from "@/components/AssistantPanel";
+import { X } from "lucide-react";
 
 export function AppShell({ children }: { children?: ReactNode }) {
   const { user } = useApp();
   const navigate = useNavigate();
   const pathname = useRouterState({ select: (s) => s.location.pathname });
+  const [focusMode, setFocusMode] = useState(false);
 
   useEffect(() => {
     if (!user && pathname !== "/login" && pathname !== "/forgot-password") {
@@ -23,15 +29,39 @@ export function AppShell({ children }: { children?: ReactNode }) {
   // Soft sound on route change
   useEffect(() => { click("tick"); }, [pathname]);
 
+  // F toggles focus mode
+  useEffect(() => {
+    const fn = (e: KeyboardEvent) => {
+      const t = e.target as HTMLElement | null;
+      if (t && /^(INPUT|TEXTAREA|SELECT)$/.test(t.tagName)) return;
+      if (t?.isContentEditable) return;
+      if (e.key === "f" || e.key === "F") {
+        if (e.metaKey || e.ctrlKey || e.altKey) return;
+        e.preventDefault();
+        setFocusMode((v) => !v);
+      }
+      if (e.key === "Escape" && focusMode) setFocusMode(false);
+    };
+    window.addEventListener("keydown", fn);
+    return () => window.removeEventListener("keydown", fn);
+  }, [focusMode]);
+
   if (!user) return null;
 
   return (
-    <div className="flex min-h-screen w-full text-foreground relative">
+    <div className={`flex min-h-screen w-full text-foreground relative ${focusMode ? "focus-mode" : ""}`}>
       <CursorSpotlight />
+      <CustomCursor />
       <CommandPalette />
-      <AppSidebar />
+      <ShortcutsDialog />
+      <AssistantPanel />
+      <div data-app-sidebar className="contents">
+        <AppSidebar />
+      </div>
       <div className="flex flex-1 flex-col min-w-0">
-        <AppHeader />
+        <div data-app-chrome className="contents">
+          <AppHeader />
+        </div>
         <main className="relative flex-1 min-w-0 p-6 lg:p-8 z-[1]">
           <AnimatePresence mode="wait">
             <motion.div
@@ -51,6 +81,15 @@ export function AppShell({ children }: { children?: ReactNode }) {
           </AnimatePresence>
         </main>
       </div>
+      {focusMode && (
+        <button
+          onClick={() => setFocusMode(false)}
+          className="fixed top-5 right-5 z-[100] inline-flex items-center gap-2 rounded-full glass px-4 py-2 text-xs font-medium text-foreground/90 hover:text-foreground transition-colors"
+        >
+          <X className="size-3.5" />
+          Exit focus  ·  <kbd className="text-[10px] opacity-70">Esc</kbd>
+        </button>
+      )}
       <Toaster />
     </div>
   );
