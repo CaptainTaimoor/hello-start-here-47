@@ -17,6 +17,7 @@ import { Route as AppTeamRouteImport } from './routes/_app.team'
 import { Route as AppProjectsRouteImport } from './routes/_app.projects'
 import { Route as AppDepartmentsRouteImport } from './routes/_app.departments'
 import { Route as AppDashboardRouteImport } from './routes/_app.dashboard'
+import { Route as AppAdminRouteImport } from './routes/_app.admin'
 import { Route as AppTeamNewsRouteImport } from './routes/_app.team.news'
 import { Route as AppProjectsNewsRouteImport } from './routes/_app.projects.news'
 import { Route as AppDepartmentsItRouteImport } from './routes/_app.departments.it'
@@ -63,6 +64,11 @@ const AppDepartmentsRoute = AppDepartmentsRouteImport.update({
 const AppDashboardRoute = AppDashboardRouteImport.update({
   id: '/dashboard',
   path: '/dashboard',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppAdminRoute = AppAdminRouteImport.update({
+  id: '/admin',
+  path: '/admin',
   getParentRoute: () => AppRoute,
 } as any)
 const AppTeamNewsRoute = AppTeamNewsRouteImport.update({
@@ -113,6 +119,7 @@ export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/forgot-password': typeof ForgotPasswordRoute
   '/login': typeof LoginRoute
+  '/admin': typeof AppAdminRoute
   '/dashboard': typeof AppDashboardRoute
   '/departments': typeof AppDepartmentsRouteWithChildren
   '/projects': typeof AppProjectsRouteWithChildren
@@ -130,6 +137,7 @@ export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/forgot-password': typeof ForgotPasswordRoute
   '/login': typeof LoginRoute
+  '/admin': typeof AppAdminRoute
   '/dashboard': typeof AppDashboardRoute
   '/departments': typeof AppDepartmentsRouteWithChildren
   '/projects': typeof AppProjectsRouteWithChildren
@@ -149,6 +157,7 @@ export interface FileRoutesById {
   '/_app': typeof AppRouteWithChildren
   '/forgot-password': typeof ForgotPasswordRoute
   '/login': typeof LoginRoute
+  '/_app/admin': typeof AppAdminRoute
   '/_app/dashboard': typeof AppDashboardRoute
   '/_app/departments': typeof AppDepartmentsRouteWithChildren
   '/_app/projects': typeof AppProjectsRouteWithChildren
@@ -168,6 +177,7 @@ export interface FileRouteTypes {
     | '/'
     | '/forgot-password'
     | '/login'
+    | '/admin'
     | '/dashboard'
     | '/departments'
     | '/projects'
@@ -185,6 +195,7 @@ export interface FileRouteTypes {
     | '/'
     | '/forgot-password'
     | '/login'
+    | '/admin'
     | '/dashboard'
     | '/departments'
     | '/projects'
@@ -203,6 +214,7 @@ export interface FileRouteTypes {
     | '/_app'
     | '/forgot-password'
     | '/login'
+    | '/_app/admin'
     | '/_app/dashboard'
     | '/_app/departments'
     | '/_app/projects'
@@ -280,6 +292,13 @@ declare module '@tanstack/react-router' {
       path: '/dashboard'
       fullPath: '/dashboard'
       preLoaderRoute: typeof AppDashboardRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/_app/admin': {
+      id: '/_app/admin'
+      path: '/admin'
+      fullPath: '/admin'
+      preLoaderRoute: typeof AppAdminRouteImport
       parentRoute: typeof AppRoute
     }
     '/_app/team/news': {
@@ -424,6 +443,7 @@ const AppTeamRouteWithChildren =
   AppTeamRoute._addFileChildren(AppTeamRouteChildren)
 
 interface AppRouteChildren {
+  AppAdminRoute: typeof AppAdminRoute
   AppDashboardRoute: typeof AppDashboardRoute
   AppDepartmentsRoute: typeof AppDepartmentsRouteWithChildren
   AppProjectsRoute: typeof AppProjectsRouteWithChildren
@@ -431,6 +451,7 @@ interface AppRouteChildren {
 }
 
 const AppRouteChildren: AppRouteChildren = {
+  AppAdminRoute: AppAdminRoute,
   AppDashboardRoute: AppDashboardRoute,
   AppDepartmentsRoute: AppDepartmentsRouteWithChildren,
   AppProjectsRoute: AppProjectsRouteWithChildren,
