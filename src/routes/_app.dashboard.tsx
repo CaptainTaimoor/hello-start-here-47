@@ -274,7 +274,7 @@ function DashboardPage() {
             <h3 className="text-[10px] uppercase tracking-[0.22em] font-semibold text-white/40 mb-5">KPI Status</h3>
             <div className="space-y-4">
               {channels.map((c, i) => {
-                const onTrack = c.kpiStatus === "On Track" || c.kpiStatus === "Healthy";
+                const onTrack = c.kpiStatus === "On Track";
                 const pct = onTrack ? 88 - i * 6 : 45;
                 return (
                   <div key={c.id}>
