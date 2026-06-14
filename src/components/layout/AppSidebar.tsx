@@ -35,9 +35,9 @@ export function AppSidebar() {
         sidebarOpen ? "w-64" : "w-16",
       )}
     >
-      <div className="flex items-center gap-2 h-16 px-4 border-b border-sidebar-border/60">
+      <div className="flex items-center justify-center h-16 px-4 border-b border-sidebar-border/60">
         {sidebarOpen ? (
-          <img src={orvionLogo} alt="Orvion Media" className="h-7 w-auto drop-shadow-[0_0_12px_oklch(0.78_0.17_205/0.4)]" />
+          <img src={orvionLogo} alt="Orvion Media" className="h-7 w-auto block drop-shadow-[0_0_12px_oklch(0.78_0.17_205/0.4)]" />
         ) : (
           <div className="size-9 rounded-xl bg-primary/15 grid place-items-center text-primary font-bold shadow-[inset_0_1px_0_rgb(255_255_255/0.1)]">
             O
