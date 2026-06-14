@@ -48,13 +48,13 @@ export function AppShell({ children }: { children?: ReactNode }) {
   if (!ready || !user) return null;
 
   return (
-    <div className={`flex min-h-screen w-full text-foreground relative ${focusMode ? "focus-mode" : ""}`}>
+    <div className={`flex min-h-screen w-screen max-w-full overflow-x-hidden text-foreground relative ${focusMode ? "focus-mode" : ""}`}>
       <CursorSpotlight />
       <CommandPalette />
       <ShortcutsDialog />
       <AssistantPanel />
       <AppSidebar />
-      <div className="flex flex-1 flex-col min-w-0">
+      <div className="flex flex-1 basis-full flex-col min-w-0 max-w-full">
         <AppHeader />
         <main className="relative flex-1 min-w-0 p-6 z-[1]">
           <AnimatePresence mode="wait">
@@ -68,7 +68,7 @@ export function AppShell({ children }: { children?: ReactNode }) {
                 show: { transition: { staggerChildren: 0.06, delayChildren: 0.05 } },
                 exit: { opacity: 0, y: -8, transition: { duration: 0.25 } },
               }}
-              className="route-stagger"
+              className="route-stagger w-full max-w-full"
             >
               {children ?? <Outlet />}
             </motion.div>
