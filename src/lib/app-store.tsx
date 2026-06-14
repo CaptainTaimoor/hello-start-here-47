@@ -15,7 +15,7 @@ import {
 } from "./mock-data";
 import type { Channel, Notification, Role, SheetRow, User } from "./types";
 
-type Theme = "light" | "dark";
+type Theme = "light" | "dark" | "mono";
 
 interface AuthUser {
   name: string;
@@ -31,6 +31,7 @@ interface AppStore {
   // theme
   theme: Theme;
   toggleTheme: () => void;
+  setTheme: (t: Theme) => void;
   // sidebar
   sidebarOpen: boolean;
   setSidebarOpen: (v: boolean) => void;
@@ -110,7 +111,9 @@ export function AppStoreProvider({ children }: { children: ReactNode }) {
   // theme class on <html>
   useEffect(() => {
     if (typeof document === "undefined") return;
-    document.documentElement.classList.toggle("dark", theme === "dark");
+    const root = document.documentElement;
+    root.classList.toggle("dark", theme === "dark");
+    root.classList.toggle("mono", theme === "mono");
   }, [theme]);
 
   const updateSheetCell = useCallback(
@@ -129,7 +132,9 @@ export function AppStoreProvider({ children }: { children: ReactNode }) {
       login: (u) => setUser(u),
       logout: () => setUser(null),
       theme,
-      toggleTheme: () => setTheme((t) => (t === "dark" ? "light" : "dark")),
+      toggleTheme: () =>
+        setTheme((t) => (t === "dark" ? "light" : t === "light" ? "mono" : "dark")),
+      setTheme,
       sidebarOpen,
       setSidebarOpen,
       channels,

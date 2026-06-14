@@ -65,39 +65,84 @@
 }
 
 :root {
+  /* ============================================================
+     LIGHT — "Porcelain & Sapphire"
+     Warm off-white paper, deep navy ink, sapphire primary.
+     Tuned for editorial calm + premium contrast.
+     ============================================================ */
   --radius: 0.875rem;
-  --background: oklch(0.99 0.005 220);
-  --foreground: oklch(0.18 0.04 235);
+  --background: oklch(0.985 0.004 95);          /* warm porcelain */
+  --foreground: oklch(0.18 0.03 250);           /* deep ink */
   --card: oklch(1 0 0);
-  --card-foreground: oklch(0.18 0.04 235);
+  --card-foreground: oklch(0.18 0.03 250);
   --popover: oklch(1 0 0);
-  --popover-foreground: oklch(0.18 0.04 235);
-  --primary: oklch(0.74 0.16 210);
-  --primary-foreground: oklch(0.15 0.04 235);
-  --secondary: oklch(0.95 0.02 215);
-  --secondary-foreground: oklch(0.2 0.04 235);
-  --muted: oklch(0.96 0.012 220);
-  --muted-foreground: oklch(0.5 0.03 230);
-  --accent: oklch(0.92 0.06 200);
-  --accent-foreground: oklch(0.2 0.05 230);
-  --destructive: oklch(0.6 0.22 25);
+  --popover-foreground: oklch(0.18 0.03 250);
+  --primary: oklch(0.52 0.18 255);              /* sapphire */
+  --primary-foreground: oklch(0.99 0.005 250);
+  --secondary: oklch(0.965 0.006 250);
+  --secondary-foreground: oklch(0.22 0.03 250);
+  --muted: oklch(0.965 0.005 250);
+  --muted-foreground: oklch(0.48 0.02 250);
+  --accent: oklch(0.95 0.03 250);
+  --accent-foreground: oklch(0.28 0.08 255);
+  --destructive: oklch(0.58 0.22 27);
   --destructive-foreground: oklch(0.99 0 0);
-  --border: oklch(0.9 0.02 220);
-  --input: oklch(0.92 0.02 220);
-  --ring: oklch(0.74 0.16 210);
-  --chart-1: oklch(0.74 0.16 210);
-  --chart-2: oklch(0.65 0.18 195);
-  --chart-3: oklch(0.55 0.15 245);
-  --chart-4: oklch(0.8 0.14 180);
-  --chart-5: oklch(0.6 0.2 260);
-  --sidebar: oklch(0.16 0.04 235);
-  --sidebar-foreground: oklch(0.95 0.01 220);
-  --sidebar-primary: oklch(0.74 0.16 210);
-  --sidebar-primary-foreground: oklch(0.15 0.04 235);
-  --sidebar-accent: oklch(0.22 0.05 230);
-  --sidebar-accent-foreground: oklch(0.85 0.1 200);
-  --sidebar-border: oklch(0.28 0.05 230);
-  --sidebar-ring: oklch(0.74 0.16 210);
+  --border: oklch(0.92 0.006 250);
+  --input: oklch(0.93 0.006 250);
+  --ring: oklch(0.52 0.18 255);
+  --chart-1: oklch(0.52 0.18 255);
+  --chart-2: oklch(0.62 0.17 195);
+  --chart-3: oklch(0.7 0.16 145);
+  --chart-4: oklch(0.72 0.18 60);
+  --chart-5: oklch(0.55 0.22 320);
+  /* Sidebar stays dramatic dark — a hallmark of premium dashboards */
+  --sidebar: oklch(0.16 0.025 255);
+  --sidebar-foreground: oklch(0.95 0.008 250);
+  --sidebar-primary: oklch(0.7 0.17 235);
+  --sidebar-primary-foreground: oklch(0.13 0.03 255);
+  --sidebar-accent: oklch(0.22 0.035 255);
+  --sidebar-accent-foreground: oklch(0.88 0.07 230);
+  --sidebar-border: oklch(1 0 0 / 8%);
+  --sidebar-ring: oklch(0.7 0.17 235);
+}
+
+/* ============================================================
+   MONO — Black & White editorial.
+   Swiss/brutalist. No hues. One graphite accent only.
+   ============================================================ */
+.mono {
+  --background: oklch(0.995 0 0);
+  --foreground: oklch(0.12 0 0);
+  --card: oklch(1 0 0);
+  --card-foreground: oklch(0.12 0 0);
+  --popover: oklch(1 0 0);
+  --popover-foreground: oklch(0.12 0 0);
+  --primary: oklch(0.12 0 0);
+  --primary-foreground: oklch(0.99 0 0);
+  --secondary: oklch(0.96 0 0);
+  --secondary-foreground: oklch(0.18 0 0);
+  --muted: oklch(0.965 0 0);
+  --muted-foreground: oklch(0.45 0 0);
+  --accent: oklch(0.92 0 0);
+  --accent-foreground: oklch(0.12 0 0);
+  --destructive: oklch(0.25 0 0);
+  --destructive-foreground: oklch(0.99 0 0);
+  --border: oklch(0.88 0 0);
+  --input: oklch(0.9 0 0);
+  --ring: oklch(0.2 0 0);
+  --chart-1: oklch(0.12 0 0);
+  --chart-2: oklch(0.32 0 0);
+  --chart-3: oklch(0.52 0 0);
+  --chart-4: oklch(0.72 0 0);
+  --chart-5: oklch(0.85 0 0);
+  --sidebar: oklch(0.08 0 0);
+  --sidebar-foreground: oklch(0.97 0 0);
+  --sidebar-primary: oklch(0.99 0 0);
+  --sidebar-primary-foreground: oklch(0.08 0 0);
+  --sidebar-accent: oklch(0.18 0 0);
+  --sidebar-accent-foreground: oklch(0.97 0 0);
+  --sidebar-border: oklch(1 0 0 / 10%);
+  --sidebar-ring: oklch(0.99 0 0);
 }
 
 .dark {
@@ -171,6 +216,39 @@
   /* Premium ambient backdrop in dark mode */
   html.dark body {
     background: oklch(0.10 0.02 240);
+  }
+
+  /* Premium ambient backdrop in light mode — soft sapphire wash */
+  html:not(.dark):not(.mono) body {
+    background:
+      radial-gradient(1200px 600px at 8% -10%, oklch(0.92 0.06 250 / 0.55), transparent 60%),
+      radial-gradient(900px 500px at 100% 0%, oklch(0.94 0.05 200 / 0.45), transparent 65%),
+      radial-gradient(800px 800px at 50% 120%, oklch(0.95 0.05 290 / 0.35), transparent 70%),
+      var(--background);
+    background-attachment: fixed;
+  }
+
+  /* Mono backdrop — clean paper, single hairline grid */
+  html.mono body {
+    background:
+      linear-gradient(oklch(0 0 0 / 0.025) 1px, transparent 1px) 0 0 / 48px 48px,
+      linear-gradient(90deg, oklch(0 0 0 / 0.025) 1px, transparent 1px) 0 0 / 48px 48px,
+      var(--background);
+    background-attachment: fixed;
+  }
+
+  /* Mono mode: strip all gradients, glows, and saturation effects for purity */
+  html.mono .tile::before,
+  html.mono .tile::after {
+    background: none !important;
+  }
+  html.mono .aurora-text,
+  html.mono .text-gradient {
+    background: none !important;
+    -webkit-background-clip: initial !important;
+    background-clip: initial !important;
+    color: var(--foreground) !important;
+    animation: none !important;
   }
 
   /* Tabular numerals on KPIs / metric numbers */
