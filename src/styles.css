@@ -144,8 +144,17 @@
   html,
   body {
     width: 100%;
+    max-width: 100%;
     min-width: 320px;
     overflow-x: hidden;
+    overscroll-behavior-x: none;
+  }
+
+  #root,
+  [data-radix-portal],
+  [data-sonner-toaster] {
+    max-width: 100vw;
+    overflow-x: clip;
   }
 
   body {
