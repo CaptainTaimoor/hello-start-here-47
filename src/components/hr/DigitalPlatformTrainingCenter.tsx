@@ -383,7 +383,7 @@ function PoliciesTab({ platform, isHr }: { platform: Platform; isHr: boolean }) 
 }
 
 // ── Updates ─────────────────────────────────────────────────────────────
-function UpdatesTab({ platform, statusFilter }: { platform: Platform; statusFilter: string[] }) {
+function UpdatesTab({ platform, statusFilter }: { platform: Platform; statusFilter: Array<Update["status"]> }) {
   const q = useQuery({
     queryKey: ["dpc-updates", platform.id, statusFilter.join(",")],
     queryFn: async () => (await supabase.from("platform_policy_updates").select("*").eq("platform_id", platform.id).in("status", statusFilter).order("published_at", { ascending: false, nullsFirst: false })).data ?? [],
@@ -648,7 +648,7 @@ function ProgressTab({ platform }: { platform: Platform }) {
                 <td className="py-2 font-mono text-xs">{r.employee_id.slice(0, 8)}</td>
                 <td>{lesson?.title ?? "—"}</td>
                 <td><Badge variant="outline">{r.status}</Badge></td>
-                <td>{r.progress_percent}%</td>
+              <td>{`${r.progress_percent}%`}</td>
                 <td>{r.quiz_score ?? "—"}</td>
                 <td className="text-muted-foreground">{r.last_activity_at ? new Date(r.last_activity_at).toLocaleString() : "—"}</td>
               </tr>
@@ -664,7 +664,7 @@ function ProgressTab({ platform }: { platform: Platform }) {
 function HistoryTab({ platform }: { platform: Platform }) {
   const q = useQuery({
     queryKey: ["history", platform.id],
-    queryFn: async () => (await supabase.from("platform_policy_updates").select("*").eq("platform_id", platform.id).in("status", ["published","approved","rejected","archived"]).order("detected_at", { ascending: false })).data ?? [],
+      queryFn: async () => (await supabase.from("platform_policy_updates").select("*").eq("platform_id", platform.id).in("status", ["published","approved","rejected","archived"] as Update["status"][]).order("detected_at", { ascending: false })).data ?? [],
   });
   if (!q.data?.length) return <EmptyMsg icon={History} text="No change history yet."/>;
   return (
