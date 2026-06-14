@@ -48,10 +48,10 @@ function DashboardPage() {
   const { user, dashboardCards, toggleCard, notifications, channels, sheets } = useApp();
 
   // === Live ticker: gently nudges a "watching" count every 8s for that real-product feel
-  const [watching, setWatching] = useState(() => 3 + Math.floor(Math.random() * 4));
+  const [watching, setWatching] = useState(3);
   useEffect(() => {
     const id = setInterval(() => {
-      setWatching((v) => Math.max(2, v + (Math.random() > 0.5 ? 1 : -1)));
+      setWatching((v) => (v >= 5 ? 3 : v + 1));
     }, 8000);
     return () => clearInterval(id);
   }, []);
