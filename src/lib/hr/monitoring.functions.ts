@@ -78,7 +78,7 @@ export const listUpdates = createServerFn({ method: "GET" })
       .from("platform_policy_updates")
       .select("*, digital_platforms(name, slug)")
       .order("detected_at", { ascending: false });
-    if (data?.status) q = q.eq("status", data.status);
+    if (data?.status) q = q.eq("status", data.status as any);
     const { data: rows, error } = await q;
     if (error) throw new Error(error.message);
     return rows ?? [];
