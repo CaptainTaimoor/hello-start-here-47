@@ -56,7 +56,7 @@ export function AppShell({ children }: { children?: ReactNode }) {
       <AppSidebar />
       <div className="flex flex-1 flex-col min-w-0">
         <AppHeader />
-        <main className="relative flex-1 min-w-0 p-6 lg:p-8 z-[1]">
+        <main className="relative flex-1 min-w-0 p-6 z-[1]">
           <AnimatePresence mode="wait">
             <motion.div
               key={pathname}
