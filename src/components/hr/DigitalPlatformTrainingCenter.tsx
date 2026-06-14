@@ -30,6 +30,7 @@ type Lesson = Database["public"]["Tables"]["training_lessons"]["Row"];
 type Ack = Database["public"]["Tables"]["policy_acknowledgements"]["Row"];
 type Log = Database["public"]["Tables"]["policy_monitoring_logs"]["Row"];
 type Version = Database["public"]["Tables"]["platform_policy_versions"]["Row"];
+type TrainingProgress = Database["public"]["Tables"]["employee_training_progress"]["Row"];
 
 const ICONS: Record<string, LucideIcon> = {
   youtube: Youtube, facebook: Facebook, instagram: Instagram, twitter: Twitter,
