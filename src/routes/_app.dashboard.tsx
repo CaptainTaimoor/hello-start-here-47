@@ -253,19 +253,19 @@ function DashboardPage() {
       {/* CHANNEL GROWTH CHART (large) */}
       <motion.div
         variants={{ hidden: { opacity: 0, y: 20 }, show: { opacity: 1, y: 0, transition: { duration: 0.7, ease: [0.16, 1, 0.3, 1] } } }}
-        className={`md:col-span-9 ${tile} p-8`}
+        className={`md:col-span-9 ${tile} p-5 sm:p-8`}
       >
-        <div className="flex items-center justify-between mb-8">
-          <div>
+        <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4 mb-6 sm:mb-8">
+          <div className="min-w-0">
             <h3 className="text-xl font-medium text-white mb-1">Channel Growth</h3>
             <p className="text-xs text-white/40">Aggregated views across all Orvion networks · last 14 days</p>
           </div>
-          <div className="flex gap-2">
+          <div className="flex shrink-0 gap-2 self-start">
             <span className="px-3 py-1 bg-white/5 rounded-lg text-xs font-semibold text-white/60">Daily</span>
             <span className="px-3 py-1 bg-primary/10 text-primary rounded-lg text-xs font-semibold">Weekly</span>
           </div>
         </div>
-        <div className="h-56 relative">
+        <div className="h-60 relative">
           <SignatureChart labels={sigLabels} series={sigSeries} height={220} />
         </div>
       </motion.div>
@@ -284,9 +284,9 @@ function DashboardPage() {
                 const pct = onTrack ? 88 - i * 6 : 45;
                 return (
                   <div key={c.id}>
-                    <div className="flex justify-between text-xs mb-2">
-                      <span className="text-white/80 font-medium truncate">{c.name}</span>
-                      <span className={`font-bold ${onTrack ? "text-primary" : "text-orange-400"}`}>
+            <div className="flex justify-between gap-3 text-xs mb-2">
+              <span className="text-white/80 font-medium truncate">{c.name}</span>
+              <span className={`font-bold shrink-0 ${onTrack ? "text-primary" : "text-orange-400"}`}>
                         {onTrack ? `${pct}%` : "At Risk"}
                       </span>
                     </div>
@@ -317,7 +317,7 @@ function DashboardPage() {
       {dashboardCards.hr && showFor.hr && (
         <motion.div
           variants={{ hidden: { opacity: 0, y: 20 }, show: { opacity: 1, y: 0, transition: { duration: 0.6 } } }}
-          className={`md:col-span-4 ${tile}`}
+          className={`md:col-span-4 ${tile} min-h-[250px]`}
         >
           <h3 className="text-[10px] uppercase tracking-[0.22em] font-semibold text-white/40 mb-6">HR Snapshot</h3>
           <div className="grid grid-cols-2 gap-4">
@@ -346,7 +346,7 @@ function DashboardPage() {
       {dashboardCards.it && showFor.it && (
         <motion.div
           variants={{ hidden: { opacity: 0, y: 20 }, show: { opacity: 1, y: 0, transition: { duration: 0.6 } } }}
-          className={`md:col-span-4 ${tile}`}
+          className={`md:col-span-4 ${tile} min-h-[250px]`}
         >
           <h3 className="text-[10px] uppercase tracking-[0.22em] font-semibold text-white/40 mb-6">IT Snapshot</h3>
           <div className="space-y-4">
@@ -377,7 +377,7 @@ function DashboardPage() {
       {dashboardCards.finance && showFor.finance && (
         <motion.div
           variants={{ hidden: { opacity: 0, y: 20 }, show: { opacity: 1, y: 0, transition: { duration: 0.6 } } }}
-          className={`md:col-span-4 ${tile} flex flex-col justify-between`}
+          className={`md:col-span-4 ${tile} min-h-[250px] flex flex-col justify-between`}
         >
           <div className="flex justify-between items-start mb-4">
             <h3 className="text-[10px] uppercase tracking-[0.22em] font-semibold text-white/40">Finance Pulse</h3>
@@ -426,7 +426,7 @@ function DashboardPage() {
       {dashboardCards.quickLinks && (
         <motion.div
           variants={{ hidden: { opacity: 0, y: 20 }, show: { opacity: 1, y: 0, transition: { duration: 0.6 } } }}
-          className={`md:col-span-4 ${tile}`}
+          className={`md:col-span-4 ${tile} min-h-[170px]`}
         >
           <h3 className="text-[10px] uppercase tracking-[0.22em] font-semibold text-white/40 mb-5">Quick Links</h3>
           <div className="grid grid-cols-2 gap-2 text-xs">
