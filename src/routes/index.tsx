@@ -15,6 +15,7 @@ export const Route = createFileRoute("/")({
 });
 
 function Index() {
-  const { user } = useApp();
+  const { ready, user } = useApp();
+  if (!ready) return null;
   return <Navigate to={user ? "/dashboard" : "/login"} />;
 }

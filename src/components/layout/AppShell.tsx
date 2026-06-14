@@ -14,16 +14,16 @@ import { AssistantPanel } from "@/components/AssistantPanel";
 import { X } from "lucide-react";
 
 export function AppShell({ children }: { children?: ReactNode }) {
-  const { user } = useApp();
+  const { ready, user } = useApp();
   const navigate = useNavigate();
   const pathname = useRouterState({ select: (s) => s.location.pathname });
   const [focusMode, setFocusMode] = useState(false);
 
   useEffect(() => {
-    if (!user && pathname !== "/login" && pathname !== "/forgot-password") {
+    if (ready && !user && pathname !== "/login" && pathname !== "/forgot-password") {
       navigate({ to: "/login" });
     }
-  }, [user, pathname, navigate]);
+  }, [ready, user, pathname, navigate]);
 
   // Soft sound on route change
   useEffect(() => { click("tick"); }, [pathname]);
@@ -45,7 +45,7 @@ export function AppShell({ children }: { children?: ReactNode }) {
     return () => window.removeEventListener("keydown", fn);
   }, [focusMode]);
 
-  if (!user) return null;
+  if (!ready || !user) return null;
 
   return (
     <div className={`flex min-h-screen w-full text-foreground relative ${focusMode ? "focus-mode" : ""}`}>
