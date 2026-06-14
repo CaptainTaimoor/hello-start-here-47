@@ -1,9 +1,12 @@
 import { useEffect, useMemo, useState } from "react";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import {
   Youtube, Facebook, Instagram, Twitter, Music2, Ghost, Globe,
-  Radio, ShieldCheck, AlertTriangle, FileText, GraduationCap, ClipboardCheck,
-  Users, History, Bell, Download, Filter, Plus, ArrowRight, CheckCircle2, Clock,
+  ShieldCheck, AlertTriangle, FileText, GraduationCap, ClipboardCheck,
+  Users, History, Bell, Plus, CheckCircle2, Clock, RefreshCw, Eye, Send,
+  ListChecks, Radio, Activity, XCircle,
 } from "lucide-react";
+import type { LucideIcon } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Badge } from "@/components/ui/badge";
@@ -11,42 +14,31 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
-import { Progress } from "@/components/ui/progress";
-import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from "@/components/ui/sheet";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Switch } from "@/components/ui/switch";
 import { toast } from "sonner";
-import type { LucideIcon } from "lucide-react";
-import type { PlatformKey, Severity } from "@/lib/services/platform-policy-service";
+import { supabase } from "@/integrations/supabase/client";
+import type { Database } from "@/integrations/supabase/types";
 
-// ────────────────────────────────────────────────────────────────────────────
-// Mock data
-// ────────────────────────────────────────────────────────────────────────────
+type Platform = Database["public"]["Tables"]["digital_platforms"]["Row"];
+type Source = Database["public"]["Tables"]["platform_policy_sources"]["Row"];
+type Policy = Database["public"]["Tables"]["platform_policies"]["Row"];
+type Update = Database["public"]["Tables"]["platform_policy_updates"]["Row"];
+type Lesson = Database["public"]["Tables"]["training_lessons"]["Row"];
+type Ack = Database["public"]["Tables"]["policy_acknowledgements"]["Row"];
+type Log = Database["public"]["Tables"]["policy_monitoring_logs"]["Row"];
+type Version = Database["public"]["Tables"]["platform_policy_versions"]["Row"];
 
-interface PlatformMeta {
-  key: PlatformKey;
-  name: string;
-  icon: LucideIcon;
-  tint: string;
-  activePolicies: number;
-  lastUpdate: string;
-  trained: number;
-  pending: number;
-  risk: "Low" | "Medium" | "High";
-  compliance: number;
-  status: "Active" | "Monitoring" | "Paused";
-}
-
-const PLATFORMS: PlatformMeta[] = [
-  { key: "youtube",   name: "YouTube",     icon: Youtube,   tint: "text-red-500",       activePolicies: 42, lastUpdate: "2026-06-13", trained: 36, pending: 12, risk: "Medium", compliance: 88, status: "Active" },
-  { key: "facebook",  name: "Facebook",    icon: Facebook,  tint: "text-blue-500",      activePolicies: 38, lastUpdate: "2026-06-12", trained: 30, pending: 18, risk: "Medium", compliance: 81, status: "Active" },
-  { key: "instagram", name: "Instagram",   icon: Instagram, tint: "text-pink-500",      activePolicies: 31, lastUpdate: "2026-06-11", trained: 28, pending: 20, risk: "Low",    compliance: 92, status: "Active" },
-  { key: "twitter",   name: "Twitter / X", icon: Twitter,   tint: "text-sky-400",       activePolicies: 27, lastUpdate: "2026-06-14", trained: 22, pending: 26, risk: "High",   compliance: 74, status: "Monitoring" },
-  { key: "tiktok",    name: "TikTok",      icon: Music2,    tint: "text-fuchsia-400",   activePolicies: 35, lastUpdate: "2026-06-13", trained: 25, pending: 23, risk: "High",   compliance: 78, status: "Active" },
-  { key: "snapchat",  name: "Snapchat",    icon: Ghost,     tint: "text-yellow-400",    activePolicies: 22, lastUpdate: "2026-06-09", trained: 14, pending: 34, risk: "Medium", compliance: 70, status: "Active" },
-  { key: "vk",        name: "VK",          icon: Globe,     tint: "text-indigo-400",    activePolicies: 19, lastUpdate: "2026-06-08", trained: 9,  pending: 39, risk: "Medium", compliance: 65, status: "Monitoring" },
-];
+const ICONS: Record<string, LucideIcon> = {
+  youtube: Youtube, facebook: Facebook, instagram: Instagram, twitter: Twitter,
+  tiktok: Music2, snapchat: Ghost, vk: Globe,
+};
+const TINTS: Record<string, string> = {
+  youtube: "text-red-500", facebook: "text-blue-500", instagram: "text-pink-500",
+  twitter: "text-sky-400", tiktok: "text-fuchsia-400", snapchat: "text-yellow-400", vk: "text-indigo-400",
+};
 
 const POLICY_CATEGORIES = [
   "Community Guidelines", "Monetization Policies", "Copyright Policies", "Content Restrictions",
@@ -54,581 +46,783 @@ const POLICY_CATEGORIES = [
   "Misinformation Rules", "Strike & Violation Rules", "Upload & Publishing Rules", "Platform Best Practices",
 ];
 
-const MOCK_UPDATES_SEED: Array<{ title: string; summary: string; severity: Severity; team: string; action: string; source: string }> = [
-  { title: "Stricter AI-generated content disclosure",       summary: "Creators must clearly label synthetic media in the description and title overlay.",  severity: "High",     team: "News", action: "Update upload checklist by 2026-06-20", source: "Official Help Center" },
-  { title: "Updated monetization eligibility thresholds",    summary: "Channels under 500 subs no longer eligible for mid-roll ads in news categories.",      severity: "Medium",   team: "Finance & Editors", action: "Audit affected channels", source: "Creator Insider" },
-  { title: "Copyright Match expansion to short-form",        summary: "Shorts are now scanned against the full Content ID database.",                          severity: "High",     team: "Editors", action: "Review last 30 days of shorts", source: "Policy Blog" },
-  { title: "Political content labeling requirement",         summary: "Election-adjacent content must include a paid-for-by disclosure.",                       severity: "Critical", team: "News & Current Affairs", action: "Mandatory training within 48h", source: "Transparency Center" },
-  { title: "Thumbnail clickbait enforcement",                summary: "Misleading thumbnails will demote videos algorithmically.",                              severity: "Low",      team: "Thumbnail Designers", action: "Refresh thumbnail templates", source: "Creator Newsroom" },
-];
+const SEVERITIES = ["low", "medium", "high", "critical"] as const;
+const SEVERITY_TONE: Record<string, string> = {
+  low: "bg-emerald-500/15 text-emerald-300 border-emerald-500/30",
+  medium: "bg-amber-500/15 text-amber-300 border-amber-500/30",
+  high: "bg-orange-500/15 text-orange-300 border-orange-500/30",
+  critical: "bg-rose-500/15 text-rose-300 border-rose-500/30",
+};
 
-const LESSON_LEVELS = ["Beginner", "Intermediate", "Advanced"] as const;
-const LESSON_TOPICS = [
-  "Platform Policy Fundamentals", "Copyright & Fair Use", "Monetization Rules",
-  "Content Safety", "News & Current Affairs Content", "Uploading & Publishing",
-];
+// ─────────────────────────────────────────────────────────────────────────
 
-const QUIZZES = [
-  { id: "q1", name: "Platform Policy Quiz",      pass: 80, attempts: 2, result: "Passed",   score: 86 },
-  { id: "q2", name: "Copyright Quiz",            pass: 75, attempts: 1, result: "Passed",   score: 78 },
-  { id: "q3", name: "Monetization Quiz",         pass: 80, attempts: 3, result: "Retake",   score: 72 },
-  { id: "q4", name: "Community Guideline Quiz",  pass: 70, attempts: 1, result: "Pending",  score: 0  },
-];
+function useIsHrAdmin() {
+  return useQuery({
+    queryKey: ["isHrAdmin"],
+    queryFn: async () => {
+      const { data: u } = await supabase.auth.getUser();
+      if (!u.user) return false;
+      const { data } = await supabase.rpc("is_hr_or_admin", { _user_id: u.user.id });
+      return !!data;
+    },
+  });
+}
 
-const EMPLOYEES = [
-  { id: "e1", name: "Aisha Khan",   dept: "News",       lessons: 8,  total: 10, score: 88, last: "2026-06-12", pending: 1, status: "Compliant" },
-  { id: "e2", name: "Ben Larson",   dept: "Editors",    lessons: 6,  total: 10, score: 74, last: "2026-06-10", pending: 3, status: "At Risk" },
-  { id: "e3", name: "Carla Reyes",  dept: "Thumbnails", lessons: 10, total: 10, score: 95, last: "2026-06-13", pending: 0, status: "Compliant" },
-  { id: "e4", name: "David Singh",  dept: "Producers",  lessons: 4,  total: 10, score: 62, last: "2026-06-05", pending: 5, status: "Non-Compliant" },
-  { id: "e5", name: "Emma Walters", dept: "News",       lessons: 9,  total: 10, score: 91, last: "2026-06-13", pending: 1, status: "Compliant" },
-];
+function useCurrentUser() {
+  return useQuery({
+    queryKey: ["currentUser"],
+    queryFn: async () => (await supabase.auth.getUser()).data.user,
+  });
+}
 
-const ACKNOWLEDGEMENTS = [
-  { id: "a1", emp: "Aisha Khan",   policy: "AI Content Disclosure",        status: "Acknowledged", date: "2026-06-13", approval: "Approved" },
-  { id: "a2", emp: "Ben Larson",   policy: "Monetization Thresholds",      status: "Pending",      date: "—",          approval: "—" },
-  { id: "a3", emp: "Carla Reyes",  policy: "Thumbnail Clickbait",          status: "Acknowledged", date: "2026-06-12", approval: "Approved" },
-  { id: "a4", emp: "David Singh",  policy: "Political Content Labeling",   status: "Pending",      date: "—",          approval: "—" },
-  { id: "a5", emp: "Emma Walters", policy: "Copyright Match — Shorts",     status: "Acknowledged", date: "2026-06-13", approval: "Approved" },
-];
-
-const CHANGE_HISTORY = [
-  { id: "c1", title: "AI Content Disclosure",     old: "v1.2", new: "v1.3", summary: "Stricter labeling rules for synthetic media.",   date: "2026-06-13", severity: "High"     as Severity, by: "Policy Bot",  team: "News",            notes: "Mandatory training assigned." },
-  { id: "c2", title: "Monetization Eligibility",  old: "v3.0", new: "v3.1", summary: "Raised thresholds for news channels.",            date: "2026-06-12", severity: "Medium"   as Severity, by: "Admin (HR)",  team: "Finance",         notes: "Audit triggered." },
-  { id: "c3", title: "Copyright Match — Shorts",  old: "v2.4", new: "v2.5", summary: "Scope expanded to short-form.",                   date: "2026-06-11", severity: "High"     as Severity, by: "RSS Feed",    team: "Editors",         notes: "—" },
-  { id: "c4", title: "Political Content Labels",  old: "v1.0", new: "v1.1", summary: "Paid-for-by disclosure required.",                date: "2026-06-10", severity: "Critical" as Severity, by: "Admin (Compliance)", team: "News",      notes: "48h compliance window." },
-];
-
-// ────────────────────────────────────────────────────────────────────────────
-// Component
-// ────────────────────────────────────────────────────────────────────────────
+// ─────────────────────────────────────────────────────────────────────────
 
 export function DigitalPlatformTrainingCenter() {
-  const [active, setActive] = useState<PlatformMeta | null>(null);
+  const [active, setActive] = useState<Platform | null>(null);
+  const isHr = useIsHrAdmin().data ?? false;
+  const qc = useQueryClient();
+
+  const platforms = useQuery({
+    queryKey: ["platforms"],
+    queryFn: async () => (await supabase.from("digital_platforms").select("*").order("name")).data ?? [],
+  });
+
+  const health = useQuery({
+    queryKey: ["dpc-health"],
+    queryFn: async () => (await supabase.rpc("get_monitoring_health")).data as Record<string, unknown> | null,
+    refetchInterval: 30_000,
+  });
+
+  // Realtime: refresh updates feed when new ones arrive
+  useEffect(() => {
+    const ch = supabase
+      .channel("dpc-updates")
+      .on("postgres_changes", { event: "*", schema: "public", table: "platform_policy_updates" }, () => {
+        qc.invalidateQueries({ queryKey: ["dpc-updates"] });
+        qc.invalidateQueries({ queryKey: ["dpc-health"] });
+      })
+      .subscribe();
+    return () => { void supabase.removeChannel(ch); };
+  }, [qc]);
+
+  const runMonitor = useMutation({
+    mutationFn: async () => (await supabase.functions.invoke("check-platform-policy-updates", { body: {} })).data,
+    onSuccess: (data) => {
+      const d = data as { checked?: number; changed?: number; failed?: number } | null;
+      toast.success(`Monitor run: checked ${d?.checked ?? 0}, changes ${d?.changed ?? 0}, failed ${d?.failed ?? 0}`);
+      qc.invalidateQueries();
+    },
+    onError: (e: unknown) => toast.error("Monitor failed: " + (e as Error).message),
+  });
+
+  const sendReminders = useMutation({
+    mutationFn: async () => (await supabase.functions.invoke("send-training-reminders", { body: {} })).data,
+    onSuccess: (data) => {
+      const d = data as { notifications_created?: number } | null;
+      toast.success(`Reminders sent: ${d?.notifications_created ?? 0}`);
+    },
+    onError: (e: unknown) => toast.error("Reminders failed: " + (e as Error).message),
+  });
 
   return (
     <div className="space-y-4">
       <Card className="border-primary/20">
-        <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-3">
+        <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-3 gap-3 flex-wrap">
           <div>
             <CardTitle className="text-base flex items-center gap-2">
               <ShieldCheck className="size-4 text-primary"/>
               Digital Platform Training Center
             </CardTitle>
             <p className="text-xs text-muted-foreground mt-1">
-              Train teams on each platform's rules, monetization, copyright and daily policy updates.
+              Live policy monitoring, HR review workflow, training & acknowledgements — connected to Lovable Cloud.
             </p>
           </div>
           <div className="flex items-center gap-2">
-            <Badge variant="outline" className="gap-1.5 border-emerald-500/40 text-emerald-400">
-              <span className="relative flex size-1.5">
-                <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-emerald-400 opacity-60"/>
-                <span className="relative inline-flex size-1.5 rounded-full bg-emerald-400"/>
-              </span>
-              <Radio className="size-3"/> Live Policy Monitoring
+            <Badge variant="outline" className="gap-1.5">
+              <span className="relative flex size-1.5"><span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-emerald-400 opacity-60"/><span className="relative inline-flex size-1.5 rounded-full bg-emerald-400"/></span>
+              Live Policy Monitoring
             </Badge>
-            <Button size="sm" variant="outline" onClick={() => toast.success("Training report exported (mock)")}>
-              <Download className="size-3.5 mr-1.5"/> Export report
-            </Button>
+            {isHr && (
+              <>
+                <Button size="sm" variant="outline" onClick={() => runMonitor.mutate()} disabled={runMonitor.isPending}>
+                  <RefreshCw className={`size-3.5 mr-1.5 ${runMonitor.isPending ? "animate-spin" : ""}`}/> Run check
+                </Button>
+                <Button size="sm" variant="outline" onClick={() => sendReminders.mutate()} disabled={sendReminders.isPending}>
+                  <Bell className="size-3.5 mr-1.5"/> Send reminders
+                </Button>
+              </>
+            )}
           </div>
         </CardHeader>
         <CardContent>
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3">
-            {PLATFORMS.map((p) => {
-              const Icon = p.icon;
-              return (
-                <button
-                  key={p.key}
-                  onClick={() => setActive(p)}
-                  className="group text-left rounded-xl border bg-card/40 p-4 hover:border-primary/60 hover:bg-card/70 transition-all"
-                >
-                  <div className="flex items-start justify-between">
-                    <div className={`size-10 rounded-lg bg-white/[0.04] grid place-items-center ${p.tint}`}>
-                      <Icon className="size-5"/>
-                    </div>
-                    <Badge variant="outline" className="text-[10px]">{p.status}</Badge>
-                  </div>
-                  <div className="mt-3 font-semibold">{p.name}</div>
-                  <div className="mt-1 grid grid-cols-2 gap-1 text-[11px] text-muted-foreground">
-                    <div>{p.activePolicies} policies</div>
-                    <div className="text-right">Risk: <span className={riskColor(p.risk)}>{p.risk}</span></div>
-                    <div>Trained: {p.trained}</div>
-                    <div className="text-right">Pending: {p.pending}</div>
-                  </div>
-                  <div className="mt-3 flex items-center justify-between text-[11px]">
-                    <span className="text-muted-foreground">Compliance</span>
-                    <span className="font-semibold">{p.compliance}%</span>
-                  </div>
-                  <Progress value={p.compliance} className="mt-1 h-1"/>
-                  <div className="mt-3 inline-flex items-center gap-1 text-primary text-[11px] font-medium opacity-0 group-hover:opacity-100 transition">
-                    Open workspace <ArrowRight className="size-3"/>
-                  </div>
-                </button>
-              );
-            })}
-          </div>
+          <HealthRow health={health.data} />
         </CardContent>
       </Card>
 
+      <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3">
+        {(platforms.data ?? []).map((p) => <PlatformCard key={p.id} platform={p} onOpen={() => setActive(p)} />)}
+      </div>
+
       <Sheet open={!!active} onOpenChange={(o) => !o && setActive(null)}>
-        <SheetContent className="w-full sm:max-w-5xl overflow-y-auto">
-          {active && <PlatformWorkspace platform={active}/>}
+        <SheetContent className="w-full sm:max-w-[min(96vw,1100px)] overflow-y-auto">
+          {active && <PlatformWorkspace platform={active} isHr={isHr} />}
         </SheetContent>
       </Sheet>
     </div>
   );
 }
 
-// ────────────────────────────────────────────────────────────────────────────
-// Workspace (per platform)
-// ────────────────────────────────────────────────────────────────────────────
-
-function PlatformWorkspace({ platform }: { platform: PlatformMeta }) {
-  const Icon = platform.icon;
-  const [addPolicy, setAddPolicy] = useState(false);
-  const [addUpdate, setAddUpdate] = useState(false);
-  const [editPolicy, setEditPolicy] = useState<string | null>(null);
-  const [empDrawer, setEmpDrawer] = useState<typeof EMPLOYEES[number] | null>(null);
-  const [severity, setSeverity] = useState<string>("all");
-  const [updates, setUpdates] = useState(() =>
-    MOCK_UPDATES_SEED.map((u, i) => ({
-      ...u,
-      id: `u${i}`,
-      effectiveDate: `2026-06-${10 + i}`,
-      reviewed: i > 2,
-    }))
-  );
-
-  // Mock real-time feed: append a synthesized update every 15s.
-  useEffect(() => {
-    const t = setInterval(() => {
-      setUpdates((prev) => [
-        {
-          id: `live-${Date.now()}`,
-          title: "Live policy bulletin",
-          summary: "Mock real-time update — replace with RSS / API feed.",
-          severity: (["Low","Medium","High","Critical"] as Severity[])[Math.floor(Math.random()*4)],
-          team: "All teams",
-          action: "Review at next standup",
-          source: "Mock stream",
-          effectiveDate: new Date().toISOString().slice(0,10),
-          reviewed: false,
-        },
-        ...prev,
-      ].slice(0, 20));
-    }, 15000);
-    return () => clearInterval(t);
-  }, []);
-
-  const filteredUpdates = useMemo(
-    () => updates.filter((u) => severity === "all" || u.severity === severity),
-    [updates, severity]
-  );
-
+function HealthRow({ health }: { health: Record<string, unknown> | null | undefined }) {
+  const h = health ?? {};
+  const items: Array<[string, string | number]> = [
+    ["Active sources", `${h.active_sources ?? 0}/${h.total_sources ?? 0}`],
+    ["Pending review", Number(h.pending_updates ?? 0)],
+    ["Published updates", Number(h.published_updates ?? 0)],
+    ["Pending acks", Number(h.pending_acks ?? 0)],
+    ["Last run", h.last_run ? new Date(String(h.last_run)).toLocaleString() : "—"],
+  ];
   return (
-    <div className="space-y-4">
-      <SheetHeader className="space-y-0">
-        <SheetTitle className="flex items-center gap-3">
-          <span className={`size-10 rounded-lg bg-white/[0.04] grid place-items-center ${platform.tint}`}>
-            <Icon className="size-5"/>
-          </span>
-          <span>{platform.name} · Training Workspace</span>
+    <div className="grid grid-cols-2 md:grid-cols-5 gap-3">
+      {items.map(([k, v]) => (
+        <div key={k} className="rounded-md border p-3">
+          <div className="text-[10px] uppercase tracking-wider text-muted-foreground">{k}</div>
+          <div className="text-lg font-bold mt-1 truncate">{v}</div>
+        </div>
+      ))}
+    </div>
+  );
+}
+
+function PlatformCard({ platform, onOpen }: { platform: Platform; onOpen: () => void }) {
+  const Icon = ICONS[platform.slug] ?? Globe;
+  const tint = TINTS[platform.slug] ?? "text-primary";
+  const counts = useQuery({
+    queryKey: ["platform-counts", platform.id],
+    queryFn: async () => {
+      const [pol, pending, pub] = await Promise.all([
+        supabase.from("platform_policies").select("id", { count: "exact", head: true }).eq("platform_id", platform.id),
+        supabase.from("platform_policy_updates").select("id", { count: "exact", head: true }).eq("platform_id", platform.id).eq("status", "pending_review"),
+        supabase.from("platform_policy_updates").select("id", { count: "exact", head: true }).eq("platform_id", platform.id).eq("status", "published"),
+      ]);
+      return { policies: pol.count ?? 0, pending: pending.count ?? 0, published: pub.count ?? 0 };
+    },
+  });
+  return (
+    <button onClick={onOpen} className="text-left rounded-lg border p-4 hover:border-primary/60 transition-colors bg-card">
+      <div className="flex items-center justify-between">
+        <Icon className={`size-6 ${tint}`} />
+        <Badge variant="outline" className="text-[10px]">{platform.status}</Badge>
+      </div>
+      <div className="mt-3 font-semibold">{platform.name}</div>
+      <div className="text-xs text-muted-foreground mt-1">
+        {counts.data?.policies ?? 0} policies · {counts.data?.published ?? 0} published
+      </div>
+      {(counts.data?.pending ?? 0) > 0 && (
+        <div className="mt-2 inline-flex items-center gap-1 text-[11px] text-amber-300">
+          <AlertTriangle className="size-3"/> {counts.data?.pending} pending review
+        </div>
+      )}
+    </button>
+  );
+}
+
+// ─────────────────────────────────────────────────────────────────────────
+
+function PlatformWorkspace({ platform, isHr }: { platform: Platform; isHr: boolean }) {
+  return (
+    <div>
+      <SheetHeader>
+        <SheetTitle className="flex items-center gap-2">
+          {(() => { const I = ICONS[platform.slug] ?? Globe; return <I className={`size-5 ${TINTS[platform.slug] ?? "text-primary"}`}/>; })()}
+          {platform.name}
         </SheetTitle>
       </SheetHeader>
-
-      <Tabs defaultValue="overview">
+      <Tabs defaultValue="overview" className="mt-4">
         <TabsList className="flex flex-wrap h-auto">
           <TabsTrigger value="overview">Overview</TabsTrigger>
-          <TabsTrigger value="policies">Platform Policies</TabsTrigger>
-          <TabsTrigger value="updates">Daily Policy Updates</TabsTrigger>
-          <TabsTrigger value="lessons">Training Lessons</TabsTrigger>
-          <TabsTrigger value="quizzes">Quizzes</TabsTrigger>
-          <TabsTrigger value="progress">Employee Progress</TabsTrigger>
-          <TabsTrigger value="ack">Acknowledgements</TabsTrigger>
+          <TabsTrigger value="policies">Policies</TabsTrigger>
+          <TabsTrigger value="updates">Daily Updates</TabsTrigger>
+          {isHr && <TabsTrigger value="pending">Pending Review</TabsTrigger>}
+          <TabsTrigger value="lessons">Lessons</TabsTrigger>
+          <TabsTrigger value="acks">Acknowledgements</TabsTrigger>
+          <TabsTrigger value="progress">Progress</TabsTrigger>
           <TabsTrigger value="history">Change History</TabsTrigger>
+          <TabsTrigger value="sources">Sources</TabsTrigger>
+          <TabsTrigger value="logs">Monitoring Logs</TabsTrigger>
         </TabsList>
 
-        {/* Overview */}
-        <TabsContent value="overview" className="mt-4 space-y-4">
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-            <Stat label="Status"           value={platform.status}/>
-            <Stat label="Active policies"  value={platform.activePolicies}/>
-            <Stat label="Latest update"    value={platform.lastUpdate}/>
-            <Stat label="Trained"          value={platform.trained}/>
-            <Stat label="Pending training" value={platform.pending}/>
-            <Stat label="Risk level"       value={platform.risk} tone={platform.risk === "High" ? "danger" : platform.risk === "Medium" ? "warn" : "ok"}/>
-            <Stat label="Compliance score" value={`${platform.compliance}%`}/>
-            <Stat label="Effective today"  value={"2 updates"}/>
-          </div>
-          <Card>
-            <CardHeader><CardTitle className="text-sm">Quick actions</CardTitle></CardHeader>
-            <CardContent className="flex flex-wrap gap-2">
-              <Button size="sm" onClick={() => setAddPolicy(true)}><Plus className="size-3.5 mr-1.5"/> Add policy</Button>
-              <Button size="sm" variant="outline" onClick={() => setAddUpdate(true)}><Bell className="size-3.5 mr-1.5"/> Add daily update</Button>
-              <Button size="sm" variant="outline" onClick={() => toast.success("Training assigned (mock)")}><GraduationCap className="size-3.5 mr-1.5"/> Assign training</Button>
-              <Button size="sm" variant="outline" onClick={() => toast.success("Reminder sent (mock)")}><Bell className="size-3.5 mr-1.5"/> Send reminder</Button>
-              <Button size="sm" variant="outline" onClick={() => toast.success("Report exported (mock)")}><Download className="size-3.5 mr-1.5"/> Export report</Button>
-            </CardContent>
-          </Card>
-        </TabsContent>
-
-        {/* Policies */}
-        <TabsContent value="policies" className="mt-4 space-y-3">
-          <div className="flex justify-between items-center">
-            <div className="text-sm text-muted-foreground">{POLICY_CATEGORIES.length} policy categories</div>
-            <Button size="sm" onClick={() => setAddPolicy(true)}><Plus className="size-3.5 mr-1.5"/> Add policy</Button>
-          </div>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-            {POLICY_CATEGORIES.map((cat) => (
-              <Card key={cat}>
-                <CardContent className="p-4 flex items-start justify-between gap-3">
-                  <div className="flex items-start gap-3">
-                    <div className="size-8 rounded-md bg-primary/10 text-primary grid place-items-center"><FileText className="size-4"/></div>
-                    <div>
-                      <div className="font-medium text-sm">{cat}</div>
-                      <div className="text-xs text-muted-foreground mt-0.5">Last reviewed 2026-06-{10 + (cat.length % 5)}</div>
-                    </div>
-                  </div>
-                  <Button size="sm" variant="ghost" onClick={() => setEditPolicy(cat)}>Edit</Button>
-                </CardContent>
-              </Card>
-            ))}
-          </div>
-        </TabsContent>
-
-        {/* Updates */}
-        <TabsContent value="updates" className="mt-4 space-y-3">
-          <div className="flex items-center justify-between gap-2 flex-wrap">
-            <div className="flex items-center gap-2">
-              <Badge variant="outline" className="gap-1.5 border-emerald-500/40 text-emerald-400">
-                <span className="relative flex size-1.5">
-                  <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-emerald-400 opacity-60"/>
-                  <span className="relative inline-flex size-1.5 rounded-full bg-emerald-400"/>
-                </span>
-                Live feed (mock)
-              </Badge>
-              <Select value={severity} onValueChange={setSeverity}>
-                <SelectTrigger className="h-8 w-[140px] text-xs"><Filter className="size-3 mr-1"/><SelectValue/></SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="all">All severities</SelectItem>
-                  <SelectItem value="Low">Low</SelectItem>
-                  <SelectItem value="Medium">Medium</SelectItem>
-                  <SelectItem value="High">High</SelectItem>
-                  <SelectItem value="Critical">Critical</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-            <Button size="sm" onClick={() => setAddUpdate(true)}><Plus className="size-3.5 mr-1.5"/> Add update</Button>
-          </div>
-
-          <div className="space-y-2">
-            {filteredUpdates.map((u) => (
-              <Card key={u.id}>
-                <CardContent className="p-4">
-                  <div className="flex items-start justify-between gap-3">
-                    <div className="flex-1 min-w-0">
-                      <div className="flex items-center gap-2">
-                        <SeverityBadge level={u.severity}/>
-                        <span className="font-semibold text-sm">{u.title}</span>
-                        {!u.reviewed && <Badge variant="outline" className="text-[10px]">New</Badge>}
-                      </div>
-                      <p className="text-xs text-muted-foreground mt-1">{u.summary}</p>
-                      <div className="mt-2 flex flex-wrap gap-x-4 gap-y-1 text-[11px] text-muted-foreground">
-                        <span>Source: {u.source}</span>
-                        <span>Effective: {u.effectiveDate}</span>
-                        <span>Team: {u.team}</span>
-                        <span>Action: {u.action}</span>
-                      </div>
-                    </div>
-                    <div className="flex flex-col gap-1.5">
-                      <Button size="sm" variant="outline" onClick={() => {
-                        setUpdates((prev) => prev.map((x) => x.id === u.id ? { ...x, reviewed: true } : x));
-                        toast.success("Marked as reviewed");
-                      }}>
-                        <CheckCircle2 className="size-3.5 mr-1.5"/> Reviewed
-                      </Button>
-                      <Button size="sm" variant="ghost" onClick={() => toast.success("Assigned to team (mock)")}>
-                        <Users className="size-3.5 mr-1.5"/> Assign
-                      </Button>
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
-            ))}
-          </div>
-        </TabsContent>
-
-        {/* Lessons */}
-        <TabsContent value="lessons" className="mt-4 space-y-4">
-          {LESSON_LEVELS.map((level) => (
-            <Card key={level}>
-              <CardHeader><CardTitle className="text-sm">{level} lessons</CardTitle></CardHeader>
-              <CardContent className="grid grid-cols-1 md:grid-cols-2 gap-2">
-                {LESSON_TOPICS.map((topic, i) => {
-                  const done = (i + level.length) % 3 === 0;
-                  return (
-                    <div key={topic} className="flex items-center justify-between rounded-md border p-3">
-                      <div className="flex items-center gap-3">
-                        <GraduationCap className="size-4 text-primary"/>
-                        <div>
-                          <div className="text-sm font-medium">{topic}</div>
-                          <div className="text-[11px] text-muted-foreground">{level} · {platform.name}</div>
-                        </div>
-                      </div>
-                      {done
-                        ? <Badge variant="outline" className="text-emerald-400 border-emerald-500/40"><CheckCircle2 className="size-3 mr-1"/> Completed</Badge>
-                        : <Badge variant="outline"><Clock className="size-3 mr-1"/> In progress</Badge>}
-                    </div>
-                  );
-                })}
-              </CardContent>
-            </Card>
-          ))}
-        </TabsContent>
-
-        {/* Quizzes */}
-        <TabsContent value="quizzes" className="mt-4 space-y-2">
-          {QUIZZES.map((q) => (
-            <Card key={q.id}>
-              <CardContent className="p-4 flex items-center justify-between gap-3">
-                <div className="flex items-center gap-3">
-                  <div className="size-9 rounded-md bg-primary/10 text-primary grid place-items-center"><ClipboardCheck className="size-4"/></div>
-                  <div>
-                    <div className="font-medium text-sm">{q.name}</div>
-                    <div className="text-[11px] text-muted-foreground">Passing: {q.pass}% · Attempts: {q.attempts}</div>
-                  </div>
-                </div>
-                <div className="flex items-center gap-3">
-                  <div className="text-right">
-                    <div className="text-sm font-semibold">{q.score || "—"}{q.score ? "%" : ""}</div>
-                    <div className="text-[11px] text-muted-foreground">{q.result}</div>
-                  </div>
-                  <Button size="sm" variant="outline" onClick={() => toast.success(`${q.name} — retake started (mock)`)}>Retake</Button>
-                </div>
-              </CardContent>
-            </Card>
-          ))}
-        </TabsContent>
-
-        {/* Employee Progress */}
-        <TabsContent value="progress" className="mt-4">
-          <Card>
-            <CardContent className="p-0 overflow-x-auto">
-              <table className="w-full text-sm">
-                <thead><tr className="text-xs text-muted-foreground text-left border-b">
-                  <th className="py-2 px-4">Employee</th><th>Dept</th><th>Lessons</th><th>Quiz</th>
-                  <th>Last training</th><th>Pending</th><th>Status</th><th></th>
-                </tr></thead>
-                <tbody>
-                  {EMPLOYEES.map((e) => (
-                    <tr key={e.id} className="border-b last:border-0 hover:bg-accent/40">
-                      <td className="py-2 px-4 font-medium">{e.name}</td>
-                      <td>{e.dept}</td>
-                      <td>{e.lessons}/{e.total}</td>
-                      <td>{e.score}%</td>
-                      <td>{e.last}</td>
-                      <td>{e.pending}</td>
-                      <td><Badge variant="outline" className={statusColor(e.status)}>{e.status}</Badge></td>
-                      <td className="pr-4 text-right"><Button size="sm" variant="ghost" onClick={() => setEmpDrawer(e)}>View</Button></td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </CardContent>
-          </Card>
-        </TabsContent>
-
-        {/* Acknowledgements */}
-        <TabsContent value="ack" className="mt-4">
-          <Card>
-            <CardContent className="p-0 overflow-x-auto">
-              <table className="w-full text-sm">
-                <thead><tr className="text-xs text-muted-foreground text-left border-b">
-                  <th className="py-2 px-4">Employee</th><th>Policy</th><th>Platform</th>
-                  <th>Status</th><th>Date</th><th>Manager</th><th></th>
-                </tr></thead>
-                <tbody>
-                  {ACKNOWLEDGEMENTS.map((a) => (
-                    <tr key={a.id} className="border-b last:border-0">
-                      <td className="py-2 px-4 font-medium">{a.emp}</td>
-                      <td>{a.policy}</td>
-                      <td>{platform.name}</td>
-                      <td><Badge variant="outline" className={a.status === "Acknowledged" ? "text-emerald-400 border-emerald-500/40" : ""}>{a.status}</Badge></td>
-                      <td>{a.date}</td>
-                      <td>{a.approval}</td>
-                      <td className="pr-4 text-right">
-                        <Button size="sm" variant="ghost" onClick={() => toast.success(`Reminder sent to ${a.emp}`)}>
-                          <Bell className="size-3.5 mr-1.5"/> Remind
-                        </Button>
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </CardContent>
-          </Card>
-        </TabsContent>
-
-        {/* History */}
-        <TabsContent value="history" className="mt-4 space-y-2">
-          {CHANGE_HISTORY.map((c) => (
-            <Card key={c.id}>
-              <CardContent className="p-4">
-                <div className="flex items-start justify-between gap-3">
-                  <div className="flex items-start gap-3">
-                    <History className="size-4 text-muted-foreground mt-1"/>
-                    <div>
-                      <div className="font-medium text-sm">{c.title}</div>
-                      <div className="text-[11px] text-muted-foreground mt-0.5">
-                        {c.old} → <b className="text-foreground">{c.new}</b> · {c.date} · by {c.by} · team {c.team}
-                      </div>
-                      <p className="text-xs mt-2">{c.summary}</p>
-                      {c.notes !== "—" && <p className="text-[11px] text-muted-foreground mt-1">Notes: {c.notes}</p>}
-                    </div>
-                  </div>
-                  <SeverityBadge level={c.severity}/>
-                </div>
-              </CardContent>
-            </Card>
-          ))}
-        </TabsContent>
+        <TabsContent value="overview" className="mt-4"><OverviewTab platform={platform}/></TabsContent>
+        <TabsContent value="policies" className="mt-4"><PoliciesTab platform={platform} isHr={isHr}/></TabsContent>
+        <TabsContent value="updates" className="mt-4"><UpdatesTab platform={platform} statusFilter={["published","approved"]}/></TabsContent>
+        {isHr && <TabsContent value="pending" className="mt-4"><PendingReviewTab platform={platform}/></TabsContent>}
+        <TabsContent value="lessons" className="mt-4"><LessonsTab platform={platform} isHr={isHr}/></TabsContent>
+        <TabsContent value="acks" className="mt-4"><AcksTab platform={platform} isHr={isHr}/></TabsContent>
+        <TabsContent value="progress" className="mt-4"><ProgressTab platform={platform}/></TabsContent>
+        <TabsContent value="history" className="mt-4"><HistoryTab platform={platform}/></TabsContent>
+        <TabsContent value="sources" className="mt-4"><SourcesTab platform={platform} isHr={isHr}/></TabsContent>
+        <TabsContent value="logs" className="mt-4"><LogsTab platform={platform}/></TabsContent>
       </Tabs>
+    </div>
+  );
+}
 
-      {/* Modals */}
-      <Dialog open={addPolicy} onOpenChange={setAddPolicy}>
+function OverviewTab({ platform }: { platform: Platform }) {
+  const stats = useQuery({
+    queryKey: ["overview", platform.id],
+    queryFn: async () => {
+      const [p, pen, pub, ack, prog, last] = await Promise.all([
+        supabase.from("platform_policies").select("id", { count: "exact", head: true }).eq("platform_id", platform.id),
+        supabase.from("platform_policy_updates").select("id", { count: "exact", head: true }).eq("platform_id", platform.id).eq("status", "pending_review"),
+        supabase.from("platform_policy_updates").select("id", { count: "exact", head: true }).eq("platform_id", platform.id).eq("status", "published"),
+        supabase.from("policy_acknowledgements").select("id", { count: "exact", head: true }).eq("platform_id", platform.id).eq("status", "pending"),
+        supabase.from("employee_training_progress").select("id", { count: "exact", head: true }).eq("platform_id", platform.id).eq("status", "completed"),
+        supabase.from("policy_monitoring_logs").select("checked_at,run_status").eq("platform_id", platform.id).order("checked_at", { ascending: false }).limit(1).maybeSingle(),
+      ]);
+      return {
+        policies: p.count ?? 0, pending: pen.count ?? 0, published: pub.count ?? 0,
+        pendingAck: ack.count ?? 0, completed: prog.count ?? 0,
+        last: last.data,
+      };
+    },
+  });
+  const s = stats.data;
+  const tiles = [
+    ["Policies", s?.policies ?? 0],
+    ["Published updates", s?.published ?? 0],
+    ["Pending review", s?.pending ?? 0],
+    ["Pending acknowledgements", s?.pendingAck ?? 0],
+    ["Employees trained", s?.completed ?? 0],
+    ["Last monitor run", s?.last?.checked_at ? new Date(s.last.checked_at).toLocaleString() : "—"],
+  ] as const;
+  return (
+    <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
+      {tiles.map(([k, v]) => (
+        <div key={k} className="rounded-md border p-3">
+          <div className="text-[10px] uppercase tracking-wider text-muted-foreground">{k}</div>
+          <div className="text-lg font-bold mt-1 truncate">{v}</div>
+        </div>
+      ))}
+      {platform.official_policy_url && (
+        <a href={platform.official_policy_url} target="_blank" rel="noreferrer" className="col-span-full text-xs text-primary underline underline-offset-2">
+          Official policy page →
+        </a>
+      )}
+    </div>
+  );
+}
+
+// ── Policies ────────────────────────────────────────────────────────────
+function PoliciesTab({ platform, isHr }: { platform: Platform; isHr: boolean }) {
+  const qc = useQueryClient();
+  const [open, setOpen] = useState(false);
+  const [form, setForm] = useState({ title: "", category: POLICY_CATEGORIES[0], summary: "", current_content: "", risk_level: "medium" as Policy["risk_level"] });
+  const q = useQuery({
+    queryKey: ["policies", platform.id],
+    queryFn: async () => (await supabase.from("platform_policies").select("*").eq("platform_id", platform.id).order("created_at", { ascending: false })).data ?? [],
+  });
+  const create = useMutation({
+    mutationFn: async () => {
+      const { error } = await supabase.from("platform_policies").insert({ platform_id: platform.id, ...form, status: "active", current_version: "v1.0" });
+      if (error) throw error;
+    },
+    onSuccess: () => { toast.success("Policy added"); setOpen(false); setForm({ title: "", category: POLICY_CATEGORIES[0], summary: "", current_content: "", risk_level: "medium" }); qc.invalidateQueries({ queryKey: ["policies", platform.id] }); },
+    onError: (e: Error) => toast.error(e.message),
+  });
+
+  return (
+    <div className="space-y-3">
+      {isHr && (
+        <div className="flex justify-end">
+          <Button size="sm" onClick={() => setOpen(true)}><Plus className="size-3.5 mr-1.5"/> Add policy</Button>
+        </div>
+      )}
+      {(q.data ?? []).length === 0 && <EmptyMsg icon={FileText} text="No policies yet. Add the first one or import from a source."/>}
+      <div className="space-y-2">
+        {(q.data ?? []).map((p) => (
+          <div key={p.id} className="rounded-md border p-3">
+            <div className="flex items-start justify-between gap-3">
+              <div className="min-w-0">
+                <div className="font-semibold text-sm">{p.title}</div>
+              <div className="text-xs text-muted-foreground mt-0.5">{p.category} · {p.current_version}</div>
+                {p.summary && <p className="text-sm mt-2 text-muted-foreground line-clamp-2">{p.summary}</p>}
+              </div>
+              <Badge variant="outline" className={SEVERITY_TONE[p.risk_level]}>{p.risk_level}</Badge>
+            </div>
+          </div>
+        ))}
+      </div>
+
+      <Dialog open={open} onOpenChange={setOpen}>
         <DialogContent>
-          <DialogHeader><DialogTitle>Add platform policy — {platform.name}</DialogTitle></DialogHeader>
+          <DialogHeader><DialogTitle>Add policy</DialogTitle></DialogHeader>
           <div className="space-y-3">
-            <div className="space-y-1.5"><Label>Policy title</Label><Input placeholder="e.g. AI Content Disclosure"/></div>
-            <div className="space-y-1.5"><Label>Category</Label><Input placeholder="Community Guidelines"/></div>
-            <div className="space-y-1.5"><Label>Summary</Label><Textarea rows={3}/></div>
-            <div className="space-y-1.5"><Label>Effective date</Label><Input type="date"/></div>
+            <Field label="Title"><Input value={form.title} onChange={(e) => setForm((f) => ({ ...f, title: e.target.value }))}/></Field>
+            <Field label="Category">
+              <Select value={form.category} onValueChange={(v) => setForm((f) => ({ ...f, category: v }))}>
+                <SelectTrigger><SelectValue/></SelectTrigger>
+                <SelectContent>{POLICY_CATEGORIES.map((c) => <SelectItem key={c} value={c}>{c}</SelectItem>)}</SelectContent>
+              </Select>
+            </Field>
+            <Field label="Risk level">
+              <Select value={form.risk_level} onValueChange={(v) => setForm((f) => ({ ...f, risk_level: v as Policy["risk_level"] }))}>
+                <SelectTrigger><SelectValue/></SelectTrigger>
+                <SelectContent>{SEVERITIES.map((s) => <SelectItem key={s} value={s}>{s}</SelectItem>)}</SelectContent>
+              </Select>
+            </Field>
+            <Field label="Summary"><Textarea rows={2} value={form.summary} onChange={(e) => setForm((f) => ({ ...f, summary: e.target.value }))}/></Field>
+            <Field label="Content"><Textarea rows={5} value={form.current_content} onChange={(e) => setForm((f) => ({ ...f, current_content: e.target.value }))}/></Field>
           </div>
           <DialogFooter>
-            <Button variant="outline" onClick={() => setAddPolicy(false)}>Cancel</Button>
-            <Button onClick={() => { setAddPolicy(false); toast.success("Policy added (mock)"); }}>Save</Button>
+            <Button variant="outline" onClick={() => setOpen(false)}>Cancel</Button>
+            <Button onClick={() => create.mutate()} disabled={!form.title || create.isPending}>Save</Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>
+    </div>
+  );
+}
 
-      <Dialog open={!!editPolicy} onOpenChange={(o) => !o && setEditPolicy(null)}>
+// ── Updates ─────────────────────────────────────────────────────────────
+function UpdatesTab({ platform, statusFilter }: { platform: Platform; statusFilter: Array<Update["status"]> }) {
+  const q = useQuery({
+    queryKey: ["dpc-updates", platform.id, statusFilter.join(",")],
+    queryFn: async () => (await supabase.from("platform_policy_updates").select("*").eq("platform_id", platform.id).in("status", statusFilter).order("published_at", { ascending: false, nullsFirst: false })).data ?? [],
+  });
+  if (!q.data?.length) return <EmptyMsg icon={Radio} text="No published updates yet. Approved updates from Pending Review appear here."/>;
+  return (
+    <div className="space-y-2">
+      {q.data.map((u) => (
+        <div key={u.id} className="rounded-md border p-3">
+          <div className="flex items-start justify-between gap-3">
+            <div className="min-w-0">
+              <div className="font-semibold text-sm">{u.update_title}</div>
+              {u.update_summary && <p className="text-sm text-muted-foreground mt-1">{u.update_summary}</p>}
+              <div className="text-[11px] text-muted-foreground mt-2">
+                {u.affected_team && <>Affects: <b>{u.affected_team}</b> · </>}
+                Published {u.published_at ? new Date(u.published_at).toLocaleString() : "—"}
+              </div>
+              {u.action_required && <div className="text-xs mt-1.5 inline-flex items-center gap-1 text-amber-300"><AlertTriangle className="size-3"/> {u.action_required}</div>}
+            </div>
+            <Badge variant="outline" className={SEVERITY_TONE[u.severity]}>{u.severity}</Badge>
+          </div>
+        </div>
+      ))}
+    </div>
+  );
+}
+
+// ── Pending review ─────────────────────────────────────────────────────
+function PendingReviewTab({ platform }: { platform: Platform }) {
+  const qc = useQueryClient();
+  const q = useQuery({
+    queryKey: ["dpc-pending", platform.id],
+    queryFn: async () => (await supabase.from("platform_policy_updates").select("*").eq("platform_id", platform.id).eq("status", "pending_review").order("detected_at", { ascending: false })).data ?? [],
+  });
+  const [editing, setEditing] = useState<Update | null>(null);
+
+  const publish = useMutation({
+    mutationFn: async (id: string) => {
+      const { error } = await supabase.functions.invoke("publish-approved-policy-update", { body: { updateId: id } });
+      if (error) throw error;
+    },
+    onSuccess: () => { toast.success("Published to employees"); qc.invalidateQueries(); },
+    onError: (e: Error) => toast.error(e.message),
+  });
+  const reject = useMutation({
+    mutationFn: async (id: string) => {
+      const { error } = await supabase.from("platform_policy_updates").update({ status: "rejected", reviewed_at: new Date().toISOString() }).eq("id", id);
+      if (error) throw error;
+    },
+    onSuccess: () => { toast.success("Rejected"); qc.invalidateQueries(); },
+  });
+
+  if (!q.data?.length) return <EmptyMsg icon={CheckCircle2} text="Nothing pending. Auto-detected changes will appear here for review."/>;
+
+  return (
+    <div className="space-y-2">
+      {q.data.map((u) => (
+        <div key={u.id} className="rounded-md border p-3">
+          <div className="flex items-start justify-between gap-3 mb-2">
+            <div className="min-w-0">
+              <div className="font-semibold text-sm">{u.update_title}</div>
+              <div className="text-[11px] text-muted-foreground">Detected {new Date(u.detected_at).toLocaleString()}</div>
+            </div>
+            <Badge variant="outline" className={SEVERITY_TONE[u.severity]}>{u.severity}</Badge>
+          </div>
+          {u.update_summary && <p className="text-sm text-muted-foreground">{u.update_summary}</p>}
+          <div className="flex flex-wrap gap-2 mt-3">
+            <Button size="sm" variant="outline" onClick={() => setEditing(u)}><Eye className="size-3.5 mr-1.5"/> Review & edit</Button>
+            <Button size="sm" onClick={() => publish.mutate(u.id)} disabled={publish.isPending}><Send className="size-3.5 mr-1.5"/> Approve & publish</Button>
+            <Button size="sm" variant="ghost" onClick={() => reject.mutate(u.id)}><XCircle className="size-3.5 mr-1.5"/> Reject</Button>
+          </div>
+        </div>
+      ))}
+      {editing && <EditUpdateDialog update={editing} onClose={() => setEditing(null)}/>}
+    </div>
+  );
+}
+
+function EditUpdateDialog({ update, onClose }: { update: Update; onClose: () => void }) {
+  const qc = useQueryClient();
+  const [form, setForm] = useState({
+    update_title: update.update_title,
+    update_summary: update.update_summary ?? "",
+    severity: update.severity,
+    affected_team: update.affected_team ?? "",
+    action_required: update.action_required ?? "",
+    old_text: update.old_text ?? "",
+    new_text: update.new_text ?? "",
+  });
+  const save = useMutation({
+    mutationFn: async () => {
+      const { error } = await supabase.from("platform_policy_updates").update(form).eq("id", update.id);
+      if (error) throw error;
+    },
+    onSuccess: () => { toast.success("Saved"); qc.invalidateQueries(); onClose(); },
+    onError: (e: Error) => toast.error(e.message),
+  });
+  return (
+    <Dialog open onOpenChange={(o) => !o && onClose()}>
+      <DialogContent className="max-w-2xl">
+        <DialogHeader><DialogTitle>Review policy update</DialogTitle></DialogHeader>
+        <div className="space-y-3 max-h-[70vh] overflow-y-auto pr-1">
+          <Field label="Title"><Input value={form.update_title} onChange={(e) => setForm((f) => ({ ...f, update_title: e.target.value }))}/></Field>
+          <Field label="Summary"><Textarea rows={3} value={form.update_summary} onChange={(e) => setForm((f) => ({ ...f, update_summary: e.target.value }))}/></Field>
+          <div className="grid grid-cols-2 gap-3">
+            <Field label="Severity">
+              <Select value={form.severity} onValueChange={(v) => setForm((f) => ({ ...f, severity: v as Update["severity"] }))}>
+                <SelectTrigger><SelectValue/></SelectTrigger>
+                <SelectContent>{SEVERITIES.map((s) => <SelectItem key={s} value={s}>{s}</SelectItem>)}</SelectContent>
+              </Select>
+            </Field>
+            <Field label="Affected team"><Input value={form.affected_team} onChange={(e) => setForm((f) => ({ ...f, affected_team: e.target.value }))}/></Field>
+          </div>
+          <Field label="Action required"><Input value={form.action_required} onChange={(e) => setForm((f) => ({ ...f, action_required: e.target.value }))}/></Field>
+          <div className="grid grid-cols-2 gap-3">
+            <Field label="Old text"><Textarea rows={4} value={form.old_text} onChange={(e) => setForm((f) => ({ ...f, old_text: e.target.value }))}/></Field>
+            <Field label="New text"><Textarea rows={4} value={form.new_text} onChange={(e) => setForm((f) => ({ ...f, new_text: e.target.value }))}/></Field>
+          </div>
+        </div>
+        <DialogFooter>
+          <Button variant="outline" onClick={onClose}>Cancel</Button>
+          <Button onClick={() => save.mutate()} disabled={save.isPending}>Save</Button>
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
+  );
+}
+
+// ── Lessons ────────────────────────────────────────────────────────────
+function LessonsTab({ platform, isHr }: { platform: Platform; isHr: boolean }) {
+  const qc = useQueryClient();
+  const [open, setOpen] = useState(false);
+  const [form, setForm] = useState({ title: "", description: "", lesson_content: "", level: "beginner" as Lesson["level"], estimated_minutes: 15, is_required: true, status: "published" as Lesson["status"] });
+  const q = useQuery({
+    queryKey: ["lessons", platform.id],
+    queryFn: async () => (await supabase.from("training_lessons").select("*").eq("platform_id", platform.id).order("created_at", { ascending: false })).data ?? [],
+  });
+  const create = useMutation({
+    mutationFn: async () => {
+      const { error } = await supabase.from("training_lessons").insert({ ...form, platform_id: platform.id });
+      if (error) throw error;
+    },
+    onSuccess: () => { toast.success("Lesson created"); setOpen(false); qc.invalidateQueries({ queryKey: ["lessons", platform.id] }); },
+    onError: (e: Error) => toast.error(e.message),
+  });
+
+  return (
+    <div className="space-y-3">
+      {isHr && <div className="flex justify-end"><Button size="sm" onClick={() => setOpen(true)}><Plus className="size-3.5 mr-1.5"/> New lesson</Button></div>}
+      {(q.data ?? []).length === 0 && <EmptyMsg icon={GraduationCap} text="No lessons yet. Create one to train employees on this platform."/>}
+      <div className="grid md:grid-cols-2 gap-3">
+        {(q.data ?? []).map((l) => (
+          <div key={l.id} className="rounded-md border p-3">
+            <div className="flex items-start justify-between gap-2">
+              <div className="font-semibold text-sm">{l.title}</div>
+              <Badge variant="outline" className="text-[10px]">{l.status}</Badge>
+            </div>
+            <div className="text-[11px] text-muted-foreground mt-0.5">{l.level} · {l.estimated_minutes} min{l.is_required ? " · required" : ""}</div>
+            {l.description && <p className="text-sm mt-2 text-muted-foreground line-clamp-2">{l.description}</p>}
+          </div>
+        ))}
+      </div>
+
+      <Dialog open={open} onOpenChange={setOpen}>
         <DialogContent>
-          <DialogHeader><DialogTitle>Edit policy — {editPolicy}</DialogTitle></DialogHeader>
+          <DialogHeader><DialogTitle>New lesson</DialogTitle></DialogHeader>
           <div className="space-y-3">
-            <div className="space-y-1.5"><Label>Title</Label><Input defaultValue={editPolicy ?? ""}/></div>
-            <div className="space-y-1.5"><Label>Summary</Label><Textarea rows={4} defaultValue="Current policy text…"/></div>
+            <Field label="Title"><Input value={form.title} onChange={(e) => setForm((f) => ({ ...f, title: e.target.value }))}/></Field>
+            <Field label="Description"><Textarea rows={2} value={form.description} onChange={(e) => setForm((f) => ({ ...f, description: e.target.value }))}/></Field>
+            <Field label="Content"><Textarea rows={5} value={form.lesson_content} onChange={(e) => setForm((f) => ({ ...f, lesson_content: e.target.value }))}/></Field>
+            <div className="grid grid-cols-3 gap-3">
+              <Field label="Level">
+                <Select value={form.level} onValueChange={(v) => setForm((f) => ({ ...f, level: v as Lesson["level"] }))}>
+                  <SelectTrigger><SelectValue/></SelectTrigger>
+                  <SelectContent><SelectItem value="beginner">Beginner</SelectItem><SelectItem value="intermediate">Intermediate</SelectItem><SelectItem value="advanced">Advanced</SelectItem></SelectContent>
+                </Select>
+              </Field>
+              <Field label="Minutes"><Input type="number" value={form.estimated_minutes} onChange={(e) => setForm((f) => ({ ...f, estimated_minutes: Number(e.target.value) }))}/></Field>
+              <Field label="Status">
+                <Select value={form.status} onValueChange={(v) => setForm((f) => ({ ...f, status: v as Lesson["status"] }))}>
+                  <SelectTrigger><SelectValue/></SelectTrigger>
+                  <SelectContent><SelectItem value="draft">Draft</SelectItem><SelectItem value="published">Published</SelectItem><SelectItem value="archived">Archived</SelectItem></SelectContent>
+                </Select>
+              </Field>
+            </div>
           </div>
           <DialogFooter>
-            <Button variant="outline" onClick={() => setEditPolicy(null)}>Cancel</Button>
-            <Button onClick={() => { setEditPolicy(null); toast.success("Policy updated (mock)"); }}>Save</Button>
+            <Button variant="outline" onClick={() => setOpen(false)}>Cancel</Button>
+            <Button onClick={() => create.mutate()} disabled={!form.title || create.isPending}>Save</Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>
+    </div>
+  );
+}
 
-      <Dialog open={addUpdate} onOpenChange={setAddUpdate}>
+// ── Acknowledgements ────────────────────────────────────────────────────
+function AcksTab({ platform, isHr }: { platform: Platform; isHr: boolean }) {
+  const qc = useQueryClient();
+  const user = useCurrentUser().data;
+  const q = useQuery({
+    queryKey: ["acks", platform.id, isHr, user?.id],
+    queryFn: async () => {
+      let qb = supabase.from("policy_acknowledgements").select("*, platform_policy_updates(update_title, severity)").eq("platform_id", platform.id);
+      if (!isHr && user) qb = qb.eq("employee_id", user.id);
+      return (await qb.order("assigned_at", { ascending: false })).data ?? [];
+    },
+    enabled: !!user,
+  });
+  const ack = useMutation({
+    mutationFn: async (id: string) => {
+      const { error } = await supabase.from("policy_acknowledgements").update({ status: "acknowledged", acknowledged_at: new Date().toISOString() }).eq("id", id);
+      if (error) throw error;
+    },
+    onSuccess: () => { toast.success("Acknowledged"); qc.invalidateQueries({ queryKey: ["acks", platform.id] }); },
+    onError: (e: Error) => toast.error(e.message),
+  });
+
+  if (!q.data?.length) return <EmptyMsg icon={ClipboardCheck} text="No acknowledgements yet. They are created when HR publishes policy updates."/>;
+  return (
+    <div className="space-y-2">
+      {q.data.map((a) => {
+        const upd = (a as Ack & { platform_policy_updates: { update_title: string; severity: string } | null }).platform_policy_updates;
+        return (
+          <div key={a.id} className="rounded-md border p-3 flex items-center justify-between gap-3">
+            <div className="min-w-0">
+              <div className="text-sm font-medium truncate">{upd?.update_title ?? "Policy update"}</div>
+              <div className="text-[11px] text-muted-foreground">
+                Assigned {new Date(a.assigned_at).toLocaleDateString()}
+                {a.due_date && <> · Due {new Date(a.due_date).toLocaleDateString()}</>}
+              </div>
+            </div>
+            <div className="flex items-center gap-2">
+              <Badge variant="outline" className={a.status === "overdue" ? SEVERITY_TONE.critical : a.status === "acknowledged" ? SEVERITY_TONE.low : SEVERITY_TONE.medium}>{a.status}</Badge>
+              {a.status !== "acknowledged" && (a.employee_id === user?.id) && (
+                <Button size="sm" onClick={() => ack.mutate(a.id)}><CheckCircle2 className="size-3.5 mr-1.5"/> Acknowledge</Button>
+              )}
+            </div>
+          </div>
+        );
+      })}
+    </div>
+  );
+}
+
+// ── Progress ───────────────────────────────────────────────────────────
+function ProgressTab({ platform }: { platform: Platform }) {
+  const q = useQuery({
+    queryKey: ["progress", platform.id],
+    queryFn: async () => (await supabase.from("employee_training_progress").select("*, training_lessons(title)").eq("platform_id", platform.id).order("last_activity_at", { ascending: false, nullsFirst: false })).data ?? [],
+  });
+  if (!q.data?.length) return <EmptyMsg icon={Activity} text="No training activity yet."/>;
+  return (
+    <div className="overflow-x-auto">
+      <table className="w-full text-sm">
+        <thead><tr className="text-xs text-muted-foreground text-left border-b"><th className="py-2">Employee</th><th>Lesson</th><th>Status</th><th>Progress</th><th>Score</th><th>Last activity</th></tr></thead>
+        <tbody>
+          {q.data.map((r) => {
+            const lesson = (r as { training_lessons: { title: string } | null }).training_lessons;
+            return (
+              <tr key={r.id} className="border-b last:border-0">
+                <td className="py-2 font-mono text-xs">{r.employee_id.slice(0, 8)}</td>
+                <td>{lesson?.title ?? "—"}</td>
+                <td><Badge variant="outline">{r.status}</Badge></td>
+              <td>{`${r.progress_percent}%`}</td>
+                <td>{r.quiz_score ?? "—"}</td>
+                <td className="text-muted-foreground">{r.last_activity_at ? new Date(r.last_activity_at).toLocaleString() : "—"}</td>
+              </tr>
+            );
+          })}
+        </tbody>
+      </table>
+    </div>
+  );
+}
+
+// ── Change history ─────────────────────────────────────────────────────
+function HistoryTab({ platform }: { platform: Platform }) {
+  const q = useQuery({
+    queryKey: ["history", platform.id],
+      queryFn: async () => (await supabase.from("platform_policy_updates").select("*").eq("platform_id", platform.id).in("status", ["published","approved","rejected","archived"] as Update["status"][]).order("detected_at", { ascending: false })).data ?? [],
+  });
+  if (!q.data?.length) return <EmptyMsg icon={History} text="No change history yet."/>;
+  return (
+    <div className="overflow-x-auto">
+      <table className="w-full text-sm">
+        <thead><tr className="text-xs text-muted-foreground text-left border-b"><th className="py-2">Title</th><th>Status</th><th>Severity</th><th>Detected</th><th>Published</th></tr></thead>
+        <tbody>
+          {q.data.map((u) => (
+            <tr key={u.id} className="border-b last:border-0">
+              <td className="py-2">{u.update_title}</td>
+              <td><Badge variant="outline">{u.status}</Badge></td>
+              <td><Badge variant="outline" className={SEVERITY_TONE[u.severity]}>{u.severity}</Badge></td>
+              <td className="text-muted-foreground">{new Date(u.detected_at).toLocaleDateString()}</td>
+              <td className="text-muted-foreground">{u.published_at ? new Date(u.published_at).toLocaleDateString() : "—"}</td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </div>
+  );
+}
+
+// ── Sources ────────────────────────────────────────────────────────────
+function SourcesTab({ platform, isHr }: { platform: Platform; isHr: boolean }) {
+  const qc = useQueryClient();
+  const [open, setOpen] = useState(false);
+  const [editing, setEditing] = useState<Source | null>(null);
+  const blank: Partial<Source> = { source_name: "", source_url: "", source_type: "official_url", is_active: true, check_frequency: "daily" };
+  const [form, setForm] = useState<Partial<Source>>(blank);
+  const q = useQuery({
+    queryKey: ["sources", platform.id],
+    queryFn: async () => (await supabase.from("platform_policy_sources").select("*").eq("platform_id", platform.id).order("created_at")).data ?? [],
+  });
+  const save = useMutation({
+    mutationFn: async () => {
+      if (editing) {
+        const { error } = await supabase.from("platform_policy_sources").update(form).eq("id", editing.id);
+        if (error) throw error;
+      } else {
+        const { error } = await supabase.from("platform_policy_sources").insert({ platform_id: platform.id, source_name: form.source_name!, source_url: form.source_url ?? null, source_type: form.source_type!, is_active: form.is_active!, check_frequency: form.check_frequency! });
+        if (error) throw error;
+      }
+    },
+    onSuccess: () => { toast.success("Saved"); setOpen(false); setEditing(null); setForm(blank); qc.invalidateQueries({ queryKey: ["sources", platform.id] }); },
+    onError: (e: Error) => toast.error(e.message),
+  });
+  const toggle = useMutation({
+    mutationFn: async ({ id, active }: { id: string; active: boolean }) => {
+      const { error } = await supabase.from("platform_policy_sources").update({ is_active: active }).eq("id", id);
+      if (error) throw error;
+    },
+    onSuccess: () => qc.invalidateQueries({ queryKey: ["sources", platform.id] }),
+  });
+  const check = useMutation({
+    mutationFn: async (id: string) => (await supabase.functions.invoke("check-platform-policy-updates", { body: { sourceId: id } })).data,
+    onSuccess: () => { toast.success("Source checked"); qc.invalidateQueries(); },
+    onError: (e: Error) => toast.error(e.message),
+  });
+
+  function openEdit(s: Source) { setEditing(s); setForm(s); setOpen(true); }
+  function openCreate() { setEditing(null); setForm(blank); setOpen(true); }
+
+  return (
+    <div className="space-y-3">
+      {isHr && <div className="flex justify-end"><Button size="sm" onClick={openCreate}><Plus className="size-3.5 mr-1.5"/> Add source</Button></div>}
+      {(q.data ?? []).length === 0 && <EmptyMsg icon={ListChecks} text="No sources yet. Add an official policy URL, RSS feed, or API source."/>}
+      <div className="space-y-2">
+        {(q.data ?? []).map((s) => (
+          <div key={s.id} className="rounded-md border p-3">
+            <div className="flex items-start justify-between gap-3">
+              <div className="min-w-0">
+                <div className="text-sm font-semibold flex items-center gap-2">{s.source_name}<Badge variant="outline" className="text-[10px]">{s.source_type}</Badge></div>
+                {s.source_url && <a href={s.source_url} target="_blank" rel="noreferrer" className="text-xs text-primary truncate block max-w-md">{s.source_url}</a>}
+                <div className="text-[11px] text-muted-foreground mt-1">
+                  {s.check_frequency} · last {s.last_checked_at ? new Date(s.last_checked_at).toLocaleString() : "never"} · {s.last_status ?? "—"}
+                </div>
+              </div>
+              {isHr && (
+                <div className="flex items-center gap-2 shrink-0">
+                  <Switch checked={s.is_active} onCheckedChange={(v) => toggle.mutate({ id: s.id, active: v })}/>
+                  <Button size="sm" variant="outline" onClick={() => check.mutate(s.id)} disabled={check.isPending}><RefreshCw className={`size-3.5 ${check.isPending ? "animate-spin" : ""}`}/></Button>
+                  <Button size="sm" variant="ghost" onClick={() => openEdit(s)}>Edit</Button>
+                </div>
+              )}
+            </div>
+          </div>
+        ))}
+      </div>
+
+      <Dialog open={open} onOpenChange={setOpen}>
         <DialogContent>
-          <DialogHeader><DialogTitle>Add daily policy update — {platform.name}</DialogTitle></DialogHeader>
+          <DialogHeader><DialogTitle>{editing ? "Edit source" : "Add source"}</DialogTitle></DialogHeader>
           <div className="space-y-3">
-            <div className="space-y-1.5"><Label>Headline</Label><Input/></div>
-            <div className="space-y-1.5"><Label>Summary</Label><Textarea rows={3}/></div>
+            <Field label="Name"><Input value={form.source_name ?? ""} onChange={(e) => setForm((f) => ({ ...f, source_name: e.target.value }))}/></Field>
+            <Field label="Source URL"><Input value={form.source_url ?? ""} onChange={(e) => setForm((f) => ({ ...f, source_url: e.target.value }))} placeholder="https://..."/></Field>
             <div className="grid grid-cols-2 gap-3">
-              <div className="space-y-1.5"><Label>Severity</Label>
-                <Select defaultValue="Medium">
+              <Field label="Type">
+                <Select value={form.source_type} onValueChange={(v) => setForm((f) => ({ ...f, source_type: v as Source["source_type"] }))}>
                   <SelectTrigger><SelectValue/></SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="Low">Low</SelectItem>
-                    <SelectItem value="Medium">Medium</SelectItem>
-                    <SelectItem value="High">High</SelectItem>
-                    <SelectItem value="Critical">Critical</SelectItem>
+                    <SelectItem value="official_url">Official URL</SelectItem>
+                    <SelectItem value="rss">RSS</SelectItem>
+                    <SelectItem value="api">API</SelectItem>
+                    <SelectItem value="manual">Manual</SelectItem>
                   </SelectContent>
                 </Select>
-              </div>
-              <div className="space-y-1.5"><Label>Effective date</Label><Input type="date"/></div>
+              </Field>
+              <Field label="Check frequency">
+                <Select value={form.check_frequency} onValueChange={(v) => setForm((f) => ({ ...f, check_frequency: v as Source["check_frequency"] }))}>
+                  <SelectTrigger><SelectValue/></SelectTrigger>
+                  <SelectContent><SelectItem value="daily">Daily</SelectItem><SelectItem value="weekly">Weekly</SelectItem><SelectItem value="manual">Manual</SelectItem></SelectContent>
+                </Select>
+              </Field>
             </div>
-            <div className="space-y-1.5"><Label>Affected team</Label><Input placeholder="e.g. News"/></div>
+            <div className="flex items-center gap-2"><Switch checked={!!form.is_active} onCheckedChange={(v) => setForm((f) => ({ ...f, is_active: v }))}/><span className="text-sm">Active</span></div>
           </div>
           <DialogFooter>
-            <Button variant="outline" onClick={() => setAddUpdate(false)}>Cancel</Button>
-            <Button onClick={() => {
-              setAddUpdate(false);
-              setUpdates((prev) => [{
-                id: `manual-${Date.now()}`, title: "Manually added update", summary: "Mock entry added by HR admin.",
-                severity: "Medium" as Severity, team: "All teams", action: "Review",
-                source: "Admin entry", effectiveDate: new Date().toISOString().slice(0,10), reviewed: false,
-              }, ...prev]);
-              toast.success("Update published (mock)");
-            }}>Publish</Button>
+            <Button variant="outline" onClick={() => setOpen(false)}>Cancel</Button>
+            <Button onClick={() => save.mutate()} disabled={!form.source_name || save.isPending}>Save</Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>
-
-      <Sheet open={!!empDrawer} onOpenChange={(o) => !o && setEmpDrawer(null)}>
-        <SheetContent className="w-full sm:max-w-md">
-          <SheetHeader><SheetTitle>{empDrawer?.name}</SheetTitle></SheetHeader>
-          {empDrawer && (
-            <div className="mt-4 space-y-3 text-sm px-1">
-              <div className="flex items-center gap-3">
-                <Avatar className="size-12"><AvatarFallback>{empDrawer.name.split(" ").map((x) => x[0]).join("")}</AvatarFallback></Avatar>
-                <div>
-                  <div className="font-semibold">{empDrawer.name}</div>
-                  <div className="text-xs text-muted-foreground">{empDrawer.dept} · {platform.name}</div>
-                </div>
-              </div>
-              <div className="grid grid-cols-2 gap-3">
-                <Stat label="Lessons" value={`${empDrawer.lessons}/${empDrawer.total}`}/>
-                <Stat label="Quiz score" value={`${empDrawer.score}%`}/>
-                <Stat label="Last training" value={empDrawer.last}/>
-                <Stat label="Pending policies" value={empDrawer.pending}/>
-              </div>
-              <div>
-                <Label className="text-xs">Manager notes</Label>
-                <Textarea rows={3} defaultValue="On track. Needs to complete monetization quiz." className="mt-1"/>
-              </div>
-              <div className="flex gap-2">
-                <Button size="sm" onClick={() => toast.success("Reminder sent")}>Send reminder</Button>
-                <Button size="sm" variant="outline" onClick={() => toast.success("Training assigned")}>Assign training</Button>
-              </div>
-            </div>
-          )}
-        </SheetContent>
-      </Sheet>
     </div>
   );
 }
 
-// ────────────────────────────────────────────────────────────────────────────
-// Helpers
-// ────────────────────────────────────────────────────────────────────────────
-
-function Stat({ label, value, tone }: { label: string; value: string | number; tone?: "ok" | "warn" | "danger" }) {
-  const color = tone === "danger" ? "text-red-400" : tone === "warn" ? "text-amber-400" : tone === "ok" ? "text-emerald-400" : "text-foreground";
+// ── Logs ────────────────────────────────────────────────────────────────
+function LogsTab({ platform }: { platform: Platform }) {
+  const q = useQuery({
+    queryKey: ["logs", platform.id],
+    queryFn: async () => (await supabase.from("policy_monitoring_logs").select("*").eq("platform_id", platform.id).order("checked_at", { ascending: false }).limit(50)).data ?? [],
+  });
+  if (!q.data?.length) return <EmptyMsg icon={Activity} text="No monitoring runs yet for this platform."/>;
   return (
-    <div className="rounded-lg border bg-card/40 p-3">
-      <div className="text-[11px] uppercase tracking-wide text-muted-foreground">{label}</div>
-      <div className={`text-base font-semibold mt-1 ${color}`}>{value}</div>
+    <div className="space-y-2">
+      {q.data.map((l) => (
+        <div key={l.id} className="rounded-md border p-2 text-xs flex items-center justify-between gap-3">
+          <div className="min-w-0">
+            <div className="font-medium">{l.message ?? l.run_status}</div>
+            <div className="text-muted-foreground">{new Date(l.checked_at).toLocaleString()}{l.error_details ? ` · ${l.error_details}` : ""}</div>
+          </div>
+          <Badge variant="outline" className={l.run_status === "failed" ? SEVERITY_TONE.critical : l.run_status === "changes_detected" ? SEVERITY_TONE.high : SEVERITY_TONE.low}>{l.run_status}</Badge>
+        </div>
+      ))}
     </div>
   );
 }
 
-function SeverityBadge({ level }: { level: Severity }) {
-  const map: Record<Severity, string> = {
-    Low:      "border-emerald-500/40 text-emerald-400",
-    Medium:   "border-amber-500/40 text-amber-400",
-    High:     "border-orange-500/40 text-orange-400",
-    Critical: "border-red-500/40 text-red-400",
-  };
+// ─────────────────────────────────────────────────────────────────────────
+
+function Field({ label, children }: { label: string; children: React.ReactNode }) {
+  return <div className="space-y-1.5"><Label className="text-xs">{label}</Label>{children}</div>;
+}
+function EmptyMsg({ icon: Icon, text }: { icon: LucideIcon; text: string }) {
   return (
-    <Badge variant="outline" className={`gap-1 ${map[level]}`}>
-      <AlertTriangle className="size-3"/> {level}
-    </Badge>
+    <div className="rounded-md border border-dashed p-8 text-center">
+      <Icon className="size-6 mx-auto text-muted-foreground mb-2"/>
+      <p className="text-sm text-muted-foreground">{text}</p>
+    </div>
   );
-}
-
-function riskColor(r: "Low" | "Medium" | "High") {
-  return r === "High" ? "text-red-400" : r === "Medium" ? "text-amber-400" : "text-emerald-400";
-}
-
-function statusColor(s: string) {
-  if (s === "Compliant") return "text-emerald-400 border-emerald-500/40";
-  if (s === "At Risk") return "text-amber-400 border-amber-500/40";
-  return "text-red-400 border-red-500/40";
 }
