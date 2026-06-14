@@ -16,7 +16,6 @@ import { useApp } from "@/lib/app-store";
 import { ALL_ROLES, type Role } from "@/lib/types";
 import { toast } from "sonner";
 import { Toaster } from "@/components/ui/sonner";
-import { AuroraMark } from "@/components/magic/AuroraMark";
 
 export const Route = createFileRoute("/login")({
   head: () => ({
@@ -45,9 +44,8 @@ function LoginPage() {
         transition={{ duration: 1.2 }}
         className="hidden lg:flex lg:w-1/2 relative overflow-hidden p-12 flex-col justify-between"
       >
-        <div className="relative flex h-10 items-center gap-3 z-10">
-          <AuroraMark size={26} spin />
-          <img src={orvionLogo} alt="Orvion Media" className="h-9 w-auto block" />
+        <div className="relative flex h-10 items-center z-10">
+          <img src={orvionLogo} alt="Orvion Media" className="h-10 w-auto block" />
         </div>
         <div className="relative z-10 max-w-xl">
           <div className="eyebrow text-primary/80 mb-6">Newsroom OS · v2.6</div>
@@ -83,9 +81,8 @@ function LoginPage() {
           transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1], delay: 0.2 }}
           className="tile w-full max-w-md p-10"
         >
-          <div className="lg:hidden flex h-9 items-center gap-3 mb-6">
-            <AuroraMark size={23} />
-            <img src={orvionLogo} alt="Orvion Media" className="h-7 w-auto block" />
+          <div className="lg:hidden flex h-9 items-center mb-6">
+            <img src={orvionLogo} alt="Orvion Media" className="h-8 w-auto block" />
           </div>
           <div className="eyebrow text-primary/80 mb-3">Sign in</div>
           <h1 className="serif-display text-4xl text-foreground">
