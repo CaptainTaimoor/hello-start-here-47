@@ -322,7 +322,7 @@ function PoliciesTab({ platform, isHr }: { platform: Platform; isHr: boolean }) 
   });
   const create = useMutation({
     mutationFn: async () => {
-      const { error } = await supabase.from("platform_policies").insert({ platform_id: platform.id, ...form, status: "active", current_version: 1 });
+      const { error } = await supabase.from("platform_policies").insert({ platform_id: platform.id, ...form, status: "active", current_version: "v1.0" });
       if (error) throw error;
     },
     onSuccess: () => { toast.success("Policy added"); setOpen(false); setForm({ title: "", category: POLICY_CATEGORIES[0], summary: "", current_content: "", risk_level: "medium" }); qc.invalidateQueries({ queryKey: ["policies", platform.id] }); },
@@ -343,7 +343,7 @@ function PoliciesTab({ platform, isHr }: { platform: Platform; isHr: boolean }) 
             <div className="flex items-start justify-between gap-3">
               <div className="min-w-0">
                 <div className="font-semibold text-sm">{p.title}</div>
-                <div className="text-xs text-muted-foreground mt-0.5">{p.category} · v{p.current_version}</div>
+              <div className="text-xs text-muted-foreground mt-0.5">{p.category} · {p.current_version}</div>
                 {p.summary && <p className="text-sm mt-2 text-muted-foreground line-clamp-2">{p.summary}</p>}
               </div>
               <Badge variant="outline" className={SEVERITY_TONE[p.risk_level]}>{p.risk_level}</Badge>
