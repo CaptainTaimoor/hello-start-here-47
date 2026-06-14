@@ -1,5 +1,5 @@
 import { Link, useRouterState } from "@tanstack/react-router";
-import { Bell, Menu, Moon, Search, Sun } from "lucide-react";
+import { Bell, Contrast, Menu, Moon, Search, Sun } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
@@ -71,8 +71,20 @@ export function AppHeader() {
         </div>
         <div className="flex-1 md:hidden" />
         <div className="flex items-center gap-2">
-          <Button variant="ghost" size="icon" onClick={toggleTheme} aria-label="Toggle theme">
-            {theme === "dark" ? <Sun className="size-5" /> : <Moon className="size-5" />}
+          <Button
+            variant="ghost"
+            size="icon"
+            onClick={toggleTheme}
+            aria-label="Toggle theme"
+            title={`Theme: ${theme} — click to cycle (dark → light → mono)`}
+          >
+            {theme === "dark" ? (
+              <Sun className="size-5" />
+            ) : theme === "light" ? (
+              <Contrast className="size-5" />
+            ) : (
+              <Moon className="size-5" />
+            )}
           </Button>
           <Link
             to="/notifications"
