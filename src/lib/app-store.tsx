@@ -24,6 +24,7 @@ interface AuthUser {
 }
 
 interface AppStore {
+  ready: boolean;
   // auth
   user: AuthUser | null;
   login: (u: AuthUser) => void;
@@ -68,21 +69,20 @@ function readPersisted() {
 }
 
 export function AppStoreProvider({ children }: { children: ReactNode }) {
-  const persisted = readPersisted();
-
-  const [user, setUser] = useState<AuthUser | null>(persisted?.user ?? null);
-  const [theme, setTheme] = useState<Theme>(persisted?.theme ?? "dark");
+  const [ready, setReady] = useState(false);
+  const [user, setUser] = useState<AuthUser | null>(null);
+  const [theme, setTheme] = useState<Theme>("dark");
   const [sidebarOpen, setSidebarOpen] = useState(true);
-  const [channels, setChannels] = useState<Channel[]>(persisted?.channels ?? MOCK_CHANNELS);
+  const [channels, setChannels] = useState<Channel[]>(MOCK_CHANNELS);
   const [sheets, setSheets] = useState<Record<string, SheetRow[]>>(
-    persisted?.sheets ?? MOCK_SHEET_DATA,
+    MOCK_SHEET_DATA,
   );
   const [notifications, setNotifications] = useState<Notification[]>(
-    persisted?.notifications ?? MOCK_NOTIFICATIONS,
+    MOCK_NOTIFICATIONS,
   );
-  const [users, setUsers] = useState<User[]>(persisted?.users ?? MOCK_USERS);
+  const [users, setUsers] = useState<User[]>(MOCK_USERS);
   const [dashboardCards, setDashboardCards] = useState<Record<string, boolean>>(
-    persisted?.dashboardCards ?? {
+    {
       projects: true,
       team: true,
       tasks: true,
@@ -98,14 +98,29 @@ export function AppStoreProvider({ children }: { children: ReactNode }) {
     },
   );
 
+  useEffect(() => {
+    const persisted = readPersisted();
+    if (persisted) {
+      setUser(persisted.user ?? null);
+      setTheme(persisted.theme ?? "dark");
+      setChannels(persisted.channels ?? MOCK_CHANNELS);
+      setSheets(persisted.sheets ?? MOCK_SHEET_DATA);
+      setNotifications(persisted.notifications ?? MOCK_NOTIFICATIONS);
+      setUsers(persisted.users ?? MOCK_USERS);
+      setDashboardCards(persisted.dashboardCards ?? dashboardCards);
+    }
+    setReady(true);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
   // persist
   useEffect(() => {
-    if (typeof window === "undefined") return;
+    if (!ready || typeof window === "undefined") return;
     window.localStorage.setItem(
       LS_KEY,
       JSON.stringify({ user, theme, channels, sheets, notifications, users, dashboardCards }),
     );
-  }, [user, theme, channels, sheets, notifications, users, dashboardCards]);
+  }, [ready, user, theme, channels, sheets, notifications, users, dashboardCards]);
 
   // theme class on <html>
   useEffect(() => {
@@ -125,6 +140,7 @@ export function AppStoreProvider({ children }: { children: ReactNode }) {
 
   const value: AppStore = useMemo(
     () => ({
+      ready,
       user,
       login: (u) => setUser(u),
       logout: () => setUser(null),
@@ -153,7 +169,7 @@ export function AppStoreProvider({ children }: { children: ReactNode }) {
       toggleCard: (id) =>
         setDashboardCards((prev) => ({ ...prev, [id]: !prev[id] })),
     }),
-    [user, theme, sidebarOpen, channels, sheets, notifications, users, dashboardCards, updateSheetCell],
+    [ready, user, theme, sidebarOpen, channels, sheets, notifications, users, dashboardCards, updateSheetCell],
   );
 
   return <Ctx.Provider value={value}>{children}</Ctx.Provider>;
