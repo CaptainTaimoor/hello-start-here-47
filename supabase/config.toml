@@ -1,1 +1,4 @@
 project_id = "xadlztnmxupanfqywuzt"
+
+[functions.check-platform-policy-updates]
+verify_jwt = false

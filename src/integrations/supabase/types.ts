@@ -113,6 +113,42 @@ export type Database = {
           },
         ]
       }
+      notifications: {
+        Row: {
+          body: string | null
+          created_at: string
+          entity_id: string | null
+          entity_table: string | null
+          id: string
+          read: boolean
+          title: string
+          type: string
+          user_id: string
+        }
+        Insert: {
+          body?: string | null
+          created_at?: string
+          entity_id?: string | null
+          entity_table?: string | null
+          id?: string
+          read?: boolean
+          title: string
+          type: string
+          user_id: string
+        }
+        Update: {
+          body?: string | null
+          created_at?: string
+          entity_id?: string | null
+          entity_table?: string | null
+          id?: string
+          read?: boolean
+          title?: string
+          type?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       platform_policies: {
         Row: {
           category: string
@@ -166,6 +202,7 @@ export type Database = {
       platform_policy_sources: {
         Row: {
           check_frequency: Database["public"]["Enums"]["dpc_check_freq"]
+          content_hash: string | null
           created_at: string
           id: string
           is_active: boolean
@@ -179,6 +216,7 @@ export type Database = {
         }
         Insert: {
           check_frequency?: Database["public"]["Enums"]["dpc_check_freq"]
+          content_hash?: string | null
           created_at?: string
           id?: string
           is_active?: boolean
@@ -192,6 +230,7 @@ export type Database = {
         }
         Update: {
           check_frequency?: Database["public"]["Enums"]["dpc_check_freq"]
+          content_hash?: string | null
           created_at?: string
           id?: string
           is_active?: boolean
@@ -746,6 +785,7 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      get_monitoring_health: { Args: never; Returns: Json }
       has_role: {
         Args: {
           _role: Database["public"]["Enums"]["app_role"]
@@ -754,6 +794,7 @@ export type Database = {
         Returns: boolean
       }
       is_hr_or_admin: { Args: { _user_id: string }; Returns: boolean }
+      publish_policy_update: { Args: { _update_id: string }; Returns: Json }
     }
     Enums: {
       app_role: "super_admin" | "admin" | "hr" | "manager" | "employee"

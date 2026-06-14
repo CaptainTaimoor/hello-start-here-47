@@ -1,4 +1,4 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, Link } from "@tanstack/react-router";
 import { useState } from "react";
 import { Plus } from "lucide-react";
 import { PageHeader } from "@/components/common/PageHeader";
@@ -128,6 +128,15 @@ function HRPage() {
 
         <TabsContent value="training" className="mt-4">
           <div className="space-y-4">
+            <Card>
+              <CardContent className="p-4 flex flex-wrap items-center justify-between gap-2">
+                <div>
+                  <div className="font-medium text-sm">Live policy monitoring</div>
+                  <div className="text-xs text-muted-foreground">End-to-end test dashboard: edge function, realtime, pending review, publish, acknowledgements.</div>
+                </div>
+                <Button asChild size="sm"><Link to="/departments/hr/training/live-monitoring-test">Open Live Monitoring Test</Link></Button>
+              </CardContent>
+            </Card>
             <Card>
             <CardHeader><CardTitle className="text-base">Training sessions</CardTitle></CardHeader>
             <CardContent className="space-y-2 text-sm">
