@@ -131,7 +131,7 @@ function DashboardPage() {
   }>;
 
   const tile =
-    "group relative overflow-hidden rounded-3xl border border-white/[0.06] bg-[oklch(0.2_0.04_235)] p-6 transition-all duration-500 hover:border-primary/30 hover:-translate-y-0.5";
+    "group relative overflow-hidden rounded-3xl border border-white/[0.06] bg-[oklch(0.2_0.04_235)] p-5 sm:p-6 transition-all duration-500 hover:border-primary/30 hover:-translate-y-0.5";
 
   return (
     <motion.div
@@ -143,11 +143,11 @@ function DashboardPage() {
       {/* HERO */}
       <motion.div
         variants={{ hidden: { opacity: 0, y: 20 }, show: { opacity: 1, y: 0, transition: { duration: 0.7, ease: [0.16, 1, 0.3, 1] } } }}
-        className="md:col-span-8 relative overflow-hidden rounded-3xl border border-white/[0.06] bg-[oklch(0.2_0.04_235)] p-8 md:p-10 min-h-[320px] flex flex-col justify-between"
+        className="md:col-span-8 relative overflow-hidden rounded-3xl border border-white/[0.06] bg-[oklch(0.2_0.04_235)] p-5 sm:p-8 md:p-10 min-h-[260px] md:min-h-[320px] flex flex-col justify-between"
       >
         <div className="pointer-events-none absolute inset-0 [background:radial-gradient(circle_at_top_right,oklch(0.78_0.17_205/0.12),transparent_55%)]" />
-        <div className="absolute top-6 right-6 z-10">
-          <div className="flex items-center gap-3 px-3 py-1 bg-white/5 border border-white/10 rounded-full backdrop-blur-md">
+        <div className="absolute top-4 right-4 sm:top-6 sm:right-6 z-10">
+          <div className="flex items-center gap-2 sm:gap-3 px-2.5 sm:px-3 py-1 bg-white/5 border border-white/10 rounded-full backdrop-blur-md">
             <span className="relative flex size-1.5">
               <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-primary opacity-60" />
               <span className="relative inline-flex size-1.5 rounded-full bg-primary" />
@@ -160,10 +160,10 @@ function DashboardPage() {
           </div>
         </div>
         <div className="relative z-10">
-          <h1 className="font-serif text-6xl md:text-8xl font-normal text-white leading-[0.92] tracking-[-0.03em]">
+          <h1 className="font-serif text-5xl sm:text-6xl md:text-8xl font-normal text-white leading-[0.92] tracking-[-0.03em] max-w-[9ch] sm:max-w-none">
             Welcome back, <span className="italic text-primary">{firstName}.</span>
           </h1>
-          <p className="mt-4 max-w-md text-base md:text-lg text-white/50 font-light leading-relaxed">
+          <p className="mt-4 max-w-md text-sm sm:text-base md:text-lg text-white/50 font-light leading-relaxed">
             You're signed in as <span className="text-white/85">{role}</span>. Here's your production pulse for today.
           </p>
         </div>
