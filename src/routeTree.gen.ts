@@ -27,6 +27,7 @@ import { Route as AppDepartmentsHrRouteImport } from './routes/_app.departments.
 import { Route as AppDepartmentsFinanceRouteImport } from './routes/_app.departments.finance'
 import { Route as AppProjectsNewsCurrentAffairsRouteImport } from './routes/_app.projects.news.current-affairs'
 import { Route as AppProjectsNewsCurrentAffairsYoutubeRouteImport } from './routes/_app.projects.news.current-affairs.youtube'
+import { Route as AppDepartmentsHrTrainingLiveMonitoringTestRouteImport } from './routes/_app.departments.hr.training.live-monitoring-test'
 import { Route as AppProjectsNewsCurrentAffairsYoutubeChannelIdRouteImport } from './routes/_app.projects.news.current-affairs.youtube.$channelId'
 
 const LoginRoute = LoginRouteImport.update({
@@ -120,6 +121,12 @@ const AppProjectsNewsCurrentAffairsYoutubeRoute =
     path: '/youtube',
     getParentRoute: () => AppProjectsNewsCurrentAffairsRoute,
   } as any)
+const AppDepartmentsHrTrainingLiveMonitoringTestRoute =
+  AppDepartmentsHrTrainingLiveMonitoringTestRouteImport.update({
+    id: '/training/live-monitoring-test',
+    path: '/training/live-monitoring-test',
+    getParentRoute: () => AppDepartmentsHrRoute,
+  } as any)
 const AppProjectsNewsCurrentAffairsYoutubeChannelIdRoute =
   AppProjectsNewsCurrentAffairsYoutubeChannelIdRouteImport.update({
     id: '/$channelId',
@@ -139,11 +146,12 @@ export interface FileRoutesByFullPath {
   '/settings': typeof AppSettingsRoute
   '/team': typeof AppTeamRouteWithChildren
   '/departments/finance': typeof AppDepartmentsFinanceRoute
-  '/departments/hr': typeof AppDepartmentsHrRoute
+  '/departments/hr': typeof AppDepartmentsHrRouteWithChildren
   '/departments/it': typeof AppDepartmentsItRoute
   '/projects/news': typeof AppProjectsNewsRouteWithChildren
   '/team/news': typeof AppTeamNewsRoute
   '/projects/news/current-affairs': typeof AppProjectsNewsCurrentAffairsRouteWithChildren
+  '/departments/hr/training/live-monitoring-test': typeof AppDepartmentsHrTrainingLiveMonitoringTestRoute
   '/projects/news/current-affairs/youtube': typeof AppProjectsNewsCurrentAffairsYoutubeRouteWithChildren
   '/projects/news/current-affairs/youtube/$channelId': typeof AppProjectsNewsCurrentAffairsYoutubeChannelIdRoute
 }
@@ -159,11 +167,12 @@ export interface FileRoutesByTo {
   '/settings': typeof AppSettingsRoute
   '/team': typeof AppTeamRouteWithChildren
   '/departments/finance': typeof AppDepartmentsFinanceRoute
-  '/departments/hr': typeof AppDepartmentsHrRoute
+  '/departments/hr': typeof AppDepartmentsHrRouteWithChildren
   '/departments/it': typeof AppDepartmentsItRoute
   '/projects/news': typeof AppProjectsNewsRouteWithChildren
   '/team/news': typeof AppTeamNewsRoute
   '/projects/news/current-affairs': typeof AppProjectsNewsCurrentAffairsRouteWithChildren
+  '/departments/hr/training/live-monitoring-test': typeof AppDepartmentsHrTrainingLiveMonitoringTestRoute
   '/projects/news/current-affairs/youtube': typeof AppProjectsNewsCurrentAffairsYoutubeRouteWithChildren
   '/projects/news/current-affairs/youtube/$channelId': typeof AppProjectsNewsCurrentAffairsYoutubeChannelIdRoute
 }
@@ -181,11 +190,12 @@ export interface FileRoutesById {
   '/_app/settings': typeof AppSettingsRoute
   '/_app/team': typeof AppTeamRouteWithChildren
   '/_app/departments/finance': typeof AppDepartmentsFinanceRoute
-  '/_app/departments/hr': typeof AppDepartmentsHrRoute
+  '/_app/departments/hr': typeof AppDepartmentsHrRouteWithChildren
   '/_app/departments/it': typeof AppDepartmentsItRoute
   '/_app/projects/news': typeof AppProjectsNewsRouteWithChildren
   '/_app/team/news': typeof AppTeamNewsRoute
   '/_app/projects/news/current-affairs': typeof AppProjectsNewsCurrentAffairsRouteWithChildren
+  '/_app/departments/hr/training/live-monitoring-test': typeof AppDepartmentsHrTrainingLiveMonitoringTestRoute
   '/_app/projects/news/current-affairs/youtube': typeof AppProjectsNewsCurrentAffairsYoutubeRouteWithChildren
   '/_app/projects/news/current-affairs/youtube/$channelId': typeof AppProjectsNewsCurrentAffairsYoutubeChannelIdRoute
 }
@@ -208,6 +218,7 @@ export interface FileRouteTypes {
     | '/projects/news'
     | '/team/news'
     | '/projects/news/current-affairs'
+    | '/departments/hr/training/live-monitoring-test'
     | '/projects/news/current-affairs/youtube'
     | '/projects/news/current-affairs/youtube/$channelId'
   fileRoutesByTo: FileRoutesByTo
@@ -228,6 +239,7 @@ export interface FileRouteTypes {
     | '/projects/news'
     | '/team/news'
     | '/projects/news/current-affairs'
+    | '/departments/hr/training/live-monitoring-test'
     | '/projects/news/current-affairs/youtube'
     | '/projects/news/current-affairs/youtube/$channelId'
   id:
@@ -249,6 +261,7 @@ export interface FileRouteTypes {
     | '/_app/projects/news'
     | '/_app/team/news'
     | '/_app/projects/news/current-affairs'
+    | '/_app/departments/hr/training/live-monitoring-test'
     | '/_app/projects/news/current-affairs/youtube'
     | '/_app/projects/news/current-affairs/youtube/$channelId'
   fileRoutesById: FileRoutesById
@@ -388,6 +401,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AppProjectsNewsCurrentAffairsYoutubeRouteImport
       parentRoute: typeof AppProjectsNewsCurrentAffairsRoute
     }
+    '/_app/departments/hr/training/live-monitoring-test': {
+      id: '/_app/departments/hr/training/live-monitoring-test'
+      path: '/training/live-monitoring-test'
+      fullPath: '/departments/hr/training/live-monitoring-test'
+      preLoaderRoute: typeof AppDepartmentsHrTrainingLiveMonitoringTestRouteImport
+      parentRoute: typeof AppDepartmentsHrRoute
+    }
     '/_app/projects/news/current-affairs/youtube/$channelId': {
       id: '/_app/projects/news/current-affairs/youtube/$channelId'
       path: '/$channelId'
@@ -398,15 +418,27 @@ declare module '@tanstack/react-router' {
   }
 }
 
+interface AppDepartmentsHrRouteChildren {
+  AppDepartmentsHrTrainingLiveMonitoringTestRoute: typeof AppDepartmentsHrTrainingLiveMonitoringTestRoute
+}
+
+const AppDepartmentsHrRouteChildren: AppDepartmentsHrRouteChildren = {
+  AppDepartmentsHrTrainingLiveMonitoringTestRoute:
+    AppDepartmentsHrTrainingLiveMonitoringTestRoute,
+}
+
+const AppDepartmentsHrRouteWithChildren =
+  AppDepartmentsHrRoute._addFileChildren(AppDepartmentsHrRouteChildren)
+
 interface AppDepartmentsRouteChildren {
   AppDepartmentsFinanceRoute: typeof AppDepartmentsFinanceRoute
-  AppDepartmentsHrRoute: typeof AppDepartmentsHrRoute
+  AppDepartmentsHrRoute: typeof AppDepartmentsHrRouteWithChildren
   AppDepartmentsItRoute: typeof AppDepartmentsItRoute
 }
 
 const AppDepartmentsRouteChildren: AppDepartmentsRouteChildren = {
   AppDepartmentsFinanceRoute: AppDepartmentsFinanceRoute,
-  AppDepartmentsHrRoute: AppDepartmentsHrRoute,
+  AppDepartmentsHrRoute: AppDepartmentsHrRouteWithChildren,
   AppDepartmentsItRoute: AppDepartmentsItRoute,
 }
 
