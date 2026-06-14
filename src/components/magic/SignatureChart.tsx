@@ -51,11 +51,21 @@ export function SignatureChart({
   }
 
   return (
-    <div className="relative" style={{ height }}>
+    <div className="relative flex flex-col" style={{ height }}>
+      {/* legend */}
+      <div className="mb-3 flex flex-wrap justify-end gap-x-3 gap-y-1 text-[11px] text-muted-foreground">
+        {series.map((s) => (
+          <span key={s.name} className="flex items-center gap-1.5 whitespace-nowrap">
+            <span className="size-2 rounded-full" style={{ background: s.color }} />
+            {s.name}
+          </span>
+        ))}
+      </div>
+
       <svg
         viewBox={`0 0 ${W} ${H}`}
         preserveAspectRatio="none"
-        className="w-full h-full overflow-visible"
+        className="w-full min-h-0 flex-1 overflow-visible"
         onMouseMove={onMove}
         onMouseLeave={() => setHover(null)}
       >
@@ -137,15 +147,6 @@ export function SignatureChart({
         ))}
       </div>
 
-      {/* legend */}
-      <div className="absolute top-0 right-0 flex gap-3 text-[11px] text-muted-foreground">
-        {series.map((s) => (
-          <span key={s.name} className="flex items-center gap-1.5">
-            <span className="size-2 rounded-full" style={{ background: s.color }} />
-            {s.name}
-          </span>
-        ))}
-      </div>
     </div>
   );
 }
