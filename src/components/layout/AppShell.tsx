@@ -14,16 +14,16 @@ import { AssistantPanel } from "@/components/AssistantPanel";
 import { X } from "lucide-react";
 
 export function AppShell({ children }: { children?: ReactNode }) {
-  const { ready, user } = useApp();
+  const { user } = useApp();
   const navigate = useNavigate();
   const pathname = useRouterState({ select: (s) => s.location.pathname });
   const [focusMode, setFocusMode] = useState(false);
 
   useEffect(() => {
-    if (ready && !user && pathname !== "/login" && pathname !== "/forgot-password") {
+    if (!user && pathname !== "/login" && pathname !== "/forgot-password") {
       navigate({ to: "/login" });
     }
-  }, [ready, user, pathname, navigate]);
+  }, [user, pathname, navigate]);
 
   // Soft sound on route change
   useEffect(() => { click("tick"); }, [pathname]);
@@ -45,18 +45,18 @@ export function AppShell({ children }: { children?: ReactNode }) {
     return () => window.removeEventListener("keydown", fn);
   }, [focusMode]);
 
-  if (!ready || !user) return null;
+  if (!user) return null;
 
   return (
-    <div className={`flex min-h-screen w-screen max-w-full overflow-x-hidden text-foreground relative ${focusMode ? "focus-mode" : ""}`}>
+    <div className={`flex min-h-screen w-full text-foreground relative ${focusMode ? "focus-mode" : ""}`}>
       <CursorSpotlight />
       <CommandPalette />
       <ShortcutsDialog />
       <AssistantPanel />
       <AppSidebar />
-      <div className="flex flex-1 basis-full flex-col min-w-0 max-w-full">
+      <div className="flex flex-1 flex-col min-w-0">
         <AppHeader />
-        <main className="relative flex-1 min-w-0 p-4 sm:p-6 z-[1]">
+        <main className="relative flex-1 min-w-0 p-6 lg:p-8 z-[1]">
           <AnimatePresence mode="wait">
             <motion.div
               key={pathname}
@@ -68,7 +68,7 @@ export function AppShell({ children }: { children?: ReactNode }) {
                 show: { transition: { staggerChildren: 0.06, delayChildren: 0.05 } },
                 exit: { opacity: 0, y: -8, transition: { duration: 0.25 } },
               }}
-              className="route-stagger w-full max-w-full"
+              className="route-stagger"
             >
               {children ?? <Outlet />}
             </motion.div>

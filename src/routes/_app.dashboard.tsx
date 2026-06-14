@@ -48,10 +48,10 @@ function DashboardPage() {
   const { user, dashboardCards, toggleCard, notifications, channels, sheets } = useApp();
 
   // === Live ticker: gently nudges a "watching" count every 8s for that real-product feel
-  const [watching, setWatching] = useState(3);
+  const [watching, setWatching] = useState(() => 3 + Math.floor(Math.random() * 4));
   useEffect(() => {
     const id = setInterval(() => {
-      setWatching((v) => (v >= 5 ? 3 : v + 1));
+      setWatching((v) => Math.max(2, v + (Math.random() > 0.5 ? 1 : -1)));
     }, 8000);
     return () => clearInterval(id);
   }, []);
@@ -131,7 +131,7 @@ function DashboardPage() {
   }>;
 
   const tile =
-    "group relative overflow-hidden rounded-3xl border border-white/[0.06] bg-[oklch(0.2_0.04_235)] p-5 sm:p-6 transition-all duration-500 hover:border-primary/30 hover:-translate-y-0.5";
+    "group relative overflow-hidden rounded-3xl border border-white/[0.06] bg-[oklch(0.2_0.04_235)] p-6 transition-all duration-500 hover:border-primary/30 hover:-translate-y-0.5";
 
   return (
     <motion.div
@@ -143,11 +143,11 @@ function DashboardPage() {
       {/* HERO */}
       <motion.div
         variants={{ hidden: { opacity: 0, y: 20 }, show: { opacity: 1, y: 0, transition: { duration: 0.7, ease: [0.16, 1, 0.3, 1] } } }}
-        className="md:col-span-8 relative overflow-hidden rounded-3xl border border-white/[0.06] bg-[oklch(0.2_0.04_235)] p-5 sm:p-8 md:p-10 min-h-[260px] md:min-h-[320px] flex flex-col justify-between"
+        className="md:col-span-8 relative overflow-hidden rounded-3xl border border-white/[0.06] bg-[oklch(0.2_0.04_235)] p-8 md:p-10 min-h-[320px] flex flex-col justify-between"
       >
         <div className="pointer-events-none absolute inset-0 [background:radial-gradient(circle_at_top_right,oklch(0.78_0.17_205/0.12),transparent_55%)]" />
-        <div className="absolute top-4 right-4 sm:top-6 sm:right-6 z-10">
-          <div className="flex items-center gap-2 sm:gap-3 px-2.5 sm:px-3 py-1 bg-white/5 border border-white/10 rounded-full backdrop-blur-md">
+        <div className="absolute top-6 right-6 z-10">
+          <div className="flex items-center gap-3 px-3 py-1 bg-white/5 border border-white/10 rounded-full backdrop-blur-md">
             <span className="relative flex size-1.5">
               <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-primary opacity-60" />
               <span className="relative inline-flex size-1.5 rounded-full bg-primary" />
@@ -160,10 +160,10 @@ function DashboardPage() {
           </div>
         </div>
         <div className="relative z-10">
-          <h1 className="font-serif text-5xl sm:text-6xl md:text-8xl font-normal text-white leading-[0.92] tracking-[-0.03em] max-w-[9ch] sm:max-w-none">
+          <h1 className="font-serif text-6xl md:text-8xl font-normal text-white leading-[0.92] tracking-[-0.03em]">
             Welcome back, <span className="italic text-primary">{firstName}.</span>
           </h1>
-          <p className="mt-4 max-w-md text-sm sm:text-base md:text-lg text-white/50 font-light leading-relaxed">
+          <p className="mt-4 max-w-md text-base md:text-lg text-white/50 font-light leading-relaxed">
             You're signed in as <span className="text-white/85">{role}</span>. Here's your production pulse for today.
           </p>
         </div>
@@ -253,19 +253,19 @@ function DashboardPage() {
       {/* CHANNEL GROWTH CHART (large) */}
       <motion.div
         variants={{ hidden: { opacity: 0, y: 20 }, show: { opacity: 1, y: 0, transition: { duration: 0.7, ease: [0.16, 1, 0.3, 1] } } }}
-        className={`md:col-span-9 ${tile} p-5 sm:p-8`}
+        className={`md:col-span-9 ${tile} p-8`}
       >
-        <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4 mb-6 sm:mb-8">
-          <div className="min-w-0">
+        <div className="flex items-center justify-between mb-8">
+          <div>
             <h3 className="text-xl font-medium text-white mb-1">Channel Growth</h3>
             <p className="text-xs text-white/40">Aggregated views across all Orvion networks · last 14 days</p>
           </div>
-          <div className="flex shrink-0 gap-2 self-start">
+          <div className="flex gap-2">
             <span className="px-3 py-1 bg-white/5 rounded-lg text-xs font-semibold text-white/60">Daily</span>
             <span className="px-3 py-1 bg-primary/10 text-primary rounded-lg text-xs font-semibold">Weekly</span>
           </div>
         </div>
-        <div className="h-60 relative">
+        <div className="h-56 relative">
           <SignatureChart labels={sigLabels} series={sigSeries} height={220} />
         </div>
       </motion.div>
@@ -284,9 +284,9 @@ function DashboardPage() {
                 const pct = onTrack ? 88 - i * 6 : 45;
                 return (
                   <div key={c.id}>
-            <div className="flex justify-between gap-3 text-xs mb-2">
-              <span className="text-white/80 font-medium truncate">{c.name}</span>
-              <span className={`font-bold shrink-0 ${onTrack ? "text-primary" : "text-orange-400"}`}>
+                    <div className="flex justify-between text-xs mb-2">
+                      <span className="text-white/80 font-medium truncate">{c.name}</span>
+                      <span className={`font-bold ${onTrack ? "text-primary" : "text-orange-400"}`}>
                         {onTrack ? `${pct}%` : "At Risk"}
                       </span>
                     </div>
@@ -317,7 +317,7 @@ function DashboardPage() {
       {dashboardCards.hr && showFor.hr && (
         <motion.div
           variants={{ hidden: { opacity: 0, y: 20 }, show: { opacity: 1, y: 0, transition: { duration: 0.6 } } }}
-          className={`md:col-span-4 ${tile} min-h-[250px]`}
+          className={`md:col-span-4 ${tile}`}
         >
           <h3 className="text-[10px] uppercase tracking-[0.22em] font-semibold text-white/40 mb-6">HR Snapshot</h3>
           <div className="grid grid-cols-2 gap-4">
@@ -346,7 +346,7 @@ function DashboardPage() {
       {dashboardCards.it && showFor.it && (
         <motion.div
           variants={{ hidden: { opacity: 0, y: 20 }, show: { opacity: 1, y: 0, transition: { duration: 0.6 } } }}
-          className={`md:col-span-4 ${tile} min-h-[250px]`}
+          className={`md:col-span-4 ${tile}`}
         >
           <h3 className="text-[10px] uppercase tracking-[0.22em] font-semibold text-white/40 mb-6">IT Snapshot</h3>
           <div className="space-y-4">
@@ -377,7 +377,7 @@ function DashboardPage() {
       {dashboardCards.finance && showFor.finance && (
         <motion.div
           variants={{ hidden: { opacity: 0, y: 20 }, show: { opacity: 1, y: 0, transition: { duration: 0.6 } } }}
-          className={`md:col-span-4 ${tile} min-h-[250px] flex flex-col justify-between`}
+          className={`md:col-span-4 ${tile} flex flex-col justify-between`}
         >
           <div className="flex justify-between items-start mb-4">
             <h3 className="text-[10px] uppercase tracking-[0.22em] font-semibold text-white/40">Finance Pulse</h3>
@@ -426,7 +426,7 @@ function DashboardPage() {
       {dashboardCards.quickLinks && (
         <motion.div
           variants={{ hidden: { opacity: 0, y: 20 }, show: { opacity: 1, y: 0, transition: { duration: 0.6 } } }}
-          className={`md:col-span-4 ${tile} min-h-[170px]`}
+          className={`md:col-span-4 ${tile}`}
         >
           <h3 className="text-[10px] uppercase tracking-[0.22em] font-semibold text-white/40 mb-5">Quick Links</h3>
           <div className="grid grid-cols-2 gap-2 text-xs">
@@ -451,14 +451,25 @@ function DashboardPage() {
       {/* SPOTLIGHT — second fold, 16:9 editorial card, breaks the grid rhythm */}
       <motion.div
         variants={{ hidden: { opacity: 0, y: 24 }, show: { opacity: 1, y: 0, transition: { duration: 0.8, ease: [0.16, 1, 0.3, 1] } } }}
-        className="md:col-span-12 relative overflow-hidden rounded-[28px] border border-white/[0.06] min-h-[360px] md:aspect-[16/7] md:min-h-[280px]"
+        className="md:col-span-12 relative overflow-hidden rounded-[28px] border border-white/[0.06] aspect-[16/7] min-h-[280px]"
         style={{
           background:
-            "radial-gradient(760px circle at 20% 28%, oklch(0.78 0.17 205 / 0.24), transparent 58%), radial-gradient(680px circle at 86% 80%, oklch(0.55 0.22 285 / 0.22), transparent 62%), linear-gradient(180deg, oklch(0.22 0.05 240), oklch(0.14 0.03 240))",
+            "radial-gradient(800px circle at 20% 30%, oklch(0.78 0.17 205 / 0.28), transparent 55%), radial-gradient(700px circle at 85% 80%, oklch(0.55 0.22 285 / 0.32), transparent 60%), linear-gradient(180deg, oklch(0.22 0.05 240), oklch(0.14 0.03 240))",
         }}
       >
-        <div className="relative h-full grid grid-cols-1 md:grid-cols-12 gap-6 p-6 sm:p-8 md:p-12">
-          <div className="md:col-span-7 flex flex-col justify-between gap-8">
+        {/* Floating orbs */}
+        <div className="absolute inset-0 pointer-events-none">
+          <div className="absolute top-[15%] left-[55%] size-40 rounded-full bg-primary/20 blur-3xl animate-pulse" />
+          <div className="absolute bottom-[10%] right-[20%] size-56 rounded-full bg-purple-500/15 blur-3xl" style={{ animation: "float-y 6s ease-in-out infinite" }} />
+        </div>
+        {/* Grain overlay */}
+        <div
+          aria-hidden
+          className="absolute inset-0 opacity-[0.04] mix-blend-overlay pointer-events-none"
+          style={{ backgroundImage: "url(\"data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E\")" }}
+        />
+        <div className="relative h-full grid grid-cols-1 md:grid-cols-12 gap-6 p-8 md:p-12">
+          <div className="md:col-span-7 flex flex-col justify-between">
             <div className="flex items-center gap-2">
               <span className="grid place-items-center size-8 rounded-xl bg-white/10 backdrop-blur-md text-primary">
                 <Sparkles className="size-4" />
@@ -466,14 +477,14 @@ function DashboardPage() {
               <span className="eyebrow text-white/60">Aurora · in beta</span>
             </div>
             <div className="max-w-xl">
-              <h2 className="font-serif text-4xl sm:text-5xl md:text-6xl font-normal text-white leading-[0.95] tracking-[-0.025em]">
+              <h2 className="font-serif text-4xl md:text-6xl font-normal text-white leading-[0.95] tracking-[-0.025em]">
                 Ask anything.<br />
                 <span className="italic text-primary/90">Aurora answers in your data.</span>
               </h2>
               <p className="mt-4 text-sm md:text-base text-white/50 max-w-md leading-relaxed">
                 The signature moment: hit <kbd className="text-[10px] px-1.5 py-0.5 rounded border border-white/15 bg-white/[0.06]">⌘ .</kbd> from anywhere and Aurora opens. She knows your channels, sheets, and team — so you can stop hunting and start shipping.
               </p>
-              <div className="mt-6 flex flex-wrap gap-3">
+              <div className="mt-6 flex gap-3">
                 <button
                   onClick={() => {
                     const ev = new KeyboardEvent("keydown", { key: ".", metaKey: true });

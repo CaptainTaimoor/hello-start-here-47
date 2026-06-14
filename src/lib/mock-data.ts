@@ -202,25 +202,10 @@ export const MOCK_USERS: User[] = [
 ];
 
 export const MOCK_ANALYTICS = {
-  views: [11200, 13600, 9200, 13300, 11250, 9750, 9100, 11650, 9900, 9700, 11800, 9950, 10300, 9400].map((value, i) => ({ day: `D${i + 1}`, value })),
-  subs: [94, 126, 72, 138, 118, 96, 88, 122, 102, 90, 112, 86, 108, 98].map((value, i) => ({ day: `D${i + 1}`, value })),
-  watch: [1520, 1740, 1390, 1810, 1660, 1480, 1420, 1710, 1510, 1450, 1620, 1470, 1580, 1490].map((value, i) => ({ day: `D${i + 1}`, value })),
-  engagement: [
-    { likes: 420, comments: 62 },
-    { likes: 510, comments: 74 },
-    { likes: 360, comments: 48 },
-    { likes: 540, comments: 81 },
-    { likes: 470, comments: 66 },
-    { likes: 390, comments: 52 },
-    { likes: 350, comments: 47 },
-    { likes: 500, comments: 72 },
-    { likes: 430, comments: 58 },
-    { likes: 410, comments: 54 },
-    { likes: 485, comments: 69 },
-    { likes: 395, comments: 51 },
-    { likes: 455, comments: 63 },
-    { likes: 405, comments: 56 },
-  ].map((value, i) => ({ day: `D${i + 1}`, ...value })),
+  views: Array.from({ length: 14 }, (_, i) => ({ day: `D${i + 1}`, value: 8000 + Math.round(Math.random() * 6000) })),
+  subs: Array.from({ length: 14 }, (_, i) => ({ day: `D${i + 1}`, value: 50 + Math.round(Math.random() * 200) })),
+  watch: Array.from({ length: 14 }, (_, i) => ({ day: `D${i + 1}`, value: 1200 + Math.round(Math.random() * 800) })),
+  engagement: Array.from({ length: 14 }, (_, i) => ({ day: `D${i + 1}`, likes: 200 + Math.round(Math.random() * 400), comments: 30 + Math.round(Math.random() * 80) })),
 };
 
 export const MOCK_EMPLOYEES = [

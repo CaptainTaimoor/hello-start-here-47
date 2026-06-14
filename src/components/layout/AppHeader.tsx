@@ -47,7 +47,7 @@ export function AppHeader() {
 
   return (
     <header className="sticky top-0 z-30 border-b border-white/[0.06] bg-background/30 backdrop-blur-2xl backdrop-saturate-150 shadow-[0_1px_0_0_rgb(255_255_255/0.04)_inset]">
-      <div className="flex h-16 items-center gap-3 px-6">
+      <div className="flex items-center gap-3 px-6 h-16">
         <Button
           variant="ghost"
           size="icon"
@@ -70,7 +70,7 @@ export function AppHeader() {
           </div>
         </div>
         <div className="flex-1 md:hidden" />
-        <div className="flex items-center gap-2 ml-auto">
+        <div className="flex items-center gap-2">
           <Button variant="ghost" size="icon" onClick={toggleTheme} aria-label="Toggle theme">
             {theme === "dark" ? <Sun className="size-5" /> : <Moon className="size-5" />}
           </Button>
@@ -92,7 +92,7 @@ export function AppHeader() {
                       {user.name.split(" ").map((p) => p[0]).slice(0, 2).join("")}
                     </AvatarFallback>
                   </Avatar>
-                  <div className="text-left hidden md:block min-w-[90px]">
+                  <div className="text-left hidden md:block">
                     <div className="text-sm font-medium leading-none">{user.name}</div>
                     <Badge variant="secondary" className="mt-1 text-[10px] py-0 h-4">
                       {user.role}
