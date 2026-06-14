@@ -44,8 +44,8 @@ function LoginPage() {
         transition={{ duration: 1.2 }}
         className="hidden lg:flex lg:w-1/2 relative overflow-hidden p-12 flex-col justify-between"
       >
-        <div className="relative flex h-10 items-center z-10">
-          <img src={orvionLogo} alt="Orvion Media" className="h-10 w-auto block" />
+        <div className="relative h-10 w-[108px] overflow-hidden z-10">
+          <img src={orvionLogo} alt="Orvion Media" className="h-10 w-auto max-w-none block -translate-x-[31px]" />
         </div>
         <div className="relative z-10 max-w-xl">
           <div className="eyebrow text-primary/80 mb-6">Newsroom OS · v2.6</div>
@@ -81,8 +81,8 @@ function LoginPage() {
           transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1], delay: 0.2 }}
           className="tile w-full max-w-md p-10"
         >
-          <div className="lg:hidden flex h-9 items-center mb-6">
-            <img src={orvionLogo} alt="Orvion Media" className="h-8 w-auto block" />
+          <div className="lg:hidden h-8 w-[86px] overflow-hidden mb-6">
+            <img src={orvionLogo} alt="Orvion Media" className="h-8 w-auto max-w-none block -translate-x-[25px]" />
           </div>
           <div className="eyebrow text-primary/80 mb-3">Sign in</div>
           <h1 className="serif-display text-4xl text-foreground">
