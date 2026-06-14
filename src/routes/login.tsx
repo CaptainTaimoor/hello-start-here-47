@@ -45,9 +45,9 @@ function LoginPage() {
         transition={{ duration: 1.2 }}
         className="hidden lg:flex lg:w-1/2 relative overflow-hidden p-12 flex-col justify-between"
       >
-        <div className="relative flex items-center gap-3 z-10 h-10">
-          <AuroraMark size={32} spin />
-          <img src={orvionLogo} alt="Orvion Media" className="h-9 w-auto block" />
+        <div className="relative flex items-start gap-3 z-10">
+          <AuroraMark size={28} spin />
+          <img src={orvionLogo} alt="Orvion Media" className="h-9 w-auto block -mt-1" />
         </div>
         <div className="relative z-10 max-w-xl">
           <div className="eyebrow text-primary/80 mb-6">Newsroom OS · v2.6</div>
