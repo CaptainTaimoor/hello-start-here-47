@@ -15,6 +15,7 @@ import { MOCK_EMPLOYEES } from "@/lib/mock-data";
 import { StatCard } from "@/components/common/StatCard";
 import { Users, UserPlus, Clock, GraduationCap } from "lucide-react";
 import { toast } from "sonner";
+import { DigitalPlatformTrainingCenter } from "@/components/hr/DigitalPlatformTrainingCenter";
 
 export const Route = createFileRoute("/_app/departments/hr")({
   head: () => ({ meta: [{ title: "HR — Orvion Media" }] }),
@@ -126,7 +127,8 @@ function HRPage() {
         </TabsContent>
 
         <TabsContent value="training" className="mt-4">
-          <Card>
+          <div className="space-y-4">
+            <Card>
             <CardHeader><CardTitle className="text-base">Training sessions</CardTitle></CardHeader>
             <CardContent className="space-y-2 text-sm">
               {["Editing best practices","YouTube SEO 101","Adobe After Effects deep dive"].map((t)=>(
@@ -136,7 +138,9 @@ function HRPage() {
                 </div>
               ))}
             </CardContent>
-          </Card>
+            </Card>
+            <DigitalPlatformTrainingCenter />
+          </div>
         </TabsContent>
       </Tabs>
 
