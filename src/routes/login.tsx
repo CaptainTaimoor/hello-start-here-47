@@ -1,6 +1,7 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useState } from "react";
 import { motion } from "motion/react";
+import orvionLogo from "@/assets/orvion-logo.png";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -15,6 +16,7 @@ import { useApp } from "@/lib/app-store";
 import { ALL_ROLES, type Role } from "@/lib/types";
 import { toast } from "sonner";
 import { Toaster } from "@/components/ui/sonner";
+import { AuroraMark } from "@/components/magic/AuroraMark";
 
 export const Route = createFileRoute("/login")({
   head: () => ({
@@ -43,7 +45,10 @@ function LoginPage() {
         transition={{ duration: 1.2 }}
         className="hidden lg:flex lg:w-1/2 relative overflow-hidden p-12 flex-col justify-between"
       >
-        <OrvionWordmark className="relative z-10" />
+        <div className="relative flex items-start gap-3 z-10">
+          <AuroraMark size={28} spin />
+          <img src={orvionLogo} alt="Orvion Media" className="h-9 w-auto block -mt-1" />
+        </div>
         <div className="relative z-10 max-w-xl">
           <div className="eyebrow text-primary/80 mb-6">Newsroom OS · v2.6</div>
           <motion.h2
@@ -78,7 +83,10 @@ function LoginPage() {
           transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1], delay: 0.2 }}
           className="tile w-full max-w-md p-10"
         >
-          <OrvionWordmark className="lg:hidden mb-6 scale-90 origin-left" />
+          <div className="lg:hidden flex items-center gap-3 mb-6">
+            <AuroraMark size={24} />
+            <img src={orvionLogo} alt="Orvion Media" className="h-7 w-auto" />
+          </div>
           <div className="eyebrow text-primary/80 mb-3">Sign in</div>
           <h1 className="serif-display text-4xl text-foreground">
             Welcome <span className="italic text-primary">back.</span>
@@ -132,19 +140,6 @@ function LoginPage() {
             This is a mock authentication. No credentials are validated.
           </p>
         </motion.div>
-      </div>
-    </div>
-  );
-}
-
-function OrvionWordmark({ className = "" }: { className?: string }) {
-  return (
-    <div aria-label="Orvion Media" className={`w-fit text-foreground ${className}`}>
-      <div className="font-sans text-[28px] font-light leading-none tracking-[0.08em]">
-        ORVI<span className="text-primary font-semibold">O</span>N
-      </div>
-      <div className="mt-0.5 text-center font-sans text-[10px] font-light leading-none tracking-[0.48em] text-foreground/80">
-        MEDIA
       </div>
     </div>
   );
