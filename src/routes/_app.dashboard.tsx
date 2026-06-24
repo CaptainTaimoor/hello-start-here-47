@@ -141,7 +141,7 @@ function DashboardPage() {
   }>;
 
   const tile =
-    "group relative overflow-hidden rounded-3xl border border-white/[0.06] bg-[oklch(0.2_0.04_235)] p-6 transition-all duration-500 hover:border-primary/30 hover:-translate-y-0.5";
+    "group relative overflow-hidden rounded-3xl border border-white/[0.06] bg-[oklch(0.2_0.04_235)] p-6 transition-all duration-500 hover:border-primary/30 hover:-translate-y-1 hover:shadow-[0_30px_80px_-30px_oklch(0.7_0.2_240/0.45)] before:pointer-events-none before:absolute before:inset-0 before:rounded-[inherit] before:bg-[radial-gradient(420px_circle_at_50%_0%,oklch(0.82_0.16_205/0.14),transparent_60%)] before:opacity-0 hover:before:opacity-100 before:transition-opacity";
 
   return (
     <motion.div
