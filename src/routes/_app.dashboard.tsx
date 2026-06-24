@@ -8,11 +8,16 @@ import {
   Users,
   Sparkles,
   ArrowUpRight,
+  Flame,
+  Trophy,
+  X,
+  Quote,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { motion } from "motion/react";
 import { NumberTicker } from "@/components/magic/NumberTicker";
 import { SignatureChart } from "@/components/magic/SignatureChart";
+import { toast } from "sonner";
 import {
   DropdownMenu,
   DropdownMenuContent,
