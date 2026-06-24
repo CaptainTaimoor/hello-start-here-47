@@ -64,9 +64,19 @@ export function AppShell({ children }: { children?: ReactNode }) {
               animate="show"
               exit="exit"
               variants={{
-                hidden: {},
-                show: { transition: { staggerChildren: 0.06, delayChildren: 0.05 } },
-                exit: { opacity: 0, y: -8, transition: { duration: 0.25 } },
+                hidden: { opacity: 0, y: 12, filter: "blur(6px)" },
+                show: {
+                  opacity: 1,
+                  y: 0,
+                  filter: "blur(0px)",
+                  transition: {
+                    duration: 0.45,
+                    ease: [0.16, 1, 0.3, 1],
+                    staggerChildren: 0.06,
+                    delayChildren: 0.05,
+                  },
+                },
+                exit: { opacity: 0, y: -10, filter: "blur(4px)", transition: { duration: 0.28, ease: [0.7, 0, 0.84, 0] } },
               }}
               className="route-stagger"
             >
