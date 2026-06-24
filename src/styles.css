@@ -549,3 +549,8 @@ html[data-perf="low"] .skeleton-aurora {
   will-change: transform;
 }
 .ticker-track:hover { animation-play-state: paused; }
+
+@keyframes grid-pan {
+  0%   { background-position: 0 0, 0 0; }
+  100% { background-position: 40px 40px, 40px 40px; }
+}
