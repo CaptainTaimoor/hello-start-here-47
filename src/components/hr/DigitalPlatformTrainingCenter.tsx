@@ -125,9 +125,13 @@ export function DigitalPlatformTrainingCenter() {
   });
 
   return (
-    <div className="space-y-4">
-      <Card className="border-primary/20">
-        <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-3 gap-3 flex-wrap">
+    <div className="space-y-4 animate-fade-in">
+      <Card className="border-primary/20 relative overflow-hidden">
+        {/* animated gradient sweep */}
+        <div className="pointer-events-none absolute inset-0 -z-0 opacity-60">
+          <div className="absolute -inset-x-20 -top-20 h-40 w-1/2 bg-gradient-to-r from-primary/0 via-primary/25 to-primary/0 blur-2xl animate-[shimmer-x_6s_linear_infinite]" />
+        </div>
+        <CardHeader className="relative flex flex-row items-center justify-between space-y-0 pb-3 gap-3 flex-wrap">
           <div>
             <CardTitle className="text-base flex items-center gap-2">
               <ShieldCheck className="size-4 text-primary"/>
@@ -138,9 +142,13 @@ export function DigitalPlatformTrainingCenter() {
             </p>
           </div>
           <div className="flex items-center gap-2">
-            <Badge variant="outline" className="gap-1.5">
-              <span className="relative flex size-1.5"><span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-emerald-400 opacity-60"/><span className="relative inline-flex size-1.5 rounded-full bg-emerald-400"/></span>
-              Live Policy Monitoring
+            <Badge variant="outline" className="gap-1.5 border-emerald-500/40 bg-emerald-500/5">
+              <span className="relative flex size-2">
+                <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-emerald-400 opacity-70"/>
+                <span className="absolute inline-flex h-full w-full animate-[ping_2.4s_ease-out_infinite] rounded-full bg-emerald-400 opacity-30"/>
+                <span className="relative inline-flex size-2 rounded-full bg-emerald-400 shadow-[0_0_8px_rgba(52,211,153,0.8)]"/>
+              </span>
+              <span className="bg-gradient-to-r from-emerald-300 to-emerald-500 bg-clip-text text-transparent font-semibold">Live Policy Monitoring</span>
             </Badge>
             {isHr && (
               <>
@@ -183,10 +191,18 @@ function HealthRow({ health }: { health: Record<string, unknown> | null | undefi
   ];
   return (
     <div className="grid grid-cols-2 md:grid-cols-5 gap-3">
-      {items.map(([k, v]) => (
-        <div key={k} className="rounded-md border p-3">
-          <div className="text-[10px] uppercase tracking-wider text-muted-foreground">{k}</div>
-          <div className="text-lg font-bold mt-1 truncate">{v}</div>
+      {items.map(([k, v], i) => (
+        <div
+          key={k}
+          className="group relative rounded-md border p-3 overflow-hidden transition-all duration-300 hover:border-primary/60 hover:-translate-y-0.5 hover:shadow-[0_8px_24px_-12px_rgba(99,102,241,0.45)] animate-fade-in"
+          style={{ animationDelay: `${i * 70}ms`, animationFillMode: "backwards" }}
+        >
+          <div className="pointer-events-none absolute inset-x-0 -top-1/2 h-full bg-gradient-to-b from-primary/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity"/>
+          <div className="text-[10px] uppercase tracking-wider text-muted-foreground flex items-center gap-1.5">
+            <span className="size-1 rounded-full bg-primary/70 animate-pulse"/>
+            {k}
+          </div>
+          <div className="text-lg font-bold mt-1 truncate tabular-nums">{v}</div>
         </div>
       ))}
     </div>
@@ -207,19 +223,28 @@ function PlatformCard({ platform, onOpen }: { platform: Platform; onOpen: () => 
       return { policies: pol.count ?? 0, pending: pending.count ?? 0, published: pub.count ?? 0 };
     },
   });
+  const pending = counts.data?.pending ?? 0;
   return (
-    <button onClick={onOpen} className="text-left rounded-lg border p-4 hover:border-primary/60 transition-colors bg-card">
-      <div className="flex items-center justify-between">
-        <Icon className={`size-6 ${tint}`} />
+    <button
+      onClick={onOpen}
+      className="group relative text-left rounded-lg border p-4 bg-card overflow-hidden transition-all duration-300 hover:border-primary/60 hover:-translate-y-1 hover:shadow-[0_12px_30px_-12px_rgba(99,102,241,0.5)] animate-fade-in"
+    >
+      <div className="pointer-events-none absolute -inset-px rounded-lg opacity-0 group-hover:opacity-100 transition-opacity bg-gradient-to-br from-primary/10 via-transparent to-primary/5"/>
+      <div className="relative flex items-center justify-between">
+        <Icon className={`size-6 ${tint} transition-transform duration-300 group-hover:scale-110 group-hover:rotate-[-4deg]`} />
         <Badge variant="outline" className="text-[10px]">{platform.status}</Badge>
       </div>
-      <div className="mt-3 font-semibold">{platform.name}</div>
-      <div className="text-xs text-muted-foreground mt-1">
+      <div className="relative mt-3 font-semibold">{platform.name}</div>
+      <div className="relative text-xs text-muted-foreground mt-1 tabular-nums">
         {counts.data?.policies ?? 0} policies · {counts.data?.published ?? 0} published
       </div>
-      {(counts.data?.pending ?? 0) > 0 && (
-        <div className="mt-2 inline-flex items-center gap-1 text-[11px] text-amber-300">
-          <AlertTriangle className="size-3"/> {counts.data?.pending} pending review
+      {pending > 0 && (
+        <div className="relative mt-2 inline-flex items-center gap-1.5 text-[11px] text-amber-300">
+          <span className="relative flex size-1.5">
+            <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-amber-400 opacity-70"/>
+            <span className="relative inline-flex size-1.5 rounded-full bg-amber-400"/>
+          </span>
+          <AlertTriangle className="size-3"/> {pending} pending review
         </div>
       )}
     </button>
