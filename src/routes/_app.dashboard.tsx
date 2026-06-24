@@ -24,6 +24,8 @@ import { useApp } from "@/lib/app-store";
 import { MOCK_ANALYTICS } from "@/lib/mock-data";
 import { Link } from "@tanstack/react-router";
 import { LiveTicker } from "@/components/layout/LiveTicker";
+import { BorderBeam } from "@/components/magic/BorderBeam";
+import { Meteors } from "@/components/magic/Meteors";
 
 export const Route = createFileRoute("/_app/dashboard")({
   head: () => ({ meta: [{ title: "Dashboard — Orvion Media" }] }),
@@ -54,6 +56,13 @@ function DashboardPage() {
     const id = setInterval(() => {
       setWatching((v) => Math.max(2, v + (Math.random() > 0.5 ? 1 : -1)));
     }, 8000);
+    return () => clearInterval(id);
+  }, []);
+
+  // Live ticking clock
+  const [now, setNow] = useState(() => new Date());
+  useEffect(() => {
+    const id = setInterval(() => setNow(new Date()), 1000);
     return () => clearInterval(id);
   }, []);
 
@@ -152,19 +161,23 @@ function DashboardPage() {
       {/* HERO */}
       <motion.div
         variants={{ hidden: { opacity: 0, y: 20 }, show: { opacity: 1, y: 0, transition: { duration: 0.7, ease: [0.16, 1, 0.3, 1] } } }}
-        className="md:col-span-8 relative overflow-hidden rounded-[2rem] border border-white/10 bg-[oklch(0.16_0.03_235)] shadow-2xl shadow-[oklch(0.5_0.15_220/0.18)] min-h-[360px]"
+        className="md:col-span-8 group relative overflow-hidden rounded-[2rem] border border-white/10 bg-[oklch(0.16_0.03_235)] shadow-2xl shadow-[oklch(0.5_0.15_220/0.18)] min-h-[360px] grain tilt-3d"
       >
+        {/* meteors + border beam */}
+        <Meteors number={14} />
+        <BorderBeam size={260} duration={11} />
+
         {/* ambient glows */}
-        <div className="pointer-events-none absolute -top-48 -right-48 size-[500px] rounded-full bg-primary/10 blur-[120px]" />
-        <div className="pointer-events-none absolute -bottom-24 -left-24 size-[300px] rounded-full bg-violet-600/10 blur-[100px]" />
+        <div className="pointer-events-none absolute -top-48 -right-48 size-[500px] rounded-full bg-primary/10 blur-[120px] animate-[float-y_8s_ease-in-out_infinite]" />
+        <div className="pointer-events-none absolute -bottom-24 -left-24 size-[300px] rounded-full bg-violet-600/10 blur-[100px] animate-[float-y_11s_ease-in-out_infinite]" />
 
         {/* Top utility bar */}
         <div className="relative z-10 flex items-center justify-between px-8 md:px-10 pt-7 gap-4">
           <div className="flex items-center gap-5">
             <div className="flex flex-col">
               <span className="text-[10px] font-semibold uppercase tracking-[0.18em] text-white/40 mb-0.5">Current Session</span>
-              <span className="text-xs font-medium text-white/70 tabular-nums">
-                {new Date().toLocaleDateString(undefined, { weekday: "long", month: "short", day: "numeric" })} · {new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}
+              <span className="text-xs font-medium text-white/70 tabular-nums font-mono">
+                {now.toLocaleDateString(undefined, { weekday: "long", month: "short", day: "numeric" })} · {now.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit", second: "2-digit" })}
               </span>
             </div>
             <div className="hidden sm:block h-8 w-px bg-white/10" />
@@ -175,9 +188,8 @@ function DashboardPage() {
           </div>
 
           <div className="flex items-center gap-3 bg-black/30 backdrop-blur-md border border-white/5 rounded-full pl-3 pr-4 py-1.5">
-            <span className="relative flex size-2">
-              <span className="absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-60 animate-ping" />
-              <span className="relative inline-flex size-2 rounded-full bg-emerald-400" />
+            <span className="relative flex size-2 text-emerald-400 ping-ring">
+              <span className="relative inline-flex size-2 rounded-full bg-emerald-400 shadow-[0_0_10px_rgba(52,211,153,0.7)]" />
             </span>
             <span className="text-[10px] font-bold tracking-[0.15em] text-white uppercase">Operational</span>
             <span className="w-px h-3 bg-white/20" />
@@ -245,7 +257,7 @@ function DashboardPage() {
                   <NumberTicker value={98.4} decimals={1} /><span className="text-base text-primary/70">%</span>
                 </span>
                 <svg className="w-16 h-8 text-emerald-400/60 mb-1.5" viewBox="0 0 100 40" preserveAspectRatio="none">
-                  <path d="M0 35 Q 10 20 20 30 T 40 10 T 60 25 T 80 15 T 100 35" fill="none" stroke="currentColor" strokeWidth="2" />
+                  <path className="spark-path" d="M0 35 Q 10 20 20 30 T 40 10 T 60 25 T 80 15 T 100 35" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
                 </svg>
               </div>
             </div>
