@@ -153,9 +153,6 @@ function DashboardPage() {
     return () => clearInterval(id);
   }, []);
 
-  const role0 = user?.role ?? "Viewer";
-  const totalRowsEarly = Object.values(sheets).reduce((s, r) => s + r.length, 0);
-  void role0;
 
   // === Motivational: daily rotating quote (deterministic by day-of-year) ===
   const QUOTES = [
@@ -213,19 +210,6 @@ function DashboardPage() {
     window.localStorage.setItem(milestoneKey, "dismissed");
     setShowMilestone(false);
   }
-
-  // === EOD recap toast (fires once at/after 18:00 local) ===
-  useEffect(() => {
-    const recapKey = `orvion-recap-${now.toISOString().slice(0, 10)}`;
-    if (typeof window === "undefined") return;
-    if (now.getHours() >= 18 && !window.localStorage.getItem(recapKey)) {
-      window.localStorage.setItem(recapKey, "shown");
-      toast(`You moved ${totalRows + 14} rows today. Rest well, ${user?.name?.split(" ")[0] ?? "you"}.`, {
-        duration: 6000,
-        icon: "🌙",
-      });
-    }
-  }, [now, totalRows, user]);
 
   // === Time-aware greeting ===
   const hour = now.getHours();
