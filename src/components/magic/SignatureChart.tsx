@@ -70,22 +70,55 @@ export function SignatureChart({
 
         {/* horizontal gridlines */}
         {[0.25, 0.5, 0.75].map((t) => (
-          <line key={t} x1={0} x2={W} y1={H * t} y2={H * t} stroke="white" strokeOpacity={0.04} />
+          <line
+            key={t}
+            x1={PAD}
+            x2={W - PAD}
+            y1={H * t}
+            y2={H * t}
+            stroke="white"
+            strokeOpacity={0.08}
+            strokeDasharray="2 4"
+          />
+        ))}
+        {/* y-axis tick labels */}
+        {[0.25, 0.5, 0.75].map((t) => (
+          <text
+            key={`tl-${t}`}
+            x={W - PAD + 2}
+            y={H * t - 2}
+            fill="white"
+            fillOpacity={0.25}
+            fontSize={8}
+            fontFamily="monospace"
+            textAnchor="end"
+          >
+            {Math.round(stacked.max * (1 - t)).toLocaleString()}
+          </text>
         ))}
 
         {/* stacked areas */}
         {stacked.layers.map((l, idx) => (
-          <motion.path
-            key={l.name}
-            d={areaPath(l.lower, l.upper)}
-            fill={`url(#sig-grad-${idx})`}
-            stroke={l.color}
-            strokeWidth={1.4}
-            strokeLinejoin="round"
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ duration: 0.9, delay: 0.6 + idx * 0.12, ease: [0.16, 1, 0.3, 1] }}
-          />
+          <g key={l.name}>
+            <motion.path
+              d={areaPath(l.lower, l.upper)}
+              fill={`url(#sig-grad-${idx})`}
+              stroke="none"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ duration: 0.9, delay: 0.4 + idx * 0.12, ease: [0.16, 1, 0.3, 1] }}
+            />
+            <path
+              d={l.upper.map((v, i) => `${i === 0 ? "M" : "L"}${x(i).toFixed(1)},${y(v).toFixed(1)}`).join(" ")}
+              fill="none"
+              stroke={l.color}
+              strokeWidth={1.6}
+              strokeLinejoin="round"
+              strokeLinecap="round"
+              className="line-draw"
+              style={{ ["--draw-len" as string]: "2000", animationDelay: `${0.5 + idx * 0.18}s` }}
+            />
+          </g>
         ))}
 
         {/* crosshair */}
