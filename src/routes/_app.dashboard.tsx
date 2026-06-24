@@ -510,6 +510,98 @@ function DashboardPage() {
       )}
 
       {/* STAT CARDS */}
+      {/* MOTIVATIONAL ROW: quote · streak · today's win + ring · shoutout */}
+      <motion.div
+        variants={{ hidden: { opacity: 0, y: 16 }, show: { opacity: 1, y: 0, transition: { duration: 0.6 } } }}
+        className="md:col-span-12 grid grid-cols-1 md:grid-cols-12 gap-5"
+      >
+        {/* Rotating quote */}
+        <div className={`md:col-span-4 ${tile} flex flex-col justify-between min-h-[160px]`}>
+          <div className="flex items-center justify-between">
+            <span className="text-[10px] uppercase tracking-[0.22em] font-semibold text-white/40">Today's Note</span>
+            <Quote className="size-4 text-primary/50" strokeWidth={1.5} />
+          </div>
+          <div>
+            <p className="font-serif italic text-xl md:text-2xl text-white leading-snug tracking-tight">
+              "{quote.q}"
+            </p>
+            <p className="mt-3 text-[11px] uppercase tracking-[0.18em] text-white/35 font-medium">{quote.a}</p>
+          </div>
+        </div>
+
+        {/* Streak + 30-day heatmap */}
+        <div className={`md:col-span-3 ${tile} flex flex-col justify-between min-h-[160px]`}>
+          <div className="flex items-center justify-between">
+            <span className="text-[10px] uppercase tracking-[0.22em] font-semibold text-white/40">Streak</span>
+            <span className="inline-flex items-center gap-1.5 rounded-full bg-orange-500/15 text-orange-300 px-2 py-0.5 text-[11px] font-bold ring-1 ring-inset ring-orange-400/25">
+              <Flame className="size-3" /> {streak}d
+            </span>
+          </div>
+          <div>
+            <p className="text-4xl font-light text-white tabular-nums tracking-tight leading-none">
+              {streak}<span className="text-base text-white/40 ml-1">days</span>
+            </p>
+            <div className="mt-4 grid grid-cols-15 gap-[3px]" style={{ gridTemplateColumns: "repeat(15, minmax(0, 1fr))" }}>
+              {heatmap.map((v, i) => (
+                <span
+                  key={i}
+                  className="aspect-square rounded-[2px]"
+                  style={{
+                    background:
+                      v === 0
+                        ? "rgba(255,255,255,0.05)"
+                        : `oklch(0.72 0.18 ${30 + v * 5} / ${0.35 + v * 0.18})`,
+                  }}
+                />
+              ))}
+            </div>
+          </div>
+        </div>
+
+        {/* Today's win */}
+        <div className={`md:col-span-3 ${tile} flex flex-col justify-between min-h-[160px]`}>
+          <span className="text-[10px] uppercase tracking-[0.22em] font-semibold text-white/40">Today's Win</span>
+          {todaysWin ? (
+            <div>
+              <p className="font-serif italic text-lg text-white leading-snug">"{todaysWin}"</p>
+              <p className="mt-2 text-[11px] text-emerald-400 font-medium tracking-wider uppercase">Logged · {now.toLocaleDateString(undefined, { month: "short", day: "numeric" })}</p>
+            </div>
+          ) : (
+            <form onSubmit={saveWin} className="flex flex-col gap-2">
+              <input
+                value={winInput}
+                onChange={(e) => setWinInput(e.target.value)}
+                placeholder="One thing that went right…"
+                className="w-full bg-white/[0.04] border border-white/10 rounded-xl px-3 py-2 text-sm text-white placeholder:text-white/30 focus:outline-none focus:border-primary/50 focus:bg-white/[0.06] transition"
+                maxLength={80}
+              />
+              <button
+                type="submit"
+                disabled={!winInput.trim()}
+                className="self-start inline-flex items-center gap-1.5 rounded-lg bg-primary/15 text-primary px-3 py-1.5 text-[11px] font-bold uppercase tracking-wider hover:bg-primary/25 transition disabled:opacity-40 disabled:cursor-not-allowed"
+              >
+                Log it <ArrowUpRight className="size-3" />
+              </button>
+            </form>
+          )}
+        </div>
+
+        {/* Shoutout */}
+        <div className={`md:col-span-2 ${tile} flex flex-col justify-between min-h-[160px]`}>
+          <span className="text-[10px] uppercase tracking-[0.22em] font-semibold text-white/40">Shoutout</span>
+          <div>
+            <div className="flex items-center gap-2 mb-2">
+              <span className="size-7 rounded-full bg-gradient-to-br from-primary/40 to-violet-500/40 grid place-items-center text-[10px] font-bold text-white">
+                {shoutout.who.split(" ").map((p) => p[0]).join("")}
+              </span>
+              <span className="text-xs font-semibold text-white">{shoutout.who}</span>
+            </div>
+            <p className="text-xs text-white/70 leading-snug">{shoutout.what} 🎉</p>
+            <p className="mt-2 text-[10px] uppercase tracking-wider text-white/30 font-medium">{shoutout.when} ago</p>
+          </div>
+        </div>
+      </motion.div>
+
       {stats.map((s) => {
         const Icon = s.icon;
         const badgeCls =
