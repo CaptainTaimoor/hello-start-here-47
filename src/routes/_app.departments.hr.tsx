@@ -254,15 +254,23 @@ function EmpTable({ onOpen }: { onOpen: (e: typeof MOCK_EMPLOYEES[number]) => vo
       <table className="w-full text-sm">
         <thead><tr className="text-xs text-muted-foreground text-left border-b"><th className="py-2">Name</th><th>Department</th><th>Role</th><th>Email</th><th>Joined</th><th>Status</th></tr></thead>
         <tbody>
-          {MOCK_EMPLOYEES.map((e) => (
-            <tr key={e.id} className="border-b last:border-0 hover:bg-accent/40 cursor-pointer" onClick={() => onOpen(e)}>
+          {MOCK_EMPLOYEES.map((e, i) => (
+            <motion.tr
+              key={e.id}
+              initial={{ opacity: 0, y: 6 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: Math.min(i, 12) * 0.03, duration: 0.35, ease: [0.16,1,0.3,1] }}
+              whileHover={{ x: 2 }}
+              className="border-b last:border-0 hover:bg-primary/5 cursor-pointer transition-colors"
+              onClick={() => onOpen(e)}
+            >
               <td className="py-2 font-medium">{e.name}</td>
               <td>{e.dept}</td>
               <td>{e.role}</td>
               <td className="text-muted-foreground">{e.email}</td>
               <td>{e.joined}</td>
               <td><Badge variant="outline">{e.status}</Badge></td>
-            </tr>
+            </motion.tr>
           ))}
         </tbody>
       </table>
