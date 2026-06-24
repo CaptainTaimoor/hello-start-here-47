@@ -271,19 +271,40 @@ function PlatformCard({ platform, onOpen }: { platform: Platform; onOpen: () => 
     },
   });
   const pending = counts.data?.pending ?? 0;
+  const policies = counts.data?.policies ?? 0;
+  const published = counts.data?.published ?? 0;
+  const pubPct = policies > 0 ? Math.min(100, Math.round((published / policies) * 100)) : 0;
   return (
     <button
       onClick={onOpen}
       className="group relative text-left rounded-lg border p-4 bg-card overflow-hidden transition-all duration-300 hover:border-primary/60 hover:-translate-y-1 hover:shadow-[0_12px_30px_-12px_rgba(99,102,241,0.5)] animate-fade-in"
     >
       <div className="pointer-events-none absolute -inset-px rounded-lg opacity-0 group-hover:opacity-100 transition-opacity bg-gradient-to-br from-primary/10 via-transparent to-primary/5"/>
+      {/* corner sheen */}
+      <div className="pointer-events-none absolute -top-10 -right-10 size-24 rounded-full bg-primary/10 blur-2xl opacity-0 group-hover:opacity-100 transition-opacity"/>
       <div className="relative flex items-center justify-between">
-        <Icon className={`size-6 ${tint} transition-transform duration-300 group-hover:scale-110 group-hover:rotate-[-4deg]`} />
+        <span className="relative inline-flex items-center justify-center size-10 rounded-full bg-card">
+          <span className="absolute inset-0 rounded-full p-[1.5px] bg-[conic-gradient(from_0deg,theme(colors.primary/0.7),transparent_60%,theme(colors.primary/0.7))] opacity-60 group-hover:opacity-100 group-hover:animate-spin [animation-duration:6s]">
+            <span className="block size-full rounded-full bg-card"/>
+          </span>
+          <Icon className={`relative size-5 ${tint} transition-transform duration-300 group-hover:scale-110 group-hover:rotate-[-6deg]`} />
+        </span>
         <Badge variant="outline" className="text-[10px]">{platform.status}</Badge>
       </div>
-      <div className="relative mt-3 font-semibold">{platform.name}</div>
-      <div className="relative text-xs text-muted-foreground mt-1 tabular-nums">
-        {counts.data?.policies ?? 0} policies · {counts.data?.published ?? 0} published
+      <div className="relative mt-3 font-semibold flex items-center gap-2">
+        {platform.name}
+        <span className="ml-auto text-[10px] tabular-nums text-muted-foreground">{pubPct}%</span>
+      </div>
+      <div className="relative mt-1.5 h-1 w-full rounded-full bg-muted/40 overflow-hidden">
+        <div
+          className={`h-full rounded-full bg-gradient-to-r from-primary/60 to-primary transition-[width] duration-700`}
+          style={{ width: `${pubPct}%` }}
+        />
+      </div>
+      <div className="relative text-xs text-muted-foreground mt-2 tabular-nums flex items-center gap-2">
+        <FileText className="size-3"/> {policies} policies
+        <span className="text-muted-foreground/40">·</span>
+        <CheckCircle2 className="size-3 text-emerald-400/80"/> {published} live
       </div>
       {pending > 0 && (
         <div className="relative mt-2 inline-flex items-center gap-1.5 text-[11px] text-amber-300">
