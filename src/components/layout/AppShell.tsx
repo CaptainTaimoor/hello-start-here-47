@@ -7,7 +7,6 @@ import { Toaster } from "@/components/ui/sonner";
 import { motion, AnimatePresence } from "motion/react";
 import { CommandPalette } from "@/components/CommandPalette";
 import { CursorSpotlight } from "@/components/magic/CursorSpotlight";
-import { AuroraBackground } from "@/components/magic/AuroraBackground";
 import { click } from "@/lib/sound";
 import { useState } from "react";
 import { ShortcutsDialog } from "@/components/ShortcutsDialog";
@@ -50,7 +49,6 @@ export function AppShell({ children }: { children?: ReactNode }) {
 
   return (
     <div className={`flex min-h-screen w-full text-foreground relative ${focusMode ? "focus-mode" : ""}`}>
-      <AuroraBackground />
       <CursorSpotlight />
       <CommandPalette />
       <ShortcutsDialog />

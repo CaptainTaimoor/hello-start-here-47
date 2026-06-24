@@ -1,7 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useState } from "react";
-import { Plus, CheckCircle2, Clock as ClockIcon, Sparkles } from "lucide-react";
-import { motion } from "motion/react";
+import { Plus } from "lucide-react";
 import { PageHeader } from "@/components/common/PageHeader";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -17,9 +16,6 @@ import { StatCard } from "@/components/common/StatCard";
 import { Users, UserPlus, Clock, GraduationCap } from "lucide-react";
 import { toast } from "sonner";
 import { DigitalPlatformTrainingCenter } from "@/components/hr/DigitalPlatformTrainingCenter";
-import { BorderBeam } from "@/components/magic/BorderBeam";
-import { Meteors } from "@/components/magic/Meteors";
-import { LiveDot } from "@/components/magic/LiveDot";
 
 export const Route = createFileRoute("/_app/departments/hr")({
   head: () => ({ meta: [{ title: "HR — Orvion Media" }] }),
@@ -69,39 +65,20 @@ function HRPage() {
         </TabsContent>
 
         <TabsContent value="attendance" className="mt-4">
-          <Card className="relative overflow-hidden">
-            <BorderBeam size={180} duration={9} />
-            <CardHeader className="flex flex-row items-center justify-between">
-              <CardTitle className="text-base">Today's attendance</CardTitle>
-              <LiveDot label="Live" tone="success" />
-            </CardHeader>
+          <Card>
+            <CardHeader><CardTitle className="text-base">Today's attendance</CardTitle></CardHeader>
             <CardContent>
               <table className="w-full text-sm">
                 <thead><tr className="text-xs text-muted-foreground text-left border-b"><th className="py-2">Employee</th><th>Check in</th><th>Check out</th><th>Hours</th><th>Status</th></tr></thead>
                 <tbody>
                   {MOCK_EMPLOYEES.slice(0,6).map((e,i) => (
-                    <motion.tr
-                      key={e.id}
-                      initial={{ opacity: 0, x: -8 }}
-                      animate={{ opacity: 1, x: 0 }}
-                      transition={{ delay: i * 0.05, duration: 0.4, ease: [0.16,1,0.3,1] }}
-                      whileHover={{ backgroundColor: "color-mix(in oklab, var(--primary) 6%, transparent)" }}
-                      className="border-b last:border-0"
-                    >
+                    <tr key={e.id} className="border-b last:border-0">
                       <td className="py-2">{e.name}</td>
                       <td>09:{10+i}</td>
                       <td>18:{20+i}</td>
                       <td>{8 + (i%3)}h</td>
-                      <td>
-                        <Badge variant="outline" className="gap-1.5">
-                          <span className="relative flex size-1.5">
-                            <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-emerald-400 opacity-60" />
-                            <span className="relative inline-flex size-1.5 rounded-full bg-emerald-400" />
-                          </span>
-                          Present
-                        </Badge>
-                      </td>
-                    </motion.tr>
+                      <td><Badge variant="outline">Present</Badge></td>
+                    </tr>
                   ))}
                 </tbody>
               </table>
@@ -117,65 +94,32 @@ function HRPage() {
                 { who: "Ben L.", hrs: 3, when: "2026-06-12", st: "Pending" },
                 { who: "Aisha K.", hrs: 2, when: "2026-06-11", st: "Approved" },
               ].map((o,i) => (
-                <motion.div
-                  key={i}
-                  initial={{ opacity: 0, y: 8 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: i * 0.08, duration: 0.5, ease: [0.16,1,0.3,1] }}
-                  whileHover={{ y: -2, boxShadow: "0 8px 24px -12px color-mix(in oklab, var(--primary) 50%, transparent)" }}
-                  className="flex items-center justify-between rounded-md border p-3 transition-colors hover:border-primary/30"
-                >
-                  <div className="flex items-center gap-2">
-                    {o.st === "Pending"
-                      ? <ClockIcon className="size-4 text-amber-400 animate-pulse" />
-                      : <CheckCircle2 className="size-4 text-emerald-400" />}
-                    <span>{o.who} · {o.hrs}h · {o.when}</span>
-                  </div>
-                  <Badge variant="outline" className={o.st === "Pending" ? "border-amber-400/40 text-amber-300" : "border-emerald-400/40 text-emerald-300"}>{o.st}</Badge>
-                </motion.div>
+                <div key={i} className="flex items-center justify-between rounded-md border p-3">
+                  <div>{o.who} · {o.hrs}h · {o.when}</div>
+                  <Badge variant="outline">{o.st}</Badge>
+                </div>
               ))}
             </CardContent>
           </Card>
         </TabsContent>
 
         <TabsContent value="hiring" className="mt-4">
-          <Card className="relative overflow-hidden">
-            <BorderBeam size={200} duration={11} />
-            <CardHeader className="flex flex-row items-center justify-between">
-              <CardTitle className="text-base">Hiring pipeline</CardTitle>
-              <Badge variant="outline" className="gap-1.5 border-primary/30 text-primary">
-                <Sparkles className="size-3" /> 13 candidates
-              </Badge>
-            </CardHeader>
+          <Card>
+            <CardHeader><CardTitle className="text-base">Hiring pipeline</CardTitle></CardHeader>
             <CardContent>
               <div className="grid grid-cols-1 md:grid-cols-4 gap-3 text-sm">
                 {["Applied","Screening","Interview","Offer"].map((col,i)=>(
-                  <motion.div
-                    key={col}
-                    initial={{ opacity: 0, y: 12 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ delay: i * 0.1, duration: 0.5, ease: [0.16,1,0.3,1] }}
-                  >
-                    <div className="text-xs font-semibold text-muted-foreground mb-2 flex items-center gap-2">
-                      <span className="size-1.5 rounded-full bg-primary animate-pulse" />
-                      {col} · {[6,4,2,1][i]}
-                    </div>
+                  <div key={col}>
+                    <div className="text-xs font-semibold text-muted-foreground mb-2">{col} · {[6,4,2,1][i]}</div>
                     <div className="space-y-2">
                       {Array.from({length:[3,2,1,1][i]}).map((_,j)=>(
-                        <motion.div
-                          key={j}
-                          initial={{ opacity: 0, scale: 0.96 }}
-                          animate={{ opacity: 1, scale: 1 }}
-                          transition={{ delay: i * 0.1 + j * 0.05 + 0.2, duration: 0.4 }}
-                          whileHover={{ y: -3, boxShadow: "0 12px 28px -12px color-mix(in oklab, var(--primary) 55%, transparent)" }}
-                          className="rounded-md border p-3 cursor-pointer transition-colors hover:border-primary/40 bg-gradient-to-br from-card to-card/60"
-                        >
+                        <div key={j} className="rounded-md border p-3">
                           <div className="font-medium">Candidate {j+1}</div>
                           <div className="text-xs text-muted-foreground">Video Editor · 3 yrs</div>
-                        </motion.div>
+                        </div>
                       ))}
                     </div>
-                  </motion.div>
+                  </div>
                 ))}
               </div>
             </CardContent>
@@ -184,22 +128,14 @@ function HRPage() {
 
         <TabsContent value="training" className="mt-4">
           <div className="space-y-4">
-            <Card className="relative overflow-hidden">
-              <Meteors number={8} />
-              <CardHeader><CardTitle className="text-base">Training sessions</CardTitle></CardHeader>
+            <Card>
+            <CardHeader><CardTitle className="text-base">Training sessions</CardTitle></CardHeader>
             <CardContent className="space-y-2 text-sm">
-              {["Editing best practices","YouTube SEO 101","Adobe After Effects deep dive"].map((t,i)=>(
-                <motion.div
-                  key={t}
-                  initial={{ opacity: 0, x: -8 }}
-                  animate={{ opacity: 1, x: 0 }}
-                  transition={{ delay: i * 0.08, duration: 0.5 }}
-                  whileHover={{ x: 4 }}
-                  className="rounded-md border p-3 flex justify-between transition-colors hover:border-primary/30 hover:bg-primary/5"
-                >
+              {["Editing best practices","YouTube SEO 101","Adobe After Effects deep dive"].map((t)=>(
+                <div key={t} className="rounded-md border p-3 flex justify-between">
                   <span>{t}</span>
                   <Badge variant="outline">Scheduled</Badge>
-                </motion.div>
+                </div>
               ))}
             </CardContent>
             </Card>
@@ -253,23 +189,15 @@ function EmpTable({ onOpen }: { onOpen: (e: typeof MOCK_EMPLOYEES[number]) => vo
       <table className="w-full text-sm">
         <thead><tr className="text-xs text-muted-foreground text-left border-b"><th className="py-2">Name</th><th>Department</th><th>Role</th><th>Email</th><th>Joined</th><th>Status</th></tr></thead>
         <tbody>
-          {MOCK_EMPLOYEES.map((e, i) => (
-            <motion.tr
-              key={e.id}
-              initial={{ opacity: 0, y: 6 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: Math.min(i, 12) * 0.03, duration: 0.35, ease: [0.16,1,0.3,1] }}
-              whileHover={{ x: 2 }}
-              className="border-b last:border-0 hover:bg-primary/5 cursor-pointer transition-colors"
-              onClick={() => onOpen(e)}
-            >
+          {MOCK_EMPLOYEES.map((e) => (
+            <tr key={e.id} className="border-b last:border-0 hover:bg-accent/40 cursor-pointer" onClick={() => onOpen(e)}>
               <td className="py-2 font-medium">{e.name}</td>
               <td>{e.dept}</td>
               <td>{e.role}</td>
               <td className="text-muted-foreground">{e.email}</td>
               <td>{e.joined}</td>
               <td><Badge variant="outline">{e.status}</Badge></td>
-            </motion.tr>
+            </tr>
           ))}
         </tbody>
       </table>
