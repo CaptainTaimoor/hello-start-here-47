@@ -390,19 +390,32 @@ function DashboardPage() {
               {channels.map((c, i) => {
                 const onTrack = c.kpiStatus === "On Track";
                 const pct = onTrack ? 88 - i * 6 : 45;
+                const filled = Math.round(pct / 10);
                 return (
                   <div key={c.id}>
                     <div className="flex justify-between text-xs mb-2">
-                      <span className="text-white/80 font-medium truncate">{c.name}</span>
-                      <span className={`font-bold ${onTrack ? "text-primary" : "text-orange-400"}`}>
+                      <span className="text-white/80 font-medium truncate flex items-center gap-2">
+                        <span className={`block w-0.5 h-3 rounded-full ${onTrack ? "bg-primary" : "bg-orange-400"}`} />
+                        {c.name}
+                      </span>
+                      <span className={`font-bold tabular-nums ${onTrack ? "text-primary" : "text-orange-400"}`}>
                         {onTrack ? `${pct}%` : "At Risk"}
                       </span>
                     </div>
-                    <div className="w-full bg-white/5 h-1 rounded-full overflow-hidden">
-                      <div
-                        className={`${onTrack ? "bg-primary" : "bg-orange-400"} h-1 rounded-full`}
-                        style={{ width: `${pct}%` }}
-                      />
+                    <div className="flex gap-1">
+                      {Array.from({ length: 10 }).map((_, k) => (
+                        <span
+                          key={k}
+                          className={`flex-1 h-1.5 rounded-sm transition-all duration-500 ${
+                            k < filled
+                              ? onTrack
+                                ? "bg-primary shadow-[0_0_6px_oklch(0.82_0.16_205/0.5)]"
+                                : "bg-orange-400"
+                              : "bg-white/[0.06]"
+                          }`}
+                          style={{ transitionDelay: `${k * 40}ms` }}
+                        />
+                      ))}
                     </div>
                   </div>
                 );
