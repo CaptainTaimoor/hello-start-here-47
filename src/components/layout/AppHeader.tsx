@@ -22,6 +22,7 @@ import {
 } from "@/components/ui/breadcrumb";
 import { useApp } from "@/lib/app-store";
 import { useEffect } from "react";
+import { LiveTicker } from "./LiveTicker";
 
 function toTitle(s: string) {
   return s.replace(/-/g, " ").replace(/\b\w/g, (c) => c.toUpperCase());
@@ -140,6 +141,7 @@ export function AppHeader() {
           </Breadcrumb>
         </div>
       )}
+      <LiveTicker />
     </header>
   );
 }

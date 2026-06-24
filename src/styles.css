@@ -538,3 +538,14 @@ html[data-perf="low"] .skeleton-aurora {
     scroll-behavior: auto !important;
   }
 }
+
+/* === Live ticker marquee === */
+@keyframes ticker-scroll {
+  0%   { transform: translateX(0); }
+  100% { transform: translateX(-50%); }
+}
+.ticker-track {
+  animation: ticker-scroll 38s linear infinite;
+  will-change: transform;
+}
+.ticker-track:hover { animation-play-state: paused; }
