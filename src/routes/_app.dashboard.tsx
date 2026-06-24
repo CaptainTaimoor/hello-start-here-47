@@ -25,6 +25,90 @@ import { MOCK_ANALYTICS } from "@/lib/mock-data";
 import { Link } from "@tanstack/react-router";
 import { LiveTicker } from "@/components/layout/LiveTicker";
 
+// Channel brand color palette — keyed deterministically by index
+const CHANNEL_COLORS = [
+  "oklch(0.82 0.16 205)",
+  "oklch(0.7 0.2 285)",
+  "oklch(0.75 0.18 175)",
+  "oklch(0.78 0.18 35)",
+  "oklch(0.7 0.22 25)",
+  "oklch(0.72 0.2 145)",
+];
+
+// Tiny inline sparkline used next to stat numbers
+function MiniSpark({ data, color = "oklch(0.82 0.16 205)" }: { data: number[]; color?: string }) {
+  const W = 64, H = 22, PAD = 2;
+  const min = Math.min(...data), max = Math.max(...data);
+  const range = max - min || 1;
+  const pts = data.map((v, i) => {
+    const x = PAD + (i / (data.length - 1)) * (W - PAD * 2);
+    const y = H - PAD - ((v - min) / range) * (H - PAD * 2);
+    return `${i === 0 ? "M" : "L"}${x.toFixed(1)},${y.toFixed(1)}`;
+  }).join(" ");
+  const last = data[data.length - 1];
+  const lx = W - PAD;
+  const ly = H - PAD - ((last - min) / range) * (H - PAD * 2);
+  return (
+    <svg viewBox={`0 0 ${W} ${H}`} className="w-16 h-6 overflow-visible" aria-hidden>
+      <path d={pts} fill="none" stroke={color} strokeWidth={1.4} strokeLinecap="round" strokeLinejoin="round" className="spark-mini" style={{ color }} />
+      <circle cx={lx} cy={ly} r={1.8} fill={color} />
+    </svg>
+  );
+}
+
+// 10-cell dot bar (filled = pct/10)
+function DotBar({ pct, color }: { pct: number; color: string }) {
+  const filled = Math.max(0, Math.min(10, Math.round(pct / 10)));
+  return (
+    <div className="flex gap-[3px]">
+      {Array.from({ length: 10 }).map((_, i) => (
+        <span
+          key={i}
+          className="h-1.5 flex-1 rounded-[2px] transition-colors"
+          style={{
+            background: i < filled ? color : "rgba(255,255,255,0.06)",
+            boxShadow: i < filled ? `0 0 6px ${color}` : undefined,
+          }}
+        />
+      ))}
+    </div>
+  );
+}
+
+// Radial donut (System Health %)
+function RadialPct({ value, size = 78, stroke = 7 }: { value: number; size?: number; stroke?: number }) {
+  const r = (size - stroke) / 2;
+  const C = 2 * Math.PI * r;
+  const offset = C * (1 - value / 100);
+  return (
+    <div className="relative" style={{ width: size, height: size }}>
+      <svg width={size} height={size} className="-rotate-90">
+        <defs>
+          <linearGradient id="rad-g" x1="0" y1="0" x2="1" y2="1">
+            <stop offset="0%" stopColor="oklch(0.85 0.16 200)" />
+            <stop offset="100%" stopColor="oklch(0.7 0.2 285)" />
+          </linearGradient>
+        </defs>
+        <circle cx={size / 2} cy={size / 2} r={r} fill="none" stroke="rgba(255,255,255,0.08)" strokeWidth={stroke} />
+        <motion.circle
+          cx={size / 2} cy={size / 2} r={r}
+          fill="none" stroke="url(#rad-g)" strokeWidth={stroke} strokeLinecap="round"
+          strokeDasharray={C}
+          initial={{ strokeDashoffset: C }}
+          animate={{ strokeDashoffset: offset }}
+          transition={{ duration: 1.6, ease: [0.16, 1, 0.3, 1], delay: 0.3 }}
+        />
+      </svg>
+      <div className="absolute inset-0 grid place-items-center">
+        <span className="text-base font-medium text-white tabular-nums">
+          <NumberTicker value={value} decimals={1} />
+          <span className="text-[10px] text-primary/70 ml-0.5">%</span>
+        </span>
+      </div>
+    </div>
+  );
+}
+
 export const Route = createFileRoute("/_app/dashboard")({
   head: () => ({ meta: [{ title: "Dashboard — Orvion Media" }] }),
   component: DashboardPage,
