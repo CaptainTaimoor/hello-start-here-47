@@ -95,7 +95,7 @@ function DashboardPage() {
   }, [channels, views]);
 
   const activity = [
-    { who: "Aisha K.", what: "edited Daily Content (3 rows)", when: "5m" },
+    { who: "Aisha K.", what: "is editing Daily Content", when: "now", typing: true },
     { who: "Ben L.", what: "marked Markets close render complete", when: "22m" },
     { who: "Carla R.", what: "added KPI note for Orvion World", when: "1h" },
     { who: "Priya M.", what: "approved thumbnail v3", when: "2h" },
@@ -108,6 +108,7 @@ function DashboardPage() {
       value: 1,
       label: "Assigned Projects",
       badge: { text: "+1", tone: "primary" as const },
+      spark: [2, 3, 2, 4, 3, 5, 4, 6, 5, 7, 6, 8],
     },
     dashboardCards.team && {
       key: "t",
@@ -115,6 +116,7 @@ function DashboardPage() {
       value: teamCount,
       label: "Team Members",
       badge: { text: "Active", tone: "muted" as const },
+      spark: [10, 12, 11, 13, 14, 13, 15, 16, 15, 17, 18, 18],
     },
     dashboardCards.tasks && {
       key: "ts",
@@ -122,6 +124,7 @@ function DashboardPage() {
       value: 12,
       label: "Pending Tasks",
       badge: { text: "3 Due", tone: "danger" as const },
+      spark: [18, 16, 17, 14, 15, 13, 14, 12, 13, 11, 12, 12],
     },
     dashboardCards.sheets && {
       key: "sh",
@@ -129,6 +132,7 @@ function DashboardPage() {
       value: totalRows,
       label: "Pending Sheet Rows",
       badge: null,
+      spark: [4, 6, 5, 8, 7, 9, 8, 10, 9, 11, 10, 12],
     },
   ].filter(Boolean) as Array<{
     key: string;
@@ -136,6 +140,7 @@ function DashboardPage() {
     value: number;
     label: string;
     badge: { text: string; tone: "primary" | "muted" | "danger" } | null;
+    spark: number[];
   }>;
 
   const tile =
