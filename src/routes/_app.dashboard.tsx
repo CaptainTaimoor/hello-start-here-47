@@ -155,48 +155,6 @@ function DashboardPage() {
         className="md:col-span-8 relative overflow-hidden rounded-3xl border border-white/[0.06] bg-[oklch(0.2_0.04_235)] p-8 md:p-10 min-h-[320px] flex flex-col justify-between"
       >
         <div className="pointer-events-none absolute inset-0 [background:radial-gradient(circle_at_top_right,oklch(0.78_0.17_205/0.12),transparent_55%)]" />
-        {/* moving aurora gradient */}
-        <motion.div
-          aria-hidden
-          className="pointer-events-none absolute -inset-1 opacity-60"
-          style={{
-            background:
-              "conic-gradient(from 0deg at 70% 30%, oklch(0.78 0.17 205/0.22), transparent 30%, oklch(0.55 0.22 285/0.20) 60%, transparent 90%)",
-            filter: "blur(40px)",
-          }}
-          animate={{ rotate: 360 }}
-          transition={{ duration: 36, ease: "linear", repeat: Infinity }}
-        />
-        {/* animated grid */}
-        <div
-          aria-hidden
-          className="pointer-events-none absolute inset-0 opacity-[0.07] [background-image:linear-gradient(rgba(255,255,255,.6)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,.6)_1px,transparent_1px)] [background-size:40px_40px] [mask-image:radial-gradient(ellipse_at_center,black,transparent_70%)]"
-          style={{ animation: "grid-pan 20s linear infinite" }}
-        />
-        {/* floating orbs */}
-        <motion.div
-          aria-hidden
-          className="pointer-events-none absolute -top-10 -left-10 size-40 rounded-full bg-primary/20 blur-2xl"
-          animate={{ y: [0, 18, 0], x: [0, 10, 0] }}
-          transition={{ duration: 9, repeat: Infinity, ease: "easeInOut" }}
-        />
-        <motion.div
-          aria-hidden
-          className="pointer-events-none absolute bottom-0 right-10 size-52 rounded-full bg-violet-500/15 blur-3xl"
-          animate={{ y: [0, -22, 0], x: [0, -14, 0] }}
-          transition={{ duration: 11, repeat: Infinity, ease: "easeInOut" }}
-        />
-        {/* drifting sparkles */}
-        {[...Array(6)].map((_, i) => (
-          <motion.span
-            key={i}
-            aria-hidden
-            className="pointer-events-none absolute size-1 rounded-full bg-white/60"
-            style={{ left: `${10 + i * 14}%`, top: `${20 + (i % 3) * 25}%` }}
-            animate={{ y: [0, -14, 0], opacity: [0.2, 0.9, 0.2] }}
-            transition={{ duration: 3 + i * 0.4, repeat: Infinity, ease: "easeInOut", delay: i * 0.3 }}
-          />
-        ))}
         <div className="absolute top-6 right-6 z-10">
           <div className="flex items-center gap-3 px-3 py-1 bg-white/5 border border-white/10 rounded-full backdrop-blur-md">
             <span className="relative flex size-1.5">
