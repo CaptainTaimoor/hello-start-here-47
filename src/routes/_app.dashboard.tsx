@@ -133,7 +133,13 @@ function DashboardPage() {
   }>;
 
   const tile =
-    "group relative overflow-hidden rounded-3xl border border-white/[0.06] bg-[oklch(0.2_0.04_235)] p-6 transition-all duration-500 hover:border-primary/30 hover:-translate-y-0.5";
+    "group relative overflow-hidden rounded-3xl p-6 transition-all duration-500 " +
+    "border border-white/[0.06] " +
+    "bg-[linear-gradient(180deg,color-mix(in_oklab,white_4%,transparent),transparent_55%),color-mix(in_oklab,var(--card)_55%,transparent)] " +
+    "backdrop-blur-2xl backdrop-saturate-150 " +
+    "shadow-[0_1px_0_0_rgb(255_255_255/0.08)_inset,0_0_0_1px_rgb(255_255_255/0.03)_inset,0_24px_60px_-24px_rgb(0_0_0/0.6)] " +
+    "hover:border-white/[0.12] hover:-translate-y-0.5 " +
+    "hover:shadow-[0_1px_0_0_rgb(255_255_255/0.12)_inset,0_0_0_1px_color-mix(in_oklab,var(--primary)_18%,transparent)_inset,0_32px_80px_-24px_rgb(0_0_0/0.7)]";
 
   return (
     <motion.div
@@ -145,7 +151,7 @@ function DashboardPage() {
       {/* HERO */}
       <motion.div
         variants={{ hidden: { opacity: 0, y: 20 }, show: { opacity: 1, y: 0, transition: { duration: 0.7, ease: [0.16, 1, 0.3, 1] } } }}
-        className="md:col-span-8 relative overflow-hidden rounded-3xl border border-white/[0.06] bg-[oklch(0.2_0.04_235)] p-8 md:p-10 min-h-[320px] flex flex-col justify-between"
+        className={`md:col-span-8 ${tile} p-8 md:p-10 min-h-[320px] flex flex-col justify-between`}
       >
         <Meteors number={14} />
         <BorderBeam size={260} duration={10} />
@@ -307,11 +313,12 @@ function DashboardPage() {
           </div>
         )}
         {dashboardCards.editing && showFor.editing && (
-          <div className="rounded-3xl bg-primary p-6 flex flex-col justify-between min-h-[140px]">
-            <h3 className="text-[10px] uppercase tracking-[0.22em] font-bold text-[oklch(0.15_0.04_235)]/60">Editing Queue</h3>
-            <div>
-              <p className="text-5xl font-semibold text-[oklch(0.15_0.04_235)] leading-none mb-1 tracking-tight">14</p>
-              <p className="text-[10px] font-bold text-[oklch(0.15_0.04_235)]/60 uppercase tracking-wider">Videos in pipeline</p>
+          <div className={`${tile} flex flex-col justify-between min-h-[140px] !p-6`}>
+            <div className="pointer-events-none absolute inset-0 [background:radial-gradient(120%_80%_at_0%_0%,oklch(0.78_0.17_205/0.18),transparent_55%)]" />
+            <h3 className="relative text-[10px] uppercase tracking-[0.22em] font-semibold text-white/40">Editing Queue</h3>
+            <div className="relative">
+              <p className="text-5xl font-light text-white leading-none mb-1 tracking-[-0.02em] tabular-nums"><NumberTicker value={14} /></p>
+              <p className="text-[10px] text-white/40 font-semibold uppercase tracking-[0.18em]">Videos in pipeline</p>
             </div>
           </div>
         )}

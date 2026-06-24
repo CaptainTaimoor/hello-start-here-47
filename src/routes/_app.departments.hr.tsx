@@ -38,15 +38,14 @@ function HRPage() {
         actions={<Button onClick={() => setOpen(true)}><Plus className="size-4 mr-2"/> Add employee</Button>}
       />
       <Tabs defaultValue="overview">
-        <TabsList className="flex flex-wrap h-auto relative overflow-hidden">
-          <BorderBeam size={120} duration={6} />
-          <TabsTrigger value="overview" className="transition-all data-[state=active]:shadow-[0_0_20px_-4px_var(--primary)]">Overview</TabsTrigger>
-          <TabsTrigger value="records" className="transition-all data-[state=active]:shadow-[0_0_20px_-4px_var(--primary)]">All Records</TabsTrigger>
-          <TabsTrigger value="employees" className="transition-all data-[state=active]:shadow-[0_0_20px_-4px_var(--primary)]">Employees</TabsTrigger>
-          <TabsTrigger value="attendance" className="transition-all data-[state=active]:shadow-[0_0_20px_-4px_var(--primary)]">Attendance</TabsTrigger>
-          <TabsTrigger value="overtime" className="transition-all data-[state=active]:shadow-[0_0_20px_-4px_var(--primary)]">Overtime</TabsTrigger>
-          <TabsTrigger value="hiring" className="transition-all data-[state=active]:shadow-[0_0_20px_-4px_var(--primary)]">Hiring</TabsTrigger>
-          <TabsTrigger value="training" className="transition-all data-[state=active]:shadow-[0_0_20px_-4px_var(--primary)]">Training</TabsTrigger>
+        <TabsList className="flex flex-wrap h-auto">
+          <TabsTrigger value="overview">Overview</TabsTrigger>
+          <TabsTrigger value="records">All Records</TabsTrigger>
+          <TabsTrigger value="employees">Employees</TabsTrigger>
+          <TabsTrigger value="attendance">Attendance</TabsTrigger>
+          <TabsTrigger value="overtime">Overtime</TabsTrigger>
+          <TabsTrigger value="hiring">Hiring</TabsTrigger>
+          <TabsTrigger value="training">Training</TabsTrigger>
         </TabsList>
 
         <TabsContent value="overview" className="mt-4 grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-4">
