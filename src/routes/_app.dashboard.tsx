@@ -239,7 +239,7 @@ function DashboardPage() {
                       {i}
                     </div>
                   ))}
-                  <div className="size-9 rounded-full border-2 border-[oklch(0.16_0.03_235)] bg-primary/20 flex items-center justify-center text-[10px] font-bold text-primary">
+                  <div className="size-9 rounded-full border-2 border-[oklch(0.16_0.03_235)] bg-primary/20 flex items-center justify-center text-[10px] font-bold text-primary conic-ring">
                     +{Math.max(teamCount - 4, 0)}
                   </div>
                 </div>
