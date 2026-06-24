@@ -24,8 +24,6 @@ import { useApp } from "@/lib/app-store";
 import { MOCK_ANALYTICS } from "@/lib/mock-data";
 import { Link } from "@tanstack/react-router";
 import { LiveTicker } from "@/components/layout/LiveTicker";
-import { BorderBeam } from "@/components/magic/BorderBeam";
-import { Meteors } from "@/components/magic/Meteors";
 
 export const Route = createFileRoute("/_app/dashboard")({
   head: () => ({ meta: [{ title: "Dashboard — Orvion Media" }] }),
@@ -163,14 +161,6 @@ function DashboardPage() {
         variants={{ hidden: { opacity: 0, y: 20 }, show: { opacity: 1, y: 0, transition: { duration: 0.7, ease: [0.16, 1, 0.3, 1] } } }}
         className="md:col-span-8 group relative overflow-hidden rounded-[2rem] border border-white/10 bg-[oklch(0.16_0.03_235)] shadow-2xl shadow-[oklch(0.5_0.15_220/0.18)] min-h-[360px] grain tilt-3d"
       >
-        {/* meteors + border beam */}
-        <Meteors number={14} />
-        <BorderBeam size={260} duration={11} />
-
-        {/* ambient glows */}
-        <div className="pointer-events-none absolute -top-48 -right-48 size-[500px] rounded-full bg-primary/10 blur-[120px] animate-[float-y_8s_ease-in-out_infinite]" />
-        <div className="pointer-events-none absolute -bottom-24 -left-24 size-[300px] rounded-full bg-violet-600/10 blur-[100px] animate-[float-y_11s_ease-in-out_infinite]" />
-
         {/* Top utility bar */}
         <div className="relative z-10 flex items-center justify-between px-8 md:px-10 pt-7 gap-4">
           <div className="flex items-center gap-5">
@@ -201,7 +191,7 @@ function DashboardPage() {
         <div className="relative z-10 px-8 md:px-10 pt-10 pb-10 flex flex-col lg:flex-row lg:items-end lg:justify-between gap-10">
           <div className="max-w-2xl">
             <h1 className="font-serif text-6xl md:text-7xl font-normal text-white leading-[1.02] tracking-[-0.03em]">
-              Welcome back, <span className="italic aurora-text">{firstName}.</span>
+              Welcome back, <span className="italic text-primary">{firstName}.</span>
             </h1>
             <p className="mt-5 text-base md:text-lg text-white/55 max-w-md font-light leading-relaxed">
               You're signed in as <span className="text-white/90 font-medium">{role}</span>. Here's your production pulse for today.
