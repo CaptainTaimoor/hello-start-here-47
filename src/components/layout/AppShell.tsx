@@ -28,6 +28,31 @@ export function AppShell({ children }: { children?: ReactNode }) {
   // Soft sound on route change
   useEffect(() => { click("tick"); }, [pathname]);
 
+  // Pause ambient animations when tab hidden
+  useEffect(() => {
+    const setVis = () => {
+      document.documentElement.dataset.visibility = document.hidden ? "hidden" : "visible";
+    };
+    setVis();
+    document.addEventListener("visibilitychange", setVis);
+    return () => document.removeEventListener("visibilitychange", setVis);
+  }, []);
+
+  // Detect low-perf devices (low cores / save-data / low memory) -> reduce ambient motion
+  useEffect(() => {
+    const nav = navigator as Navigator & {
+      deviceMemory?: number;
+      connection?: { saveData?: boolean; effectiveType?: string };
+    };
+    const lowCores = (nav.hardwareConcurrency ?? 8) <= 4;
+    const lowMem = (nav.deviceMemory ?? 8) <= 4;
+    const saveData = nav.connection?.saveData === true;
+    const slowNet = /^(2g|slow-2g)$/.test(nav.connection?.effectiveType ?? "");
+    if (lowCores || lowMem || saveData || slowNet) {
+      document.documentElement.dataset.perf = "low";
+    }
+  }, []);
+
   // F toggles focus mode
   useEffect(() => {
     const fn = (e: KeyboardEvent) => {
@@ -64,9 +89,19 @@ export function AppShell({ children }: { children?: ReactNode }) {
               animate="show"
               exit="exit"
               variants={{
-                hidden: {},
-                show: { transition: { staggerChildren: 0.06, delayChildren: 0.05 } },
-                exit: { opacity: 0, y: -8, transition: { duration: 0.25 } },
+                hidden: { opacity: 0, y: 12, filter: "blur(6px)" },
+                show: {
+                  opacity: 1,
+                  y: 0,
+                  filter: "blur(0px)",
+                  transition: {
+                    duration: 0.45,
+                    ease: [0.16, 1, 0.3, 1],
+                    staggerChildren: 0.06,
+                    delayChildren: 0.05,
+                  },
+                },
+                exit: { opacity: 0, y: -10, filter: "blur(4px)", transition: { duration: 0.28, ease: [0.7, 0, 0.84, 0] } },
               }}
               className="route-stagger"
             >
