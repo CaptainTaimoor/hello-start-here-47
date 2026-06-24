@@ -13,6 +13,8 @@ import { Button } from "@/components/ui/button";
 import { motion } from "motion/react";
 import { NumberTicker } from "@/components/magic/NumberTicker";
 import { SignatureChart } from "@/components/magic/SignatureChart";
+import { Meteors } from "@/components/magic/Meteors";
+import { BorderBeam } from "@/components/magic/BorderBeam";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -145,6 +147,8 @@ function DashboardPage() {
         variants={{ hidden: { opacity: 0, y: 20 }, show: { opacity: 1, y: 0, transition: { duration: 0.7, ease: [0.16, 1, 0.3, 1] } } }}
         className="md:col-span-8 relative overflow-hidden rounded-3xl border border-white/[0.06] bg-[oklch(0.2_0.04_235)] p-8 md:p-10 min-h-[320px] flex flex-col justify-between"
       >
+        <Meteors number={14} />
+        <BorderBeam size={260} duration={10} />
         <div className="pointer-events-none absolute inset-0 [background:radial-gradient(circle_at_top_right,oklch(0.78_0.17_205/0.12),transparent_55%)]" />
         <div className="absolute top-6 right-6 z-10">
           <div className="flex items-center gap-3 px-3 py-1 bg-white/5 border border-white/10 rounded-full backdrop-blur-md">
