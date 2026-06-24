@@ -153,6 +153,83 @@ function DashboardPage() {
     return () => clearInterval(id);
   }, []);
 
+  // === Motivational: daily rotating quote (deterministic by day-of-year) ===
+  const QUOTES = [
+    { q: "Ship the work. The work ships you.", a: "Studio mantra" },
+    { q: "Make it good. Then make it shorter.", a: "— Strunk, paraphrased" },
+    { q: "The standard you walk past is the standard you accept.", a: "— David Hurley" },
+    { q: "Done is the engine of more.", a: "— Bre Pettis" },
+    { q: "Slow is smooth. Smooth is fast.", a: "Field saying" },
+    { q: "Taste is the new currency.", a: "Editorial truism" },
+    { q: "You don't rise to your goals — you fall to your systems.", a: "— James Clear" },
+  ];
+  const dayOfYear = Math.floor((+now - +new Date(now.getFullYear(), 0, 0)) / 86400000);
+  const quote = QUOTES[dayOfYear % QUOTES.length];
+
+  // === Streak (persisted in localStorage; fake-bootstrapped to 12) ===
+  const [streak] = useState(() => {
+    if (typeof window === "undefined") return 12;
+    const stored = window.localStorage.getItem("orvion-streak");
+    if (stored) return Number(stored);
+    window.localStorage.setItem("orvion-streak", "12");
+    return 12;
+  });
+  const heatmap = useMemo(
+    () => Array.from({ length: 30 }, (_, i) => (i < 30 - streak ? 0 : 1 + ((i * 7) % 4))),
+    [streak],
+  );
+
+  // === Today's win (persisted per-day) ===
+  const todayKey = `orvion-win-${now.toISOString().slice(0, 10)}`;
+  const [winInput, setWinInput] = useState("");
+  const [todaysWin, setTodaysWin] = useState<string | null>(null);
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    setTodaysWin(window.localStorage.getItem(todayKey));
+  }, [todayKey]);
+  function saveWin(e: React.FormEvent) {
+    e.preventDefault();
+    const v = winInput.trim();
+    if (!v) return;
+    window.localStorage.setItem(todayKey, v);
+    setTodaysWin(v);
+    setWinInput("");
+    toast.success("Logged. Rest is yours.", { duration: 2500 });
+  }
+
+  // === Milestone banner (dismissible per-day) ===
+  const milestoneKey = `orvion-milestone-${now.toISOString().slice(0, 10)}`;
+  const [showMilestone, setShowMilestone] = useState(true);
+  useEffect(() => {
+    if (typeof window !== "undefined" && window.localStorage.getItem(milestoneKey) === "dismissed") {
+      setShowMilestone(false);
+    }
+  }, [milestoneKey]);
+  function dismissMilestone() {
+    window.localStorage.setItem(milestoneKey, "dismissed");
+    setShowMilestone(false);
+  }
+
+  // === EOD recap toast (fires once at/after 18:00 local) ===
+  useEffect(() => {
+    const recapKey = `orvion-recap-${now.toISOString().slice(0, 10)}`;
+    if (typeof window === "undefined") return;
+    if (now.getHours() >= 18 && !window.localStorage.getItem(recapKey)) {
+      window.localStorage.setItem(recapKey, "shown");
+      toast(`You moved ${totalRows + 14} rows today. Rest well, ${user?.name?.split(" ")[0] ?? "you"}.`, {
+        duration: 6000,
+        icon: "🌙",
+      });
+    }
+  }, [now, totalRows, user]);
+
+  // === Time-aware greeting ===
+  const hour = now.getHours();
+  const salutation = hour < 5 ? "Burning the midnight oil" : hour < 12 ? "Good morning" : hour < 17 ? "Good afternoon" : hour < 22 ? "Good evening" : "Still here";
+
+  // === Shoutout (latest "win" from activity feed) ===
+  const shoutout = { who: "Ben L.", what: "shipped Markets Close", when: "22m" };
+
   const role = user?.role ?? "Viewer";
 
   const showFor = useMemo(
