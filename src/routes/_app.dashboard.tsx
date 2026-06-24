@@ -157,14 +157,11 @@ function DashboardPage() {
         {/* premium ambient layer */}
         <div className="pointer-events-none absolute inset-0 overflow-hidden">
           <div className="hero-conic" />
-          <div className="absolute inset-0 hero-grid opacity-60" />
           <div className="hero-orb-a pointer-events-none absolute -top-40 -right-40 size-[520px] rounded-full bg-primary/20 blur-[130px]" />
           <div className="hero-orb-b pointer-events-none absolute -bottom-28 -left-28 size-[360px] rounded-full bg-violet-500/20 blur-[110px]" />
           <div className="absolute inset-0 bg-gradient-to-b from-white/[0.04] via-transparent to-black/30" />
           <div className="hero-shine" />
         </div>
-        {/* inner glass border highlight */}
-        <div className="pointer-events-none absolute inset-0 rounded-[2rem] ring-1 ring-inset ring-white/10 [box-shadow:inset_0_1px_0_0_rgba(255,255,255,0.08)]" />
 
         {/* Top utility bar */}
         <div className="relative z-10 flex items-center justify-between px-8 md:px-10 pt-7 gap-4">
