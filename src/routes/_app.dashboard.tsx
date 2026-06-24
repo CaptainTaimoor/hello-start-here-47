@@ -153,6 +153,10 @@ function DashboardPage() {
     return () => clearInterval(id);
   }, []);
 
+  const role0 = user?.role ?? "Viewer";
+  const totalRowsEarly = Object.values(sheets).reduce((s, r) => s + r.length, 0);
+  void role0;
+
   // === Motivational: daily rotating quote (deterministic by day-of-year) ===
   const QUOTES = [
     { q: "Ship the work. The work ships you.", a: "Studio mantra" },
