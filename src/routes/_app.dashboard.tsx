@@ -152,52 +152,121 @@ function DashboardPage() {
       {/* HERO */}
       <motion.div
         variants={{ hidden: { opacity: 0, y: 20 }, show: { opacity: 1, y: 0, transition: { duration: 0.7, ease: [0.16, 1, 0.3, 1] } } }}
-        className="md:col-span-8 relative overflow-hidden rounded-3xl border border-white/[0.06] bg-[oklch(0.2_0.04_235)] p-8 md:p-10 min-h-[320px] flex flex-col justify-between"
+        className="md:col-span-8 relative overflow-hidden rounded-[2rem] border border-white/10 bg-[oklch(0.16_0.03_235)] shadow-2xl shadow-[oklch(0.5_0.15_220/0.18)] min-h-[360px]"
       >
-        <div className="pointer-events-none absolute inset-0 [background:radial-gradient(circle_at_top_right,oklch(0.78_0.17_205/0.12),transparent_55%)]" />
-        <div className="absolute top-6 right-6 z-10">
-          <div className="flex items-center gap-3 px-3 py-1 bg-white/5 border border-white/10 rounded-full backdrop-blur-md">
-            <span className="relative flex size-1.5">
-              <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-primary opacity-60" />
-              <span className="relative inline-flex size-1.5 rounded-full bg-primary" />
+        {/* ambient glows */}
+        <div className="pointer-events-none absolute -top-48 -right-48 size-[500px] rounded-full bg-primary/10 blur-[120px]" />
+        <div className="pointer-events-none absolute -bottom-24 -left-24 size-[300px] rounded-full bg-violet-600/10 blur-[100px]" />
+
+        {/* Top utility bar */}
+        <div className="relative z-10 flex items-center justify-between px-8 md:px-10 pt-7 gap-4">
+          <div className="flex items-center gap-5">
+            <div className="flex flex-col">
+              <span className="text-[10px] font-semibold uppercase tracking-[0.18em] text-white/40 mb-0.5">Current Session</span>
+              <span className="text-xs font-medium text-white/70 tabular-nums">
+                {new Date().toLocaleDateString(undefined, { weekday: "long", month: "short", day: "numeric" })} · {new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}
+              </span>
+            </div>
+            <div className="hidden sm:block h-8 w-px bg-white/10" />
+            <div className="hidden sm:flex items-center gap-2">
+              <Sparkles className="size-4 text-primary" />
+              <span className="text-xs font-medium text-white/70">All systems clear</span>
+            </div>
+          </div>
+
+          <div className="flex items-center gap-3 bg-black/30 backdrop-blur-md border border-white/5 rounded-full pl-3 pr-4 py-1.5">
+            <span className="relative flex size-2">
+              <span className="absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-60 animate-ping" />
+              <span className="relative inline-flex size-2 rounded-full bg-emerald-400" />
             </span>
-            <span className="text-[10px] uppercase tracking-[0.18em] font-semibold text-white/70">Operational</span>
-            <span className="w-px h-3 bg-white/10" />
-            <span className="text-[10px] tracking-[0.14em] font-medium text-white/50 tabular-nums">
-              {watching} watching
-            </span>
+            <span className="text-[10px] font-bold tracking-[0.15em] text-white uppercase">Operational</span>
+            <span className="w-px h-3 bg-white/20" />
+            <span className="text-[10px] font-medium text-primary/90 tabular-nums">{watching} watching</span>
           </div>
         </div>
-        <div className="relative z-10">
-          <h1 className="font-serif text-6xl md:text-8xl font-normal text-white leading-[0.92] tracking-[-0.03em]">
-            Welcome back, <span className="italic text-primary">{firstName}.</span>
-          </h1>
-          <p className="mt-4 max-w-md text-base md:text-lg text-white/50 font-light leading-relaxed">
-            You're signed in as <span className="text-white/85">{role}</span>. Here's your production pulse for today.
-          </p>
+
+        {/* Body */}
+        <div className="relative z-10 px-8 md:px-10 pt-10 pb-10 flex flex-col lg:flex-row lg:items-end lg:justify-between gap-10">
+          <div className="max-w-2xl">
+            <h1 className="font-serif text-6xl md:text-7xl font-normal text-white leading-[1.02] tracking-[-0.03em]">
+              Welcome back, <span className="italic text-primary">{firstName}.</span>
+            </h1>
+            <p className="mt-5 text-base md:text-lg text-white/55 max-w-md font-light leading-relaxed">
+              You're signed in as <span className="text-white/90 font-medium">{role}</span>. Here's your production pulse for today.
+            </p>
+
+            <div className="mt-8 flex flex-wrap items-center gap-5">
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button variant="outline" size="sm" className="rounded-xl bg-white/5 border-white/10 hover:bg-white/10 text-white/90 group">
+                    <Settings2 className="size-4 mr-2 text-primary transition-transform group-hover:rotate-12" />
+                    Customize View
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="start" className="w-60">
+                  <DropdownMenuLabel>Dashboard cards</DropdownMenuLabel>
+                  {CARDS.map((c) => (
+                    <DropdownMenuCheckboxItem
+                      key={c.id}
+                      checked={!!dashboardCards[c.id]}
+                      onCheckedChange={() => toggleCard(c.id)}
+                    >
+                      {c.label}
+                    </DropdownMenuCheckboxItem>
+                  ))}
+                </DropdownMenuContent>
+              </DropdownMenu>
+
+              <div className="flex items-center gap-3">
+                <div className="flex -space-x-2.5">
+                  {["RS", "PM", "AK", "BL"].map((i, n) => (
+                    <div
+                      key={n}
+                      className="size-9 rounded-full border-2 border-[oklch(0.16_0.03_235)] bg-gradient-to-br from-primary/40 to-violet-500/40 flex items-center justify-center text-[10px] font-semibold text-white"
+                    >
+                      {i}
+                    </div>
+                  ))}
+                  <div className="size-9 rounded-full border-2 border-[oklch(0.16_0.03_235)] bg-primary/20 flex items-center justify-center text-[10px] font-bold text-primary">
+                    +{Math.max(teamCount - 4, 0)}
+                  </div>
+                </div>
+                <span className="text-[10px] text-white/40 font-semibold tracking-[0.18em] uppercase">Team Active</span>
+              </div>
+            </div>
+          </div>
+
+          {/* Right micro-KPIs */}
+          <div className="hidden lg:flex flex-col gap-7 items-end shrink-0">
+            <div className="text-right">
+              <div className="text-[10px] font-bold text-white/40 uppercase tracking-[0.2em] mb-1.5">System Health</div>
+              <div className="flex items-end gap-3">
+                <span className="text-3xl font-light text-white tracking-tighter tabular-nums">
+                  <NumberTicker value={98.4} decimals={1} /><span className="text-base text-primary/70">%</span>
+                </span>
+                <svg className="w-16 h-8 text-emerald-400/60 mb-1.5" viewBox="0 0 100 40" preserveAspectRatio="none">
+                  <path d="M0 35 Q 10 20 20 30 T 40 10 T 60 25 T 80 15 T 100 35" fill="none" stroke="currentColor" strokeWidth="2" />
+                </svg>
+              </div>
+            </div>
+
+            <div className="text-right">
+              <div className="text-[10px] font-bold text-white/40 uppercase tracking-[0.2em] mb-1.5">Active Nodes</div>
+              <div className="flex items-center gap-3">
+                <span className="text-3xl font-light text-white tracking-tighter tabular-nums">
+                  <NumberTicker value={4281} />
+                </span>
+                <div className="flex flex-col leading-tight">
+                  <span className="text-[10px] font-bold text-emerald-400">+12%</span>
+                  <span className="text-[9px] text-white/30">vs LY</span>
+                </div>
+              </div>
+            </div>
+          </div>
         </div>
-        <div className="relative z-10 mt-6 flex gap-3">
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <Button variant="outline" size="sm" className="rounded-xl bg-white/5 border-white/10 hover:bg-white/10 text-white/85">
-                <Settings2 className="size-4 mr-2 text-primary" />
-                Customize View
-              </Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent align="start" className="w-60">
-              <DropdownMenuLabel>Dashboard cards</DropdownMenuLabel>
-              {CARDS.map((c) => (
-                <DropdownMenuCheckboxItem
-                  key={c.id}
-                  checked={!!dashboardCards[c.id]}
-                  onCheckedChange={() => toggleCard(c.id)}
-                >
-                  {c.label}
-                </DropdownMenuCheckboxItem>
-              ))}
-            </DropdownMenuContent>
-          </DropdownMenu>
-        </div>
+
+        {/* bottom accent line */}
+        <div className="absolute bottom-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-primary/40 to-transparent" />
       </motion.div>
 
       {/* LIVE ACTIVITY */}
