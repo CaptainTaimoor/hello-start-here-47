@@ -70,8 +70,19 @@ export function SignatureChart({
 
         {/* horizontal gridlines */}
         {[0.25, 0.5, 0.75].map((t) => (
-          <line key={t} x1={0} x2={W} y1={H * t} y2={H * t} stroke="white" strokeOpacity={0.04} />
+          <line
+            key={t}
+            x1={0}
+            x2={W}
+            y1={H * t}
+            y2={H * t}
+            stroke="white"
+            strokeOpacity={0.06}
+            strokeDasharray="2 4"
+          />
         ))}
+        {/* baseline */}
+        <line x1={0} x2={W} y1={H - PAD} y2={H - PAD} stroke="white" strokeOpacity={0.12} />
 
         {/* stacked areas */}
         {stacked.layers.map((l, idx) => (
@@ -82,9 +93,9 @@ export function SignatureChart({
             stroke={l.color}
             strokeWidth={1.4}
             strokeLinejoin="round"
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ duration: 0.9, delay: 0.6 + idx * 0.12, ease: [0.16, 1, 0.3, 1] }}
+            initial={{ opacity: 0, pathLength: 0 }}
+            animate={{ opacity: 1, pathLength: 1 }}
+            transition={{ duration: 1.4, delay: 0.4 + idx * 0.15, ease: [0.16, 1, 0.3, 1] }}
           />
         ))}
 
@@ -106,6 +117,13 @@ export function SignatureChart({
           </>
         )}
       </svg>
+
+      {/* y-axis tick labels */}
+      <div className="pointer-events-none absolute inset-y-0 left-0 flex flex-col justify-between py-1 text-[9px] font-mono text-white/25 tracking-wider">
+        <span>{Math.round(stacked.max).toLocaleString()}</span>
+        <span>{Math.round(stacked.max * 0.5).toLocaleString()}</span>
+        <span>0</span>
+      </div>
 
       {/* tooltip */}
       {hover !== null && (
