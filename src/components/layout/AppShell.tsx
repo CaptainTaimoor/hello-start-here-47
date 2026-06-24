@@ -7,7 +7,6 @@ import { Toaster } from "@/components/ui/sonner";
 import { motion, AnimatePresence } from "motion/react";
 import { CommandPalette } from "@/components/CommandPalette";
 import { CursorSpotlight } from "@/components/magic/CursorSpotlight";
-import { AnimatedGridPattern } from "@/components/magic/AnimatedGridPattern";
 import { click } from "@/lib/sound";
 import { useState } from "react";
 import { ShortcutsDialog } from "@/components/ShortcutsDialog";
@@ -58,12 +57,6 @@ export function AppShell({ children }: { children?: ReactNode }) {
       <div className="flex flex-1 flex-col min-w-0">
         <AppHeader />
         <main className="relative flex-1 min-w-0 p-6 lg:p-8 z-[1]">
-          <AnimatedGridPattern
-            numSquares={24}
-            maxOpacity={0.08}
-            duration={5}
-            className="[mask-image:radial-gradient(700px_circle_at_center,white,transparent)] -z-[1] text-primary/30"
-          />
           <AnimatePresence mode="wait">
             <motion.div
               key={pathname}
