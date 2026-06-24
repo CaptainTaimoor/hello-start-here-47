@@ -306,28 +306,14 @@ function DashboardPage() {
             : s.badge?.tone === "primary"
               ? "text-primary bg-primary/10"
               : "text-white/40 bg-white/5";
-        const idx = stats.indexOf(s) + 1;
-        const spark = Array.from({ length: 12 }, (_, i) =>
-          12 + Math.round(8 * Math.sin(i * 0.7 + s.key.charCodeAt(0)) + i * 0.6),
-        );
-        const sparkPath = spark
-          .map((v, i) => `${i === 0 ? "M" : "L"}${(i / (spark.length - 1)) * 80},${24 - (v / 28) * 18}`)
-          .join(" ");
         return (
           <motion.div
             key={s.key}
             variants={{ hidden: { opacity: 0, y: 20 }, show: { opacity: 1, y: 0, transition: { duration: 0.6, ease: [0.16, 1, 0.3, 1] } } }}
             className={`md:col-span-3 ${tile}`}
           >
-            <span
-              aria-hidden
-              className="pointer-events-none absolute -top-1 right-3 font-serif text-[78px] leading-none tracking-tighter select-none"
-              style={{ WebkitTextStroke: "1px oklch(1 0 0 / 0.07)", color: "transparent" }}
-            >
-              {String(idx).padStart(2, "0")}
-            </span>
             <div className="flex justify-between items-start mb-6">
-              <div className="p-2.5 bg-primary/10 rounded-xl text-primary transition-transform duration-500 group-hover:rotate-6 group-hover:scale-110">
+              <div className="p-2.5 bg-primary/10 rounded-xl text-primary">
                 <Icon className="size-5" strokeWidth={1.5} />
               </div>
               {s.badge && (
@@ -336,24 +322,10 @@ function DashboardPage() {
                 </span>
               )}
             </div>
-            <div className="flex items-end justify-between gap-3">
-              <div>
-                <p className="text-4xl md:text-5xl font-light text-white tracking-[-0.02em] mb-1 tabular-nums">
-                  <NumberTicker value={s.value} />
-                </p>
-                <p className="text-[11px] text-white/40 uppercase tracking-[0.18em] font-semibold">{s.label}</p>
-              </div>
-              <svg viewBox="0 0 80 24" className="w-20 h-7 text-primary/70 shrink-0" preserveAspectRatio="none">
-                <defs>
-                  <linearGradient id={`spark-${s.key}`} x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="0%" stopColor="currentColor" stopOpacity="0.35" />
-                    <stop offset="100%" stopColor="currentColor" stopOpacity="0" />
-                  </linearGradient>
-                </defs>
-                <path d={`${sparkPath} L80,24 L0,24 Z`} fill={`url(#spark-${s.key})`} />
-                <path className="spark-path" d={sparkPath} fill="none" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round" />
-              </svg>
-            </div>
+            <p className="text-4xl md:text-5xl font-light text-white tracking-[-0.02em] mb-1 tabular-nums">
+              <NumberTicker value={s.value} />
+            </p>
+            <p className="text-[11px] text-white/40 uppercase tracking-[0.18em] font-semibold">{s.label}</p>
           </motion.div>
         );
       })}
@@ -390,32 +362,19 @@ function DashboardPage() {
               {channels.map((c, i) => {
                 const onTrack = c.kpiStatus === "On Track";
                 const pct = onTrack ? 88 - i * 6 : 45;
-                const filled = Math.round(pct / 10);
                 return (
                   <div key={c.id}>
                     <div className="flex justify-between text-xs mb-2">
-                      <span className="text-white/80 font-medium truncate flex items-center gap-2">
-                        <span className={`block w-0.5 h-3 rounded-full ${onTrack ? "bg-primary" : "bg-orange-400"}`} />
-                        {c.name}
-                      </span>
-                      <span className={`font-bold tabular-nums ${onTrack ? "text-primary" : "text-orange-400"}`}>
+                      <span className="text-white/80 font-medium truncate">{c.name}</span>
+                      <span className={`font-bold ${onTrack ? "text-primary" : "text-orange-400"}`}>
                         {onTrack ? `${pct}%` : "At Risk"}
                       </span>
                     </div>
-                    <div className="flex gap-1">
-                      {Array.from({ length: 10 }).map((_, k) => (
-                        <span
-                          key={k}
-                          className={`flex-1 h-1.5 rounded-sm transition-all duration-500 ${
-                            k < filled
-                              ? onTrack
-                                ? "bg-primary shadow-[0_0_6px_oklch(0.82_0.16_205/0.5)]"
-                                : "bg-orange-400"
-                              : "bg-white/[0.06]"
-                          }`}
-                          style={{ transitionDelay: `${k * 40}ms` }}
-                        />
-                      ))}
+                    <div className="w-full bg-white/5 h-1 rounded-full overflow-hidden">
+                      <div
+                        className={`${onTrack ? "bg-primary" : "bg-orange-400"} h-1 rounded-full`}
+                        style={{ width: `${pct}%` }}
+                      />
                     </div>
                   </div>
                 );
