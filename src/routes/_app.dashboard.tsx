@@ -189,7 +189,21 @@ function DashboardPage() {
         <div className="relative z-10 px-8 md:px-10 pt-10 pb-10 flex flex-col lg:flex-row lg:items-end lg:justify-between gap-10">
           <div className="max-w-2xl">
             <h1 className="font-serif text-6xl md:text-7xl font-normal text-white leading-[1.02] tracking-[-0.03em]">
-              Welcome back, <span className="italic text-primary">{firstName}.</span>
+              Welcome back,{" "}
+              <span className="relative inline-block italic aurora-text [text-shadow:0_0_40px_oklch(0.82_0.16_205/0.45)] animate-[float-y_4s_ease-in-out_infinite]">
+                {firstName}
+                <span
+                  aria-hidden
+                  className="pointer-events-none absolute -inset-x-4 -inset-y-2 -z-10 rounded-full bg-primary/20 blur-2xl animate-[pulse-glow_3s_ease-in-out_infinite]"
+                />
+                <span
+                  aria-hidden
+                  className="pointer-events-none absolute inset-0 -z-10 overflow-hidden"
+                >
+                  <span className="absolute inset-y-0 -left-1/3 w-1/3 bg-gradient-to-r from-transparent via-white/30 to-transparent blur-md animate-[sheen_3.5s_ease-in-out_infinite]" />
+                </span>
+              </span>
+              <span className="text-primary">.</span>
             </h1>
             <p className="mt-5 text-base md:text-lg text-white/55 max-w-md font-light leading-relaxed">
               You're signed in as <span className="text-white/90 font-medium">{role}</span>. Here's your production pulse for today.
