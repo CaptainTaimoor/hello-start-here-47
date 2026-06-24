@@ -331,8 +331,13 @@ function DashboardPage() {
           <div className="hidden lg:flex flex-col gap-7 items-end shrink-0">
             <div className="text-right">
               <div className="text-[10px] font-bold text-white/40 uppercase tracking-[0.2em] mb-1.5">System Health</div>
-              <div className="flex items-center justify-end gap-3">
-                <RadialPct value={98.4} />
+              <div className="flex items-end gap-3">
+                <span className="text-3xl font-light text-white tracking-tighter tabular-nums">
+                  <NumberTicker value={98.4} decimals={1} /><span className="text-base text-primary/70">%</span>
+                </span>
+                <svg className="w-16 h-8 text-emerald-400/60 mb-1.5" viewBox="0 0 100 40" preserveAspectRatio="none">
+                  <path className="spark-path" d="M0 35 Q 10 20 20 30 T 40 10 T 60 25 T 80 15 T 100 35" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
+                </svg>
               </div>
             </div>
 
@@ -416,10 +421,7 @@ function DashboardPage() {
             <p className="text-4xl md:text-5xl font-light text-white tracking-[-0.02em] mb-1 tabular-nums">
               <NumberTicker value={s.value} />
             </p>
-            <div className="flex items-end justify-between gap-3">
-              <p className="text-[11px] text-white/40 uppercase tracking-[0.18em] font-semibold">{s.label}</p>
-              <MiniSpark data={s.spark} color={s.badge?.tone === "danger" ? "oklch(0.7 0.2 25)" : "oklch(0.82 0.16 205)"} />
-            </div>
+            <p className="text-[11px] text-white/40 uppercase tracking-[0.18em] font-semibold">{s.label}</p>
           </motion.div>
         );
       })}
@@ -456,21 +458,20 @@ function DashboardPage() {
               {channels.map((c, i) => {
                 const onTrack = c.kpiStatus === "On Track";
                 const pct = onTrack ? 88 - i * 6 : 45;
-                const brand = CHANNEL_COLORS[i % CHANNEL_COLORS.length];
-                const barColor = onTrack ? brand : "oklch(0.72 0.18 50)";
                 return (
-                  <div key={c.id} className="relative pl-3">
-                    <span
-                      className="absolute left-0 top-0.5 bottom-0.5 w-[3px] rounded-full"
-                      style={{ background: brand, boxShadow: `0 0 8px ${brand}` }}
-                    />
+                  <div key={c.id}>
                     <div className="flex justify-between text-xs mb-2">
                       <span className="text-white/80 font-medium truncate">{c.name}</span>
-                      <span className="font-bold tabular-nums" style={{ color: onTrack ? brand : "oklch(0.78 0.18 50)" }}>
+                      <span className={`font-bold ${onTrack ? "text-primary" : "text-orange-400"}`}>
                         {onTrack ? `${pct}%` : "At Risk"}
                       </span>
                     </div>
-                    <DotBar pct={onTrack ? pct : 45} color={barColor} />
+                    <div className="w-full bg-white/5 h-1 rounded-full overflow-hidden">
+                      <div
+                        className={`${onTrack ? "bg-primary" : "bg-orange-400"} h-1 rounded-full`}
+                        style={{ width: `${pct}%` }}
+                      />
+                    </div>
                   </div>
                 );
               })}
