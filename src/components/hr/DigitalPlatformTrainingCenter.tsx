@@ -21,6 +21,7 @@ import { Switch } from "@/components/ui/switch";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import type { Database } from "@/integrations/supabase/types";
+import { NumberTicker } from "@/components/magic/NumberTicker";
 
 type Platform = Database["public"]["Tables"]["digital_platforms"]["Row"];
 type Source = Database["public"]["Tables"]["platform_policy_sources"]["Row"];
@@ -131,15 +132,26 @@ export function DigitalPlatformTrainingCenter() {
         <div className="pointer-events-none absolute inset-0 -z-0 opacity-60">
           <div className="absolute -inset-x-20 -top-20 h-40 w-1/2 bg-gradient-to-r from-primary/0 via-primary/25 to-primary/0 blur-2xl animate-[shimmer-x_6s_linear_infinite]" />
         </div>
+        {/* floating orbs */}
+        <div className="pointer-events-none absolute inset-0 -z-0 overflow-hidden">
+          <div className="absolute top-2 right-10 size-24 rounded-full bg-primary/10 blur-3xl animate-[float-y_7s_ease-in-out_infinite]"/>
+          <div className="absolute bottom-0 left-1/3 size-20 rounded-full bg-emerald-500/10 blur-3xl animate-[float-y_9s_ease-in-out_infinite]" style={{ animationDelay: "1.2s" }}/>
+        </div>
+        {/* subtle grid */}
+        <div className="pointer-events-none absolute inset-0 -z-0 opacity-[0.04] [background-image:linear-gradient(to_right,currentColor_1px,transparent_1px),linear-gradient(to_bottom,currentColor_1px,transparent_1px)] [background-size:24px_24px]"/>
         <CardHeader className="relative flex flex-row items-center justify-between space-y-0 pb-3 gap-3 flex-wrap">
           <div>
             <CardTitle className="text-base flex items-center gap-2">
-              <ShieldCheck className="size-4 text-primary"/>
-              Digital Platform Training Center
+              <span className="relative inline-flex">
+                <span className="absolute inset-0 rounded-full bg-primary/30 blur-md animate-pulse"/>
+                <ShieldCheck className="relative size-4 text-primary"/>
+              </span>
+              <span className="bg-gradient-to-r from-foreground via-foreground to-primary bg-clip-text text-transparent">Digital Platform Training Center</span>
             </CardTitle>
             <p className="text-xs text-muted-foreground mt-1">
               Live policy monitoring, HR review workflow, training & acknowledgements — connected to Lovable Cloud.
             </p>
+            <LastSyncTicker iso={typeof (health.data as Record<string, unknown> | null)?.last_run === "string" ? String((health.data as Record<string, unknown>).last_run) : null}/>
           </div>
           <div className="flex items-center gap-2">
             <Badge variant="outline" className="gap-1.5 border-emerald-500/40 bg-emerald-500/5">
@@ -182,29 +194,64 @@ export function DigitalPlatformTrainingCenter() {
 
 function HealthRow({ health }: { health: Record<string, unknown> | null | undefined }) {
   const h = health ?? {};
-  const items: Array<[string, string | number]> = [
-    ["Active sources", `${h.active_sources ?? 0}/${h.total_sources ?? 0}`],
-    ["Pending review", Number(h.pending_updates ?? 0)],
-    ["Published updates", Number(h.published_updates ?? 0)],
-    ["Pending acks", Number(h.pending_acks ?? 0)],
-    ["Last run", h.last_run ? new Date(String(h.last_run)).toLocaleString() : "—"],
+  const active = Number(h.active_sources ?? 0);
+  const total = Number(h.total_sources ?? 0);
+  const pct = total > 0 ? Math.round((active / total) * 100) : 0;
+  type Item = { k: string; v: React.ReactNode; tone: string; icon: LucideIcon; bar?: number };
+  const items: Item[] = [
+    { k: "Active sources", v: <><NumberTicker value={active}/><span className="text-muted-foreground/70">/{total}</span></>, tone: "text-sky-300", icon: Radio, bar: pct },
+    { k: "Pending review", v: <NumberTicker value={Number(h.pending_updates ?? 0)}/>, tone: "text-amber-300", icon: Clock },
+    { k: "Published updates", v: <NumberTicker value={Number(h.published_updates ?? 0)}/>, tone: "text-emerald-300", icon: CheckCircle2 },
+    { k: "Pending acks", v: <NumberTicker value={Number(h.pending_acks ?? 0)}/>, tone: "text-rose-300", icon: ClipboardCheck },
+    { k: "Last run", v: h.last_run ? new Date(String(h.last_run)).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit", second: "2-digit" }) : "—", tone: "text-primary", icon: Activity },
   ];
   return (
     <div className="grid grid-cols-2 md:grid-cols-5 gap-3">
-      {items.map(([k, v], i) => (
-        <div
-          key={k}
-          className="group relative rounded-md border p-3 overflow-hidden transition-all duration-300 hover:border-primary/60 hover:-translate-y-0.5 hover:shadow-[0_8px_24px_-12px_rgba(99,102,241,0.45)] animate-fade-in"
-          style={{ animationDelay: `${i * 70}ms`, animationFillMode: "backwards" }}
-        >
-          <div className="pointer-events-none absolute inset-x-0 -top-1/2 h-full bg-gradient-to-b from-primary/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity"/>
-          <div className="text-[10px] uppercase tracking-wider text-muted-foreground flex items-center gap-1.5">
-            <span className="size-1 rounded-full bg-primary/70 animate-pulse"/>
-            {k}
+      {items.map((it, i) => {
+        const Ico = it.icon;
+        return (
+          <div
+            key={it.k}
+            className="group relative rounded-md border p-3 overflow-hidden transition-all duration-300 hover:border-primary/60 hover:-translate-y-0.5 hover:shadow-[0_8px_24px_-12px_rgba(99,102,241,0.45)] animate-fade-in"
+            style={{ animationDelay: `${i * 70}ms`, animationFillMode: "backwards" }}
+          >
+            <div className="pointer-events-none absolute inset-x-0 -top-1/2 h-full bg-gradient-to-b from-primary/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity"/>
+            <div className="pointer-events-none absolute -right-2 -top-2 size-12 rounded-full bg-primary/5 blur-2xl opacity-0 group-hover:opacity-100 transition-opacity"/>
+            <div className="flex items-center justify-between">
+              <div className="text-[10px] uppercase tracking-wider text-muted-foreground flex items-center gap-1.5">
+                <span className="size-1 rounded-full bg-primary/70 animate-pulse"/>
+                {it.k}
+              </div>
+              <Ico className={`size-3.5 ${it.tone} opacity-60 group-hover:opacity-100 transition-opacity`}/>
+            </div>
+            <div className={`text-lg font-bold mt-1 truncate tabular-nums ${it.tone}`}>{it.v}</div>
+            {it.bar !== undefined && (
+              <div className="mt-2 h-1 w-full rounded-full bg-muted/50 overflow-hidden">
+                <div
+                  className="h-full bg-gradient-to-r from-sky-400 to-primary rounded-full transition-[width] duration-700"
+                  style={{ width: `${it.bar}%` }}
+                />
+              </div>
+            )}
           </div>
-          <div className="text-lg font-bold mt-1 truncate tabular-nums">{v}</div>
-        </div>
-      ))}
+        );
+      })}
+    </div>
+  );
+}
+
+function LastSyncTicker({ iso }: { iso: string | null }) {
+  const [now, setNow] = useState(Date.now());
+  useEffect(() => {
+    const t = setInterval(() => setNow(Date.now()), 1000);
+    return () => clearInterval(t);
+  }, []);
+  if (!iso) return null;
+  const diff = Math.max(0, Math.floor((now - new Date(iso).getTime()) / 1000));
+  const label = diff < 60 ? `${diff}s ago` : diff < 3600 ? `${Math.floor(diff/60)}m ago` : `${Math.floor(diff/3600)}h ago`;
+  return (
+    <div className="mt-2 inline-flex items-center gap-1.5 text-[10px] text-muted-foreground/80">
+      <Clock className="size-3"/> Last sync <span className="text-primary tabular-nums font-medium">{label}</span>
     </div>
   );
 }
@@ -224,19 +271,40 @@ function PlatformCard({ platform, onOpen }: { platform: Platform; onOpen: () => 
     },
   });
   const pending = counts.data?.pending ?? 0;
+  const policies = counts.data?.policies ?? 0;
+  const published = counts.data?.published ?? 0;
+  const pubPct = policies > 0 ? Math.min(100, Math.round((published / policies) * 100)) : 0;
   return (
     <button
       onClick={onOpen}
       className="group relative text-left rounded-lg border p-4 bg-card overflow-hidden transition-all duration-300 hover:border-primary/60 hover:-translate-y-1 hover:shadow-[0_12px_30px_-12px_rgba(99,102,241,0.5)] animate-fade-in"
     >
       <div className="pointer-events-none absolute -inset-px rounded-lg opacity-0 group-hover:opacity-100 transition-opacity bg-gradient-to-br from-primary/10 via-transparent to-primary/5"/>
+      {/* corner sheen */}
+      <div className="pointer-events-none absolute -top-10 -right-10 size-24 rounded-full bg-primary/10 blur-2xl opacity-0 group-hover:opacity-100 transition-opacity"/>
       <div className="relative flex items-center justify-between">
-        <Icon className={`size-6 ${tint} transition-transform duration-300 group-hover:scale-110 group-hover:rotate-[-4deg]`} />
+        <span className="relative inline-flex items-center justify-center size-10 rounded-full bg-card">
+          <span className="absolute inset-0 rounded-full p-[1.5px] bg-[conic-gradient(from_0deg,theme(colors.primary/0.7),transparent_60%,theme(colors.primary/0.7))] opacity-60 group-hover:opacity-100 group-hover:animate-spin [animation-duration:6s]">
+            <span className="block size-full rounded-full bg-card"/>
+          </span>
+          <Icon className={`relative size-5 ${tint} transition-transform duration-300 group-hover:scale-110 group-hover:rotate-[-6deg]`} />
+        </span>
         <Badge variant="outline" className="text-[10px]">{platform.status}</Badge>
       </div>
-      <div className="relative mt-3 font-semibold">{platform.name}</div>
-      <div className="relative text-xs text-muted-foreground mt-1 tabular-nums">
-        {counts.data?.policies ?? 0} policies · {counts.data?.published ?? 0} published
+      <div className="relative mt-3 font-semibold flex items-center gap-2">
+        {platform.name}
+        <span className="ml-auto text-[10px] tabular-nums text-muted-foreground">{pubPct}%</span>
+      </div>
+      <div className="relative mt-1.5 h-1 w-full rounded-full bg-muted/40 overflow-hidden">
+        <div
+          className={`h-full rounded-full bg-gradient-to-r from-primary/60 to-primary transition-[width] duration-700`}
+          style={{ width: `${pubPct}%` }}
+        />
+      </div>
+      <div className="relative text-xs text-muted-foreground mt-2 tabular-nums flex items-center gap-2">
+        <FileText className="size-3"/> {policies} policies
+        <span className="text-muted-foreground/40">·</span>
+        <CheckCircle2 className="size-3 text-emerald-400/80"/> {published} live
       </div>
       {pending > 0 && (
         <div className="relative mt-2 inline-flex items-center gap-1.5 text-[11px] text-amber-300">
