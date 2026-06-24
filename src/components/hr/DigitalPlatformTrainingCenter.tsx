@@ -129,8 +129,7 @@ export function DigitalPlatformTrainingCenter() {
       <Card className="border-primary/20 relative overflow-hidden">
         {/* animated gradient sweep */}
         <div className="pointer-events-none absolute inset-0 -z-0 opacity-60">
-          <div className="absolute -inset-x-20 -top-20 h-40 bg-gradient-to-r from-primary/0 via-primary/20 to-primary/0 blur-2xl animate-[shimmer_6s_linear_infinite]"
-               style={{ backgroundSize: "200% 100%" }} />
+          <div className="absolute -inset-x-20 -top-20 h-40 w-1/2 bg-gradient-to-r from-primary/0 via-primary/25 to-primary/0 blur-2xl animate-[shimmer-x_6s_linear_infinite]" />
         </div>
         <CardHeader className="relative flex flex-row items-center justify-between space-y-0 pb-3 gap-3 flex-wrap">
           <div>
