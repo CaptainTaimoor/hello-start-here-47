@@ -328,6 +328,32 @@ function DashboardPage() {
         <LiveTicker />
       </motion.div>
 
+      {/* MILESTONE BANNER */}
+      {showMilestone && (
+        <motion.div
+          variants={{ hidden: { opacity: 0, y: -10 }, show: { opacity: 1, y: 0, transition: { duration: 0.5 } } }}
+          className="md:col-span-12 relative overflow-hidden rounded-2xl border border-primary/30 bg-[linear-gradient(90deg,oklch(0.22_0.08_240),oklch(0.2_0.06_280))] px-5 py-3 flex items-center gap-4"
+        >
+          <span className="grid place-items-center size-9 rounded-xl bg-primary/15 text-primary ring-1 ring-primary/30">
+            <Trophy className="size-4" />
+          </span>
+          <div className="flex-1 min-w-0">
+            <p className="text-sm text-white/90 truncate">
+              <span className="font-semibold text-white">Orvion World</span> just crossed
+              <span className="font-semibold text-primary"> 100k views</span> this week. Team win.
+            </p>
+          </div>
+          <span className="hidden sm:inline text-[10px] uppercase tracking-[0.18em] text-white/40 font-semibold">Auto-dismisses</span>
+          <button
+            onClick={dismissMilestone}
+            className="grid place-items-center size-7 rounded-lg text-white/50 hover:text-white hover:bg-white/10"
+            aria-label="Dismiss"
+          >
+            <X className="size-4" />
+          </button>
+        </motion.div>
+      )}
+
       {/* HERO */}
       <motion.div
         variants={{ hidden: { opacity: 0, y: 20 }, show: { opacity: 1, y: 0, transition: { duration: 0.7, ease: [0.16, 1, 0.3, 1] } } }}
@@ -361,11 +387,18 @@ function DashboardPage() {
 
         {/* Body */}
         <div className="relative z-10 px-8 md:px-10 pt-10 pb-10 flex flex-col lg:flex-row lg:items-end lg:justify-between gap-10">
-          <div className="max-w-2xl">
-            <h1 className="font-serif text-6xl md:text-7xl font-normal text-white leading-[1.02] tracking-[-0.03em]">
-              Welcome back, <span className="italic text-primary">{firstName}.</span>
+          <div className="max-w-2xl relative">
+            {/* Focus mantra watermark */}
+            <span
+              aria-hidden
+              className="pointer-events-none absolute -top-6 -left-2 select-none font-serif italic text-[7rem] md:text-[9rem] leading-none text-white/[0.025] whitespace-nowrap"
+            >
+              ship the work
+            </span>
+            <h1 className="relative font-serif text-6xl md:text-7xl font-normal text-white leading-[1.02] tracking-[-0.03em]">
+              {salutation}, <span className="italic text-primary">{firstName}.</span>
             </h1>
-            <p className="mt-5 text-base md:text-lg text-white/55 max-w-md font-light leading-relaxed">
+            <p className="relative mt-5 text-base md:text-lg text-white/55 max-w-md font-light leading-relaxed">
               You're signed in as <span className="text-white/90 font-medium">{role}</span>. Here's your production pulse for today.
             </p>
 
