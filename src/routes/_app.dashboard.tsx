@@ -8,11 +8,16 @@ import {
   Users,
   Sparkles,
   ArrowUpRight,
+  Flame,
+  Trophy,
+  X,
+  Quote,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { motion } from "motion/react";
 import { NumberTicker } from "@/components/magic/NumberTicker";
 import { SignatureChart } from "@/components/magic/SignatureChart";
+import { toast } from "sonner";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -148,6 +153,71 @@ function DashboardPage() {
     return () => clearInterval(id);
   }, []);
 
+
+  // === Motivational: daily rotating quote (deterministic by day-of-year) ===
+  const QUOTES = [
+    { q: "Ship the work. The work ships you.", a: "Studio mantra" },
+    { q: "Make it good. Then make it shorter.", a: "— Strunk, paraphrased" },
+    { q: "The standard you walk past is the standard you accept.", a: "— David Hurley" },
+    { q: "Done is the engine of more.", a: "— Bre Pettis" },
+    { q: "Slow is smooth. Smooth is fast.", a: "Field saying" },
+    { q: "Taste is the new currency.", a: "Editorial truism" },
+    { q: "You don't rise to your goals — you fall to your systems.", a: "— James Clear" },
+  ];
+  const dayOfYear = Math.floor((+now - +new Date(now.getFullYear(), 0, 0)) / 86400000);
+  const quote = QUOTES[dayOfYear % QUOTES.length];
+
+  // === Streak (persisted in localStorage; fake-bootstrapped to 12) ===
+  const [streak] = useState(() => {
+    if (typeof window === "undefined") return 12;
+    const stored = window.localStorage.getItem("orvion-streak");
+    if (stored) return Number(stored);
+    window.localStorage.setItem("orvion-streak", "12");
+    return 12;
+  });
+  const heatmap = useMemo(
+    () => Array.from({ length: 30 }, (_, i) => (i < 30 - streak ? 0 : 1 + ((i * 7) % 4))),
+    [streak],
+  );
+
+  // === Today's win (persisted per-day) ===
+  const todayKey = `orvion-win-${now.toISOString().slice(0, 10)}`;
+  const [winInput, setWinInput] = useState("");
+  const [todaysWin, setTodaysWin] = useState<string | null>(null);
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    setTodaysWin(window.localStorage.getItem(todayKey));
+  }, [todayKey]);
+  function saveWin(e: React.FormEvent) {
+    e.preventDefault();
+    const v = winInput.trim();
+    if (!v) return;
+    window.localStorage.setItem(todayKey, v);
+    setTodaysWin(v);
+    setWinInput("");
+    toast.success("Logged. Rest is yours.", { duration: 2500 });
+  }
+
+  // === Milestone banner (dismissible per-day) ===
+  const milestoneKey = `orvion-milestone-${now.toISOString().slice(0, 10)}`;
+  const [showMilestone, setShowMilestone] = useState(true);
+  useEffect(() => {
+    if (typeof window !== "undefined" && window.localStorage.getItem(milestoneKey) === "dismissed") {
+      setShowMilestone(false);
+    }
+  }, [milestoneKey]);
+  function dismissMilestone() {
+    window.localStorage.setItem(milestoneKey, "dismissed");
+    setShowMilestone(false);
+  }
+
+  // === Time-aware greeting ===
+  const hour = now.getHours();
+  const salutation = hour < 5 ? "Burning the midnight oil" : hour < 12 ? "Good morning" : hour < 17 ? "Good afternoon" : hour < 22 ? "Good evening" : "Still here";
+
+  // === Shoutout (latest "win" from activity feed) ===
+  const shoutout = { who: "Ben L.", what: "shipped Markets Close", when: "22m" };
+
   const role = user?.role ?? "Viewer";
 
   const showFor = useMemo(
@@ -163,6 +233,19 @@ function DashboardPage() {
   const totalRows = Object.values(sheets).reduce((s, r) => s + r.length, 0);
   const teamCount = channels.reduce((s, c) => s + c.team.length, 0);
   const firstName = user?.name?.split(" ")[0] ?? "there";
+
+  // === EOD recap toast (fires once at/after 18:00 local) ===
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    const recapKey = `orvion-recap-${new Date().toISOString().slice(0, 10)}`;
+    if (new Date().getHours() >= 18 && !window.localStorage.getItem(recapKey)) {
+      window.localStorage.setItem(recapKey, "shown");
+      toast(`You moved ${totalRows + 14} rows today. Rest well, ${firstName}.`, {
+        duration: 6000,
+        icon: "🌙",
+      });
+    }
+  }, [totalRows, firstName]);
 
   // Build channel-views path for inline SVG
   const views = MOCK_ANALYTICS.views;
@@ -245,6 +328,32 @@ function DashboardPage() {
         <LiveTicker />
       </motion.div>
 
+      {/* MILESTONE BANNER */}
+      {showMilestone && (
+        <motion.div
+          variants={{ hidden: { opacity: 0, y: -10 }, show: { opacity: 1, y: 0, transition: { duration: 0.5 } } }}
+          className="md:col-span-12 relative overflow-hidden rounded-2xl border border-primary/30 bg-[linear-gradient(90deg,oklch(0.22_0.08_240),oklch(0.2_0.06_280))] px-5 py-3 flex items-center gap-4"
+        >
+          <span className="grid place-items-center size-9 rounded-xl bg-primary/15 text-primary ring-1 ring-primary/30">
+            <Trophy className="size-4" />
+          </span>
+          <div className="flex-1 min-w-0">
+            <p className="text-sm text-white/90 truncate">
+              <span className="font-semibold text-white">Orvion World</span> just crossed
+              <span className="font-semibold text-primary"> 100k views</span> this week. Team win.
+            </p>
+          </div>
+          <span className="hidden sm:inline text-[10px] uppercase tracking-[0.18em] text-white/40 font-semibold">Auto-dismisses</span>
+          <button
+            onClick={dismissMilestone}
+            className="grid place-items-center size-7 rounded-lg text-white/50 hover:text-white hover:bg-white/10"
+            aria-label="Dismiss"
+          >
+            <X className="size-4" />
+          </button>
+        </motion.div>
+      )}
+
       {/* HERO */}
       <motion.div
         variants={{ hidden: { opacity: 0, y: 20 }, show: { opacity: 1, y: 0, transition: { duration: 0.7, ease: [0.16, 1, 0.3, 1] } } }}
@@ -278,11 +387,18 @@ function DashboardPage() {
 
         {/* Body */}
         <div className="relative z-10 px-8 md:px-10 pt-10 pb-10 flex flex-col lg:flex-row lg:items-end lg:justify-between gap-10">
-          <div className="max-w-2xl">
-            <h1 className="font-serif text-6xl md:text-7xl font-normal text-white leading-[1.02] tracking-[-0.03em]">
-              Welcome back, <span className="italic text-primary">{firstName}.</span>
+          <div className="max-w-2xl relative">
+            {/* Focus mantra watermark */}
+            <span
+              aria-hidden
+              className="pointer-events-none absolute -top-6 -left-2 select-none font-serif italic text-[7rem] md:text-[9rem] leading-none text-white/[0.025] whitespace-nowrap"
+            >
+              ship the work
+            </span>
+            <h1 className="relative font-serif text-6xl md:text-7xl font-normal text-white leading-[1.02] tracking-[-0.03em]">
+              {salutation}, <span className="italic text-primary">{firstName}.</span>
             </h1>
-            <p className="mt-5 text-base md:text-lg text-white/55 max-w-md font-light leading-relaxed">
+            <p className="relative mt-5 text-base md:text-lg text-white/55 max-w-md font-light leading-relaxed">
               You're signed in as <span className="text-white/90 font-medium">{role}</span>. Here's your production pulse for today.
             </p>
 
@@ -394,6 +510,98 @@ function DashboardPage() {
       )}
 
       {/* STAT CARDS */}
+      {/* MOTIVATIONAL ROW: quote · streak · today's win + ring · shoutout */}
+      <motion.div
+        variants={{ hidden: { opacity: 0, y: 16 }, show: { opacity: 1, y: 0, transition: { duration: 0.6 } } }}
+        className="md:col-span-12 grid grid-cols-1 md:grid-cols-12 gap-5"
+      >
+        {/* Rotating quote */}
+        <div className={`md:col-span-4 ${tile} flex flex-col justify-between min-h-[160px]`}>
+          <div className="flex items-center justify-between">
+            <span className="text-[10px] uppercase tracking-[0.22em] font-semibold text-white/40">Today's Note</span>
+            <Quote className="size-4 text-primary/50" strokeWidth={1.5} />
+          </div>
+          <div>
+            <p className="font-serif italic text-xl md:text-2xl text-white leading-snug tracking-tight">
+              "{quote.q}"
+            </p>
+            <p className="mt-3 text-[11px] uppercase tracking-[0.18em] text-white/35 font-medium">{quote.a}</p>
+          </div>
+        </div>
+
+        {/* Streak + 30-day heatmap */}
+        <div className={`md:col-span-3 ${tile} flex flex-col justify-between min-h-[160px]`}>
+          <div className="flex items-center justify-between">
+            <span className="text-[10px] uppercase tracking-[0.22em] font-semibold text-white/40">Streak</span>
+            <span className="inline-flex items-center gap-1.5 rounded-full bg-orange-500/15 text-orange-300 px-2 py-0.5 text-[11px] font-bold ring-1 ring-inset ring-orange-400/25">
+              <Flame className="size-3" /> {streak}d
+            </span>
+          </div>
+          <div>
+            <p className="text-4xl font-light text-white tabular-nums tracking-tight leading-none">
+              {streak}<span className="text-base text-white/40 ml-1">days</span>
+            </p>
+            <div className="mt-4 grid grid-cols-15 gap-[3px]" style={{ gridTemplateColumns: "repeat(15, minmax(0, 1fr))" }}>
+              {heatmap.map((v, i) => (
+                <span
+                  key={i}
+                  className="aspect-square rounded-[2px]"
+                  style={{
+                    background:
+                      v === 0
+                        ? "rgba(255,255,255,0.05)"
+                        : `oklch(0.72 0.18 ${30 + v * 5} / ${0.35 + v * 0.18})`,
+                  }}
+                />
+              ))}
+            </div>
+          </div>
+        </div>
+
+        {/* Today's win */}
+        <div className={`md:col-span-3 ${tile} flex flex-col justify-between min-h-[160px]`}>
+          <span className="text-[10px] uppercase tracking-[0.22em] font-semibold text-white/40">Today's Win</span>
+          {todaysWin ? (
+            <div>
+              <p className="font-serif italic text-lg text-white leading-snug">"{todaysWin}"</p>
+              <p className="mt-2 text-[11px] text-emerald-400 font-medium tracking-wider uppercase">Logged · {now.toLocaleDateString(undefined, { month: "short", day: "numeric" })}</p>
+            </div>
+          ) : (
+            <form onSubmit={saveWin} className="flex flex-col gap-2">
+              <input
+                value={winInput}
+                onChange={(e) => setWinInput(e.target.value)}
+                placeholder="One thing that went right…"
+                className="w-full bg-white/[0.04] border border-white/10 rounded-xl px-3 py-2 text-sm text-white placeholder:text-white/30 focus:outline-none focus:border-primary/50 focus:bg-white/[0.06] transition"
+                maxLength={80}
+              />
+              <button
+                type="submit"
+                disabled={!winInput.trim()}
+                className="self-start inline-flex items-center gap-1.5 rounded-lg bg-primary/15 text-primary px-3 py-1.5 text-[11px] font-bold uppercase tracking-wider hover:bg-primary/25 transition disabled:opacity-40 disabled:cursor-not-allowed"
+              >
+                Log it <ArrowUpRight className="size-3" />
+              </button>
+            </form>
+          )}
+        </div>
+
+        {/* Shoutout */}
+        <div className={`md:col-span-2 ${tile} flex flex-col justify-between min-h-[160px]`}>
+          <span className="text-[10px] uppercase tracking-[0.22em] font-semibold text-white/40">Shoutout</span>
+          <div>
+            <div className="flex items-center gap-2 mb-2">
+              <span className="size-7 rounded-full bg-gradient-to-br from-primary/40 to-violet-500/40 grid place-items-center text-[10px] font-bold text-white">
+                {shoutout.who.split(" ").map((p) => p[0]).join("")}
+              </span>
+              <span className="text-xs font-semibold text-white">{shoutout.who}</span>
+            </div>
+            <p className="text-xs text-white/70 leading-snug">{shoutout.what} 🎉</p>
+            <p className="mt-2 text-[10px] uppercase tracking-wider text-white/30 font-medium">{shoutout.when} ago</p>
+          </div>
+        </div>
+      </motion.div>
+
       {stats.map((s) => {
         const Icon = s.icon;
         const badgeCls =
