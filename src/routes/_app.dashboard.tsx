@@ -25,6 +25,90 @@ import { MOCK_ANALYTICS } from "@/lib/mock-data";
 import { Link } from "@tanstack/react-router";
 import { LiveTicker } from "@/components/layout/LiveTicker";
 
+// Channel brand color palette — keyed deterministically by index
+const CHANNEL_COLORS = [
+  "oklch(0.82 0.16 205)",
+  "oklch(0.7 0.2 285)",
+  "oklch(0.75 0.18 175)",
+  "oklch(0.78 0.18 35)",
+  "oklch(0.7 0.22 25)",
+  "oklch(0.72 0.2 145)",
+];
+
+// Tiny inline sparkline used next to stat numbers
+function MiniSpark({ data, color = "oklch(0.82 0.16 205)" }: { data: number[]; color?: string }) {
+  const W = 64, H = 22, PAD = 2;
+  const min = Math.min(...data), max = Math.max(...data);
+  const range = max - min || 1;
+  const pts = data.map((v, i) => {
+    const x = PAD + (i / (data.length - 1)) * (W - PAD * 2);
+    const y = H - PAD - ((v - min) / range) * (H - PAD * 2);
+    return `${i === 0 ? "M" : "L"}${x.toFixed(1)},${y.toFixed(1)}`;
+  }).join(" ");
+  const last = data[data.length - 1];
+  const lx = W - PAD;
+  const ly = H - PAD - ((last - min) / range) * (H - PAD * 2);
+  return (
+    <svg viewBox={`0 0 ${W} ${H}`} className="w-16 h-6 overflow-visible" aria-hidden>
+      <path d={pts} fill="none" stroke={color} strokeWidth={1.4} strokeLinecap="round" strokeLinejoin="round" className="spark-mini" style={{ color }} />
+      <circle cx={lx} cy={ly} r={1.8} fill={color} />
+    </svg>
+  );
+}
+
+// 10-cell dot bar (filled = pct/10)
+function DotBar({ pct, color }: { pct: number; color: string }) {
+  const filled = Math.max(0, Math.min(10, Math.round(pct / 10)));
+  return (
+    <div className="flex gap-[3px]">
+      {Array.from({ length: 10 }).map((_, i) => (
+        <span
+          key={i}
+          className="h-1.5 flex-1 rounded-[2px] transition-colors"
+          style={{
+            background: i < filled ? color : "rgba(255,255,255,0.06)",
+            boxShadow: i < filled ? `0 0 6px ${color}` : undefined,
+          }}
+        />
+      ))}
+    </div>
+  );
+}
+
+// Radial donut (System Health %)
+function RadialPct({ value, size = 78, stroke = 7 }: { value: number; size?: number; stroke?: number }) {
+  const r = (size - stroke) / 2;
+  const C = 2 * Math.PI * r;
+  const offset = C * (1 - value / 100);
+  return (
+    <div className="relative" style={{ width: size, height: size }}>
+      <svg width={size} height={size} className="-rotate-90">
+        <defs>
+          <linearGradient id="rad-g" x1="0" y1="0" x2="1" y2="1">
+            <stop offset="0%" stopColor="oklch(0.85 0.16 200)" />
+            <stop offset="100%" stopColor="oklch(0.7 0.2 285)" />
+          </linearGradient>
+        </defs>
+        <circle cx={size / 2} cy={size / 2} r={r} fill="none" stroke="rgba(255,255,255,0.08)" strokeWidth={stroke} />
+        <motion.circle
+          cx={size / 2} cy={size / 2} r={r}
+          fill="none" stroke="url(#rad-g)" strokeWidth={stroke} strokeLinecap="round"
+          strokeDasharray={C}
+          initial={{ strokeDashoffset: C }}
+          animate={{ strokeDashoffset: offset }}
+          transition={{ duration: 1.6, ease: [0.16, 1, 0.3, 1], delay: 0.3 }}
+        />
+      </svg>
+      <div className="absolute inset-0 grid place-items-center">
+        <span className="text-base font-medium text-white tabular-nums">
+          <NumberTicker value={value} decimals={1} />
+          <span className="text-[10px] text-primary/70 ml-0.5">%</span>
+        </span>
+      </div>
+    </div>
+  );
+}
+
 export const Route = createFileRoute("/_app/dashboard")({
   head: () => ({ meta: [{ title: "Dashboard — Orvion Media" }] }),
   component: DashboardPage,
@@ -95,7 +179,7 @@ function DashboardPage() {
   }, [channels, views]);
 
   const activity = [
-    { who: "Aisha K.", what: "edited Daily Content (3 rows)", when: "5m" },
+    { who: "Aisha K.", what: "is editing Daily Content", when: "now", typing: true },
     { who: "Ben L.", what: "marked Markets close render complete", when: "22m" },
     { who: "Carla R.", what: "added KPI note for Orvion World", when: "1h" },
     { who: "Priya M.", what: "approved thumbnail v3", when: "2h" },
@@ -108,6 +192,7 @@ function DashboardPage() {
       value: 1,
       label: "Assigned Projects",
       badge: { text: "+1", tone: "primary" as const },
+      spark: [2, 3, 2, 4, 3, 5, 4, 6, 5, 7, 6, 8],
     },
     dashboardCards.team && {
       key: "t",
@@ -115,6 +200,7 @@ function DashboardPage() {
       value: teamCount,
       label: "Team Members",
       badge: { text: "Active", tone: "muted" as const },
+      spark: [10, 12, 11, 13, 14, 13, 15, 16, 15, 17, 18, 18],
     },
     dashboardCards.tasks && {
       key: "ts",
@@ -122,6 +208,7 @@ function DashboardPage() {
       value: 12,
       label: "Pending Tasks",
       badge: { text: "3 Due", tone: "danger" as const },
+      spark: [18, 16, 17, 14, 15, 13, 14, 12, 13, 11, 12, 12],
     },
     dashboardCards.sheets && {
       key: "sh",
@@ -129,6 +216,7 @@ function DashboardPage() {
       value: totalRows,
       label: "Pending Sheet Rows",
       badge: null,
+      spark: [4, 6, 5, 8, 7, 9, 8, 10, 9, 11, 10, 12],
     },
   ].filter(Boolean) as Array<{
     key: string;
@@ -136,6 +224,7 @@ function DashboardPage() {
     value: number;
     label: string;
     badge: { text: string; tone: "primary" | "muted" | "danger" } | null;
+    spark: number[];
   }>;
 
   const tile =
@@ -242,13 +331,8 @@ function DashboardPage() {
           <div className="hidden lg:flex flex-col gap-7 items-end shrink-0">
             <div className="text-right">
               <div className="text-[10px] font-bold text-white/40 uppercase tracking-[0.2em] mb-1.5">System Health</div>
-              <div className="flex items-end gap-3">
-                <span className="text-3xl font-light text-white tracking-tighter tabular-nums">
-                  <NumberTicker value={98.4} decimals={1} /><span className="text-base text-primary/70">%</span>
-                </span>
-                <svg className="w-16 h-8 text-emerald-400/60 mb-1.5" viewBox="0 0 100 40" preserveAspectRatio="none">
-                  <path className="spark-path" d="M0 35 Q 10 20 20 30 T 40 10 T 60 25 T 80 15 T 100 35" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
-                </svg>
+              <div className="flex items-center justify-end gap-3">
+                <RadialPct value={98.4} />
               </div>
             </div>
 
@@ -286,10 +370,17 @@ function DashboardPage() {
             <div className="space-y-5 flex-1">
               {activity.map((a, i) => (
                 <div key={i}>
-                  <p className="text-sm text-white/80 leading-snug">
+                  <p className="text-sm text-white/80 leading-snug flex items-center gap-2 flex-wrap">
                     <span className="font-semibold text-white">{a.who}</span> {a.what}
+                    {a.typing && (
+                      <span className="typing-dots text-primary" aria-label="typing">
+                        <span /><span /><span />
+                      </span>
+                    )}
                   </p>
-                  <span className="text-[11px] text-white/30 tracking-wider uppercase">{a.when} ago</span>
+                  <span className={`text-[11px] tracking-wider uppercase ${a.typing ? "text-emerald-400" : "text-white/30"}`}>
+                    {a.typing ? "live · now" : `${a.when} ago`}
+                  </span>
                 </div>
               ))}
             </div>
@@ -325,7 +416,10 @@ function DashboardPage() {
             <p className="text-4xl md:text-5xl font-light text-white tracking-[-0.02em] mb-1 tabular-nums">
               <NumberTicker value={s.value} />
             </p>
-            <p className="text-[11px] text-white/40 uppercase tracking-[0.18em] font-semibold">{s.label}</p>
+            <div className="flex items-end justify-between gap-3">
+              <p className="text-[11px] text-white/40 uppercase tracking-[0.18em] font-semibold">{s.label}</p>
+              <MiniSpark data={s.spark} color={s.badge?.tone === "danger" ? "oklch(0.7 0.2 25)" : "oklch(0.82 0.16 205)"} />
+            </div>
           </motion.div>
         );
       })}
@@ -362,20 +456,21 @@ function DashboardPage() {
               {channels.map((c, i) => {
                 const onTrack = c.kpiStatus === "On Track";
                 const pct = onTrack ? 88 - i * 6 : 45;
+                const brand = CHANNEL_COLORS[i % CHANNEL_COLORS.length];
+                const barColor = onTrack ? brand : "oklch(0.72 0.18 50)";
                 return (
-                  <div key={c.id}>
+                  <div key={c.id} className="relative pl-3">
+                    <span
+                      className="absolute left-0 top-0.5 bottom-0.5 w-[3px] rounded-full"
+                      style={{ background: brand, boxShadow: `0 0 8px ${brand}` }}
+                    />
                     <div className="flex justify-between text-xs mb-2">
                       <span className="text-white/80 font-medium truncate">{c.name}</span>
-                      <span className={`font-bold ${onTrack ? "text-primary" : "text-orange-400"}`}>
+                      <span className="font-bold tabular-nums" style={{ color: onTrack ? brand : "oklch(0.78 0.18 50)" }}>
                         {onTrack ? `${pct}%` : "At Risk"}
                       </span>
                     </div>
-                    <div className="w-full bg-white/5 h-1 rounded-full overflow-hidden">
-                      <div
-                        className={`${onTrack ? "bg-primary" : "bg-orange-400"} h-1 rounded-full`}
-                        style={{ width: `${pct}%` }}
-                      />
-                    </div>
+                    <DotBar pct={onTrack ? pct : 45} color={barColor} />
                   </div>
                 );
               })}
