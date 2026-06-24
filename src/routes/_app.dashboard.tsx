@@ -23,6 +23,7 @@ import {
 import { useApp } from "@/lib/app-store";
 import { MOCK_ANALYTICS } from "@/lib/mock-data";
 import { Link } from "@tanstack/react-router";
+import { LiveTicker } from "@/components/layout/LiveTicker";
 
 export const Route = createFileRoute("/_app/dashboard")({
   head: () => ({ meta: [{ title: "Dashboard — Orvion Media" }] }),
@@ -140,6 +141,14 @@ function DashboardPage() {
       variants={{ hidden: {}, show: { transition: { staggerChildren: 0.06, delayChildren: 0.1 } } }}
       className="grid grid-cols-1 md:grid-cols-12 gap-5 auto-rows-min"
     >
+      {/* LIVE TICKER */}
+      <motion.div
+        variants={{ hidden: { opacity: 0, y: 10 }, show: { opacity: 1, y: 0, transition: { duration: 0.5 } } }}
+        className="md:col-span-12 rounded-2xl overflow-hidden border border-white/[0.06]"
+      >
+        <LiveTicker />
+      </motion.div>
+
       {/* HERO */}
       <motion.div
         variants={{ hidden: { opacity: 0, y: 20 }, show: { opacity: 1, y: 0, transition: { duration: 0.7, ease: [0.16, 1, 0.3, 1] } } }}
