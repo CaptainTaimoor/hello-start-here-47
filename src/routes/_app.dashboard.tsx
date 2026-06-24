@@ -154,14 +154,9 @@ function DashboardPage() {
         variants={{ hidden: { opacity: 0, y: 20 }, show: { opacity: 1, y: 0, transition: { duration: 0.7, ease: [0.16, 1, 0.3, 1] } } }}
         className="md:col-span-8 relative overflow-hidden rounded-[2rem] border border-white/10 bg-[oklch(0.16_0.03_235)] shadow-2xl shadow-[oklch(0.5_0.15_220/0.18)] min-h-[360px]"
       >
-        {/* premium ambient layer */}
-        <div className="pointer-events-none absolute inset-0 overflow-hidden">
-          <div className="hero-conic" />
-          <div className="hero-orb-a pointer-events-none absolute -top-40 -right-40 size-[520px] rounded-full bg-primary/20 blur-[130px]" />
-          <div className="hero-orb-b pointer-events-none absolute -bottom-28 -left-28 size-[360px] rounded-full bg-violet-500/20 blur-[110px]" />
-          <div className="absolute inset-0 bg-gradient-to-b from-white/[0.04] via-transparent to-black/30" />
-          <div className="hero-shine" />
-        </div>
+        {/* ambient glows */}
+        <div className="pointer-events-none absolute -top-48 -right-48 size-[500px] rounded-full bg-primary/10 blur-[120px]" />
+        <div className="pointer-events-none absolute -bottom-24 -left-24 size-[300px] rounded-full bg-violet-600/10 blur-[100px]" />
 
         {/* Top utility bar */}
         <div className="relative z-10 flex items-center justify-between px-8 md:px-10 pt-7 gap-4">
