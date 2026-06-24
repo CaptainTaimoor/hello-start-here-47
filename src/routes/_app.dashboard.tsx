@@ -234,6 +234,19 @@ function DashboardPage() {
   const teamCount = channels.reduce((s, c) => s + c.team.length, 0);
   const firstName = user?.name?.split(" ")[0] ?? "there";
 
+  // === EOD recap toast (fires once at/after 18:00 local) ===
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    const recapKey = `orvion-recap-${new Date().toISOString().slice(0, 10)}`;
+    if (new Date().getHours() >= 18 && !window.localStorage.getItem(recapKey)) {
+      window.localStorage.setItem(recapKey, "shown");
+      toast(`You moved ${totalRows + 14} rows today. Rest well, ${firstName}.`, {
+        duration: 6000,
+        icon: "🌙",
+      });
+    }
+  }, [totalRows, firstName]);
+
   // Build channel-views path for inline SVG
   const views = MOCK_ANALYTICS.views;
   const sigLabels = views.map((v) => v.day);
