@@ -13,6 +13,7 @@ import appCss from "../styles.css?url";
 import { reportLovableError } from "../lib/lovable-error-reporting";
 import { AppStoreProvider } from "../lib/app-store";
 import { AuroraBackground } from "../components/magic/AuroraBackground";
+import { Meteors } from "../components/magic/Meteors";
 
 function NotFoundComponent() {
   return (
@@ -134,6 +135,7 @@ function RootComponent() {
     <QueryClientProvider client={queryClient}>
       <AppStoreProvider>
         <AuroraBackground />
+        <Meteors number={18} className="fixed inset-0 -z-[5]" />
         {/* Required: nested routes render here. Removing <Outlet /> breaks all child routes. */}
         <Outlet />
       </AppStoreProvider>
